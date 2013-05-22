@@ -1,0 +1,541 @@
+<?php
+/**
+* Implements hook_schema().
+*/
+function datalogger_schema() {
+
+	return;
+
+  /*1.Table: gammu*/
+  $schema['gammu'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'Version' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+  );
+  
+  /*2.Table: inbox*/
+  $schema['inbox'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'UpdatedInDB' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP',
+      ),
+      'ReceivingDateTime' => array(
+        'description' => 'TODO: please describe this field!',
+        // 'type' => 'timestamp',
+        'type' => 'text',
+        'not null' => TRUE,
+        // 'default' => '0000-00-00 00:00:00',
+      ),
+      'Text' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'SenderNumber' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '20',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'Coding' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => TRUE,
+        'default' => 'Default_No_Compression',
+      ),
+      'UDH' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'SMSCNumber' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '20',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'Class' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'TextDecoded' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'ID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'RecipientID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'Processed' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'size' => 'small',
+        'not null' => TRUE,
+        'default' => 0
+      ),
+    ),
+    'primary key' => array('ID'),
+  );
+  
+  /*3.Table: outbox*/
+  $schema['outbox'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'UpdatedInDB' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP',
+      ),
+      'InsertIntoDB' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => '0000-00-00 00:00:00',
+      ),
+      'SendingDateTime' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => '0000-00-00 00:00:00',
+      ),
+      'SendBefore' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'time',
+        'not null' => TRUE,
+        'default' => '23:59:59',
+      ),
+      'SendAfter' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'time',
+        'not null' => TRUE,
+        'default' => '00:00:00',
+      ),
+      'Text' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'DestinationNumber' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '20',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'Coding' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => TRUE,
+        'default' => 'Default_No_Compression',
+      ),
+      'UDH' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'Class' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => -1,
+      ),
+      'TextDecoded' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'ID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'MultiPart' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => FALSE,
+        'default' => 'false',
+      ),
+      'RelativeValidity' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => -1,
+      ),
+      'SenderID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => FALSE,
+      ),
+      'SendingTimeOut' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => FALSE,
+        'default' => '0000-00-00 00:00:00',
+      ),
+      'DeliveryReport' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => FALSE,
+        'default' => 'default',
+      ),
+      'CreatorID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('ID'),
+    'indexes' => array(
+      'outbox_date' => array('SendingDateTime', 'SendingTimeOut'),
+      'outbox_sender' => array('SenderID'),
+    ),
+  );
+
+  /*4.Table: outbox_multipart*/
+  $schema['outbox_multipart'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'Text' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'Coding' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => TRUE,
+        'default' => 'Default_No_Compression',
+      ),
+      'UDH' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'Class' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => -1,
+      ),
+      'TextDecoded' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => FALSE,
+      ),
+      'ID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'SequencePosition' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'primary key' => array('ID', 'SequencePosition'),
+  );
+
+  /*5.Table: */
+  $schema['pbk'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'ID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'GroupID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'Name' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'Number' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('ID'),
+  );
+  
+  /*6.Table: */
+  $schema['pbk_groups'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'Name' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'ID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('ID'),
+  );
+  
+  /*7.Table:*/
+  $schema['phones'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'ID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'UpdatedInDB' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP',
+      ),
+      'InsertIntoDB' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => '0000-00-00 00:00:00',
+      ),
+      'TimeOut' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => '0000-00-00 00:00:00',
+      ),
+      'Send' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => TRUE,
+        'default' => 'no',
+      ),
+      'Receive' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => TRUE,
+        'default' => 'no',
+      ),
+      'IMEI' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '35',
+        'not null' => TRUE,
+      ),
+      'Client' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'Battery' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'Signal' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'Sent' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'Received' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('IMEI'),
+  );       
+  
+  /*8.Table: */
+  $schema['sentitems'] = array(
+    'description' => 'TODO: please describe this table!',
+    'fields' => array(
+      'UpdatedInDB' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP',
+      ),
+      'InsertIntoDB' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => '0000-00-00 00:00:00',
+      ),
+      'SendingDateTime' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => '0000-00-00 00:00:00',
+      ),
+      'DeliveryDateTime' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'timestamp',
+        'not null' => FALSE,
+      ),
+      'Text' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'DestinationNumber' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '20',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'Coding' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => TRUE,
+        'default' => 'Default_No_Compression',
+      ),
+      'UDH' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'SMSCNumber' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '20',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'Class' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'TextDecoded' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'ID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'SenderID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+      ),
+      'SequencePosition' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'Status' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'enum',
+        'not null' => TRUE,
+        'default' => 'SendingOK',
+      ),
+      'StatusError' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'TPMR' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'RelativeValidity' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => -1,
+      ),
+      'CreatorID' => array(
+        'description' => 'TODO: please describe this field!',
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('ID', 'SequencePosition'),
+    'indexes' => array(
+      'sentitems_date' => array('DeliveryDateTime'),
+      'sentitems_dest' => array('DestinationNumber'),
+      'sentitems_sender' => array('SenderID'),
+      'sentitems_tpmr' => array('TPMR'),
+    ),
+  );
+  return $schema;
+}
+
+/**
+* Implements hook_install().
+*/
+function mymodule_install() {
+  // Create my tables.
+  drupal_install_schema('datalogger');
+}
+
+
+/**
+* Implements hook_uninstall().
+*/
+function mymodule_uninstall() {
+  // Drop my tables.
+  drupal_uninstall_schema('datalogger');
+}
+
+function datalogger_update_xx() {
+  
+  // translate t('Report monthly rainfall data (BKT14 form)');
+  
+}

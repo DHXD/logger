@@ -1,0 +1,5 @@
+name = Datalogger
+description = Datalogger.
+core = 7.x
+package = datalogger
+version = 2.0

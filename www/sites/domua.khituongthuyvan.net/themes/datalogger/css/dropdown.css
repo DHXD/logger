@@ -1,0 +1,26 @@
+/* ================================================================ 
+This copyright notice must be untouched at all times.
+
+The original version of this stylesheet and the associated (x)html
+is available at http://www.cssplay.co.uk/menus/dd_valid.html
+Copyright (c) 2005-2007 Stu Nicholls. All rights reserved.
+This stylesheet and the assocaited (x)html may be modified in any 
+way to fit your requirements.
+=================================================================== */
+/* common styling */
+div.menu {font-family: verdana, arial, sans-serif; min-width:180px; width:auto; height:100px; font-size:12px; z-index:100;}
+div.menu ul li a, div.menu ul li a:visited {display:block; text-decoration:none; min-width:125px; width:auto; height:24px; text-align:left; padding:0px 5px 0px 5px; color:#fff; border:1px solid #fff; background:transparent; line-height:24px; white-space:nowrap;}
+div.menu ul {padding:0; margin:0; list-style: none;}
+div.menu ul li {/*float:left; */position:relative; min-width:125px; width:auto;}
+div.menu ul li ul {display: none;}
+
+/* specific to non IE browsers */
+div.menu ul li:hover a {color:#fff; background:#36f; cursor:hand; cursor:pointer;}
+div.menu ul li:hover ul {display:block; position:absolute; top:0px; left:190px; width:auto;}
+div.menu ul li:hover ul li a.hide {background:#6a3; color:#fff; cursor:hand; cursor:pointer;}
+div.menu ul li:hover ul li:hover a.hide {background:#6fc; color:#000; cursor:hand; cursor:pointer;}
+div.menu ul li:hover ul li ul {display: none;}
+div.menu ul li:hover ul li a {display:block; background:#ddd; color:#000;}
+div.menu ul li:hover ul li a:hover {background:#6fc; color:#000;}
+div.menu ul li:hover ul li:hover ul {display:block; position:absolute; left:190px; top:0;}
+div.menu ul li:hover ul li:hover ul.left {left:-180px;}

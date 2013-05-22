@@ -1,0 +1,15 @@
+name = Custom Pagers
+core = 7.x
+description = Allows administrators to define custom pagers for navigation in lists of nodes.
+package = Other
+
+files[] = views/custom_pagers.views.inc
+files[] = views/custom_pagers_plugin_display_simple.inc
+files[] = views/custom_pagers_plugin_style_php_array.inc
+
+; Information added by drupal.org packaging script on 2011-09-22
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "custom_pagers"
+datestamp = "1316650200"
+
