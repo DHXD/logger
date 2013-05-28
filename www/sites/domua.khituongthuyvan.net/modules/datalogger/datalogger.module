@@ -101,7 +101,7 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
   }
   
 	
-	if(!in_array('administrator', array_values($user->roles))){
+	if(!in_array('administrator', array_values($user->roles)) || TRUE){
 		if($form_id = 'views_exposed_form'){
 			if($form['#id'] == 'views-exposed-form-view-command-send-station-page' || 
 				$form['#id'] == 'views-exposed-form-view-rainfall-default-page' ||
@@ -115,15 +115,17 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
 					$provinces = array();
 					$provinces['All'] = t('- Any -');
 					$provinces = array_merge($provinces, _datalogger_return_city2($user->field_station_region['und'][0]['value']));
-					$form['field_station_province_city_value']['#options'] = $provinces;
+					
+          ////$form['field_station_province_city_value']['#options'] = $provinces;
 					
 					//them moi nut xuat bao cao
+          /*
 					$form["submit_report"] = array(
 						"#type" => "submit",
 						"#value" => t("Report"),
 						'#weight' => 110,
 						'#submit' => array('_datalogger_submit_report'),
-					);
+					);*/
 					
 					/*
 					khong hien thi button xuat bao cao voi form: 
@@ -142,7 +144,17 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
 					$form['field_rainfall_send_time_value']['min']['#date_format'] = 'd/m/Y H:i';
 					$form['field_rainfall_send_time_value']['max']['#date_format'] = 'd/m/Y H:i';
 					
-          _datalogger_alter_add_js_stations($provinces, $province);
+          
+          global $khuvuc;
+  
+          // add provinces to Drupal.settings
+          $provinces = array();
+                  $provinces['All'] = t('- Any -');
+                  $provinces = array_merge($provinces, _datalogger_return_city2($khuvuc[0] /*$account->field_station_region['und'][0]['value']*/));
+                  //$form['stations_fieldset']['field_station_province_city_value']['#options'] = $provinces;
+          
+          _datalogger_alter_add_js_stations($provinces);
+          
           
 					//view cac lenh da thuc hien theo tung khu vuc 
 					/*view: thong ke lương mua
@@ -151,14 +163,15 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
 					 *view: bieu do mua theo gio
 					 *view: bieu do mua theo phut
 					 */
-					if($form['#id'] == 'views-exposed-form-view-station-rainfall-statistics-page' ||//thong ke luong mua
+					/*if($form['#id'] == 'views-exposed-form-view-station-rainfall-statistics-page' ||//thong ke luong mua
 							$form['#id'] == 'views-exposed-form-search-rainfall-page' ||//tra cuu luong mua
 							$form['#id'] == 'views-exposed-form-view-rainfall-default-page' ||
 							$form['#id'] == 'views-exposed-form-view-rainfall-chart-hour-page' ||//bieu do theo gio
 							$form['#id'] == 'views-exposed-form-rainfall-chart-page'){//bieu do theo op
+              */              
 								drupal_add_js(drupal_get_path('module', 'datalogger').'/list_station_follow_province.js');
-								$form['field_rainfall_station_nid']['#options'] = $stations_view;
-					}
+								//$form['field_rainfall_station_nid']['#options'] = $stations_view;
+					//}
 					
 					if($form['#id'] == 'views-exposed-form-view-command-send-station-page'){
 						$form['field_command_station_nid']['#options'] = $stations_view;
@@ -1200,7 +1213,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   $is_dev = TRUE;
   
   $value_select_province = $is_dev ? 'thua_thien_hue' : $value_select_province;
-  $value_select_month = $is_dev ? '3' : 1;
+  $value_select_month = date('n'); //$is_dev ? '3' : 1;
   
   if (!$station_name || !is_array($station_name)) $station_name = array();
   $default_station  = $is_dev ? 2976 : (isset($form_state['values']['station']) ? $form_state['values']['station']: key($station_name));

@@ -3,7 +3,7 @@
   $(document).ready(function(){
     var function_change = function () {
     
-      console.log('change....' + this.id);
+      //console.log('change....' + this.id);
       
       var station_id;
       
@@ -19,10 +19,10 @@
       var tram = $(station_id);
       
 			var filter = $(this).val();
-      console.log('$(this).val()', $(this).val());
+      //console.log('$(this).val()', $(this).val());
 			// /*
 			var index = tram.val();
-			console.log(index);
+			//console.log(index);
 			tram.empty();
 			
 			if(tram.prop) {
@@ -32,7 +32,7 @@
 				var options = tram.attr('options');
 			}
       
-      console.log(['Drupal.settings.datalogger.list_station_province', Drupal.settings.datalogger.list_station_province]);
+      //console.log(['Drupal.settings.datalogger.list_station_province', Drupal.settings.datalogger.list_station_province]);
       
 			$.each(Drupal.settings.datalogger.list_station_province[filter], function(key, text) {
 				var nid = key.substr(4);
