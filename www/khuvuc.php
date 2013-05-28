@@ -22,7 +22,7 @@
     $admin_khuvuc = array('khuvucbactrungbo', 'root');
     break;
    
-  case '210.245.110.1':
+  case '210.245.110.15':
   case 'nambo.domua.khituongthuyvan.net':
    $khuvuc = array('south_region','KHU VỰC NAM BỘ', 4);
     $admin_khuvuc = array('khuvucnambo', 'root');
