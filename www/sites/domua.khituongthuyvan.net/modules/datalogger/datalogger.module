@@ -266,9 +266,7 @@ function datalogger_views_pre_render(&$view) {
  *Description: thay đổi query hiển thị trạm theo từng khu vực trên user
  */
  function datalogger_views_query_alter(&$view, &$query) {
- 
- 
- 
+
   if($view->name == 'view_list_user' ) {
 		global $user;
 		$account = user_load($user->uid);
@@ -293,7 +291,7 @@ function datalogger_views_pre_render(&$view) {
 	//view: hien thi cac tram do mưa theo khu vuc thuc hien lenh
 	//view: hien thi cac tram do mưa theo khu vuc tren ban do
 	//view: hien thi cac lenh da thuc hien  theo khu vuc
-	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'||$view->name == 'search_rainfall' || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	) {
+	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'||$view->name == 'search_rainfall' || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	|| $view->name=="view_bieu_do_du_lieu_mua") {
 		global $user;
 		$account = user_load($user->uid);
 		if(in_array('administrator', array_values($user->roles))){
