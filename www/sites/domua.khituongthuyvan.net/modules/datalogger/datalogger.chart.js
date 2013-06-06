@@ -32,7 +32,7 @@ var delta_timezone = 0;
 				// See source code from the JSONP handler at https://github.com/highslide-software/highcharts.com/blob/master/samples/data/from-sql.php
 				//$.getJSON('http://www.highcharts.com/samples/data/from-sql.php?callback=?', function(data) {
 				
-				var u = 'http://113.160.225.111:8181/js/manage/chart/rainfalls';
+				var u = '/js/manage/chart/rainfalls';
 				//u = 'http://www.highcharts.com/samples/data/from-sql.php';
 				
 				$.getJSON(u + '?start='+ Math.round(e.min) + '&end='+ Math.round(e.max)+'&station='+ station  +'&callback=?', function(data) {
