@@ -294,7 +294,7 @@ function datalogger_views_pre_render(&$view) {
 	//view: hien thi cac tram do mưa theo khu vuc thuc hien lenh
 	//view: hien thi cac tram do mưa theo khu vuc tren ban do
 	//view: hien thi cac lenh da thuc hien  theo khu vuc
-	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'||$view->name == 'search_rainfall' || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	) {
+	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'||$view->name == 'search_rainfall' || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	|| $view->name=="view_bieu_do_du_lieu_mua") {
 		global $user;
 		$account = user_load($user->uid);
 		if(in_array('administrator', array_values($user->roles))){      
@@ -316,26 +316,49 @@ function datalogger_views_pre_render(&$view) {
 		}
 		//dpm($query->where);
 		// /*
+    
+    foreach ($query->where[1]['conditions'] as $k=>$v){
+      if(isset($v['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'])){
+    
+        $time_min = $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'];
+        $time_max = $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'];
+      
+        $time_min = str_replace ('T',' ',$time_min);
+        $time_max = str_replace ('T',' ',$time_max);
+        // Doi thoi gian ve timezone UTC vi khi query module date goi lenh :
+        // SeT @@session.time_zone = '+00:00'
+      
+        $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d\TH:i",strtotime($time_min) - 7 * 3600 );
+        $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600);
+      
+      }
+    }
+    
+    // Binhnt Should be delete code bellow
     $filter_date = ($view->name == 'search_rainfall' ? 4 : 3);
-		if(count($query->where[1]['conditions'][$filter_date]['value']) == 2){
+		if(false&&count($query->where[1]['conditions'][$filter_date]['value']) == 2){
 			// $sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1';
       
 			////$sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%d\/%m\/%Y %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%d\/%m\/%Y %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1';
 			
-      
-      $sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1';
+      // Binhnt 
+     /*  $sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1'; */
 			
-      
-			$query->where[1]['conditions'][$filter_date]['field'] = $sql;
+      // Binhnt 
+			//$query->where[1]['conditions'][$filter_date]['field'] = $sql;
 			$time_min = $query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'];
 			$time_max = $query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'];
-			
+    
+      $time_min = str_replace ('T',' ',$time_min);
+      $time_max = str_replace ('T',' ',$time_max);
       // Doi thoi gian ve timezone UTC vi khi query module date goi lenh :
       // SeT @@session.time_zone = '+00:00'
-      
-			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d H:i",strtotime($time_min) - 7 * 3600 );
-			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d H:i",strtotime($time_max) - 7 * 3600);
-      
+      dpm($time_max);
+      dpm($time_min);
+			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d\TH:i",strtotime($time_min) - 7 * 3600 );
+			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600);
+      dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
+      dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
 		}
 		// */
   }
