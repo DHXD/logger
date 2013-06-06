@@ -266,7 +266,10 @@ function datalogger_views_pre_render(&$view) {
  *Description: thay đổi query hiển thị trạm theo từng khu vực trên user
  */
  function datalogger_views_query_alter(&$view, &$query) {
-
+  if($view->current_display=='page_1'&&$view->name=='search_rainfall'){
+    return ;
+  }
+ 
   if($view->name == 'view_list_user' ) {
 		global $user;
 		$account = user_load($user->uid);
@@ -291,13 +294,13 @@ function datalogger_views_pre_render(&$view) {
 	//view: hien thi cac tram do mưa theo khu vuc thuc hien lenh
 	//view: hien thi cac tram do mưa theo khu vuc tren ban do
 	//view: hien thi cac lenh da thuc hien  theo khu vuc
-	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'||$view->name == 'search_rainfall' || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	|| $view->name=="view_bieu_do_du_lieu_mua") {
+	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'||$view->name == 'search_rainfall' || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	) {
 		global $user;
 		$account = user_load($user->uid);
-		if(in_array('administrator', array_values($user->roles))){
-			$query->where[1]['conditions'][2]['value'] = array(north_central_region,mid_central_region,
-							south_central_region,south_region,central_highlands);
-			$query->where[1]['conditions'][2]['operator'] = 'IN';
+		if(in_array('administrator', array_values($user->roles))){      
+        $query->where[1]['conditions'][2]['value'] = array(north_central_region,mid_central_region,
+                south_central_region,south_region,central_highlands);
+        $query->where[1]['conditions'][2]['operator'] = 'IN';   
 		}
 		elseif(isset($account->field_station_region['und'])){
 			foreach($account->field_station_region['und'] as $region){
@@ -313,49 +316,26 @@ function datalogger_views_pre_render(&$view) {
 		}
 		//dpm($query->where);
 		// /*
-    
-    foreach ($query->where[1]['conditions'] as $k=>$v){
-      if(isset($v['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'])){
-    
-        $time_min = $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'];
-        $time_max = $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'];
-      
-        $time_min = str_replace ('T',' ',$time_min);
-        $time_max = str_replace ('T',' ',$time_max);
-        // Doi thoi gian ve timezone UTC vi khi query module date goi lenh :
-        // SeT @@session.time_zone = '+00:00'
-      
-        $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d\TH:i",strtotime($time_min) - 7 * 3600 );
-        $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600);
-      
-      }
-    }
-    
-    // Binhnt Should be delete code bellow
     $filter_date = ($view->name == 'search_rainfall' ? 4 : 3);
-		if(false&&count($query->where[1]['conditions'][$filter_date]['value']) == 2){
+		if(count($query->where[1]['conditions'][$filter_date]['value']) == 2){
 			// $sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1';
       
 			////$sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%d\/%m\/%Y %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%d\/%m\/%Y %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1';
 			
-      // Binhnt 
-     /*  $sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1'; */
+      
+      $sql = 'DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') >= :field_data_field_rainfall_send_time_field_rainfall_send_time_value AND DATE_FORMAT(FROM_UNIXTIME(field_data_field_rainfall_send_time.field_rainfall_send_time_value), \'%Y-%m-%d %H:%i\') <= :field_data_field_rainfall_send_time_field_rainfall_send_time_value1';
 			
-      // Binhnt 
-			//$query->where[1]['conditions'][$filter_date]['field'] = $sql;
+      
+			$query->where[1]['conditions'][$filter_date]['field'] = $sql;
 			$time_min = $query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'];
 			$time_max = $query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'];
-    
-      $time_min = str_replace ('T',' ',$time_min);
-      $time_max = str_replace ('T',' ',$time_max);
+			
       // Doi thoi gian ve timezone UTC vi khi query module date goi lenh :
       // SeT @@session.time_zone = '+00:00'
-      dpm($time_max);
-      dpm($time_min);
-			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d\TH:i",strtotime($time_min) - 7 * 3600 );
-			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600);
-      dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
-      dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
+      
+			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d H:i",strtotime($time_min) - 7 * 3600 );
+			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d H:i",strtotime($time_max) - 7 * 3600);
+      
 		}
 		// */
   }
@@ -566,6 +546,26 @@ $items['gammu/sentitems/error'] = array(
 		'access callback' => '_datalogger_menu_access_callback_manage_data',
 		'type' => MENU_NORMAL_ITEM, 
 		'weight' => -26,
+	);
+  
+  $items['manage/chart/rainfalls'] = array(
+    'title' => 'Rainfall data chart',
+		'page callback' => 'drupal_get_form',
+    'page arguments' => array(
+        '_datalogger_chart_rainfall_form'
+    ),
+    'file' => 'datalogger.admin.inc',
+		'access callback' => '_datalogger_menu_access_callback_manage_data',
+		'type' => MENU_NORMAL_ITEM, 
+		'weight' => -26,
+	);
+  
+  $items['js/manage/chart/rainfalls'] = array(
+    'title' => 'Rainfall data chart JS',
+		'page callback' => '_datalogger_chart_rainfall_form_js',
+    'file' => 'datalogger.admin.inc',
+		'access callback' => '_datalogger_menu_access_callback_manage_data',
+		'type' => MENU_NORMAL_ITEM, 		
 	);
 	
 	/*$items['views/statistics/manage/report/rainfalls/all/station'] = array(
@@ -1108,7 +1108,7 @@ function datalogger_node_insert($node) {
     $node->field_khuvuc_sotinh['und'][0]['value'] = $sotinh;
     $node = node_submit($node);   
     node_save($node);
-    dpm($sotinh);
+    //dpm($sotinh);
     
 	} 
   
@@ -1123,11 +1123,11 @@ function datalogger_node_insert($node) {
     //node_object_prepare($node);
     $node->field_khuvuc_sotinh['und'][0]['value'] = $sotinh;
     $node = node_submit($node);
-    dpm('b');
+    //dpm('b');
     
     node_save($node);
-    dpm('c');
-    dpm($sotinh);
+    //dpm('c');
+    //dpm($sotinh);
     
 	}
 }*/
@@ -1310,9 +1310,16 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
      '#default_value' => $value_select_month ? $value_select_month : $form_state['input']['month'],
 		 // '#weight' => 6,
   );
+  
+  drupal_add_js('sites/domua.khituongthuyvan.net/modules/datalogger/anytime.compressed.js');
+  drupal_add_css('sites/domua.khituongthuyvan.net/modules/datalogger/anytime.compressed.css');  
+  drupal_add_js('sites/domua.khituongthuyvan.net/modules/datalogger/datalogger.datetimepicker.js');
+  
 	
 	$form['stations_fieldset']['day'] = array(
-     '#type' => 'date_popup',
+     //'#type' => 'date_popup',
+     '#type' => 'textfield',
+     '#title' => 'Date time',
      '#date_format' => 'd/m/Y', 
 		 '#required' => TRUE,	
 		 // '#weight' => 7,

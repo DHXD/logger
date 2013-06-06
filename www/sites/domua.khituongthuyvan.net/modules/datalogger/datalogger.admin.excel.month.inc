@@ -43,7 +43,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 		$max_total_time_rainfall_in_day = 0;
 		$hours_in_day = array();
     $month_day = $month.$day_time;
-    dpm($month_day);
+    //dpm($month_day);
 		$rainfalls = views_get_view_result('view_rainfall_admin','page', $nid, $month_day);
     
     //if ($day == 20) dpm($rainfalls);

@@ -9,19 +9,20 @@
       
       switch(this.id) {
       case 'edit-province':
-        station_id = '#edit-station';
+        station_id = 'edit-station';
         break;
       case 'edit-field-station-province-city-value':
-        station_id = '#edit-field-rainfall-station-nid';
+        station_id = 'edit-field-rainfall-station-nid';
         break;
       }
       
-      var tram = $(station_id);
+      var tram = $('#' + station_id);
       
 			var filter = $(this).val();
       //console.log('$(this).val()', $(this).val());
 			// /*
 			var index = tram.val();
+			if (!index) index = 0;
 			//console.log(index);
 			tram.empty();
 			
@@ -38,7 +39,10 @@
 				var nid = key.substr(4);
 				options[options.length] = new Option(text, nid);
 			});		
+			
+			document.getElementById(station_id).selectedIndex = 0;	// reset first
 			tram.val(index);
+			
 			// */
 		}
     
