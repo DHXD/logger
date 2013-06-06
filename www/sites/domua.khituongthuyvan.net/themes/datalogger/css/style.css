@@ -1917,14 +1917,6 @@ div#header {
   height: 186px;
 }
 
-fieldset#edit-stations-fieldset.form-wrapper,
-fieldset#edit-person.form-wrapper
-{
-  float: left;
-  width: 48%;
-  height: 426px;
-}
- 
 
 
 
@@ -1959,4 +1951,39 @@ form#-datalogger-report-rainfall-month-form  div.fieldset-wrapper input {
 
 input#edit-day-datepicker-popup-0 {
   width: 124px !important;
+}
+
+/* form chart */
+form#-datalogger-chart-rainfall-form #edit-stations-fieldset{
+	width: 100%;
+  float: left;
+	height: 135px;
+	margin: 3px 0;
+}
+
+form#-datalogger-chart-rainfall-form #edit-person {
+	width: 100%;
+  float: left;	
+	margin: 14px 0;
+	height: 426px;
+}
+
+form#-datalogger-chart-rainfall-form #edit-stations-fieldset .fieldset-wrapper > div,
+form#-datalogger-chart-rainfall-form #edit-stations-fieldset .fieldset-wrapper > input {
+	float: left;
+	margin: 0 6px;
+	clear: none;
+}
+
+form#-datalogger-chart-rainfall-form #edit-stations-fieldset .fieldset-wrapper > input#edit-submit {
+	margin-top: 34px;
+}
+form#-datalogger-chart-rainfall-form  .form-type-textfield  input#edit-day-to,
+form#-datalogger-chart-rainfall-form  .form-type-textfield  input#edit-day {
+	width: 140px;
+}
+
+/* calendar data popup */
+div.AnyTime-win {
+	z-index: 100;
 }
