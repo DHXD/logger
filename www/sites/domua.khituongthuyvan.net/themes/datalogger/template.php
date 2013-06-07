@@ -96,12 +96,14 @@ function datalogger_page_alter(&$page){
 	$user_path = explode('/', current_path())[0];
 	
 	if($user_path.'/'=='user/'){
-		$user_edit = explode('/', current_path())[1];
-		$user_edit_fields = user_load($user_edit);
-		if($user_edit!=$user->uid && !in_array($user->name, $admin_khuvuc)){
-			header( 'Location: /user');
-		}
-		//drupal_set_message('_page_alter: '.$user->uid.'-'.$user->name.'-'.$user_edit_fields->name.'</br>');
+		$user_edit = trim(explode('/', current_path())[1]);
+    if ($user_edit) {
+      $user_edit_fields = user_load($user_edit);
+      if($user_edit!=$user->uid && !in_array($user->name, $admin_khuvuc)){
+        header( 'Location: /user');
+      }
+      //drupal_set_message('_page_alter: '.$user->uid.'-'.$user->name.'-'.$user_edit_fields->name.'</br>');
+    }
 	}
 }
 
