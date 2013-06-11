@@ -626,6 +626,9 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
 	drupal_set_title(t('Reports daily rainfall data'));
   
 	_datalogger_select_area_province_station($form, $form_state);
+
+  $form['stations_fieldset']['day']['#type'] = 'date_popup';
+  
 	$form['stations_fieldset']['year']['#access']=FALSE;
 	$form['stations_fieldset']['month']['#access']=FALSE;
   $form['stations_fieldset']['selectStation']['station']['#multiple']= TRUE;
