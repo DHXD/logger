@@ -265,11 +265,118 @@ function datalogger_views_pre_render(&$view) {
  *Author:hungnm0302
  *Description: thay đổi query hiển thị trạm theo từng khu vực trên user
  */
+ function datalogger_views_post_execute(&$view){
+ if($view->current_display=='page'&&$view->name=='search_rainfall'){
+    //dpm($view);
+   }
+ }
+ 
  function datalogger_views_query_alter(&$view, &$query) {
+ 
   if($view->current_display=='page_1'&&$view->name=='search_rainfall'){
     return ;
   }
- 
+ if($view->current_display=='page'&&$view->name=='search_rainfall'){
+  foreach ($query->where[1]['conditions'] as $k=>$v){      
+    if(isset($v['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'])){
+
+      $time_min = $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'];
+      $time_max = $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'];
+    
+      $time_min = str_replace ('T',' ',$time_min);
+      $time_max = str_replace ('T',' ',$time_max);
+    
+      $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d\TH:i",strtotime($time_min) - 7 * 3600 );
+      $query->where[1]['conditions'][$k]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600);
+    }
+     // Need code to get station
+      if(isset($v['field'])&&$v['field']=='field_data_field_rainfall_station.field_rainfall_station_nid')
+      {
+        $query_station = $v['value'][0];
+      }
+    } 
+    // Use query here
+    //field_rainfall_measuring
+   // dpm($view);
+   if(count($_REQUEST['field_rainfall_station_nid'])){
+      $query = 'SELECT DISTINCT f.field_rainfall_send_time_value, f.entity_id
+                    FROM {field_data_field_rainfall_send_time} f ';
+      $query .= ' LEFT JOIN {field_data_field_rainfall_station} fs ON fs.entity_id=f.entity_id';
+      $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\' ';
+     
+      // Set station
+      if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
+      if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.strtotime($time_min) .' AND  f.field_rainfall_send_time_value <= '.strtotime($time_max);
+      $query .= ' GROUP BY f.field_rainfall_send_time_value';
+     // $query .= ' GROUP BY f.field_rainfall_send_time_value';
+      //$query .= ' LIMIT  0, 50';
+      // Result is returned as a iterable object that returns a stdClass object on each iteration
+      $result = db_query($query);
+      //dpm($query);
+      $in_array = array();
+      foreach ($result as $record) {
+        $in_array[] = $record->entity_id;
+       // dpm($record);
+      }
+    }
+    else $in_array = array(-1);
+    //if(count($in_array)) $imploded_array = implode(',',$in_array);
+    if(count($in_array)) {
+      unset($view-> query->where[1]['conditions']);
+      unset($view-> query->table_queue['node_field_data_field_rainfall_station__field_data_field_station_region']);
+      $new_condition = array();
+      $new_condition['field']= 'node.nid';
+      $new_condition['value'] = $in_array;
+      $new_condition['operator'] = 'in';
+      $view-> query->where[1]['conditions'][] = $new_condition;
+    }
+    return;
+  }
+  
+  if($view->name == 'luong_mua_excel' && $view->current_display=='page'){
+    //dpm($view);
+    //dpm($view->args);
+    // Get some argument
+    $query_station = $view->args[0];
+    $time = $view->args[1];
+    $year = substr($time, 0, 4);
+     $month = substr($time, 4, 2);
+     $day = substr($time, -2, 2);
+     $time_min = mktime(0,0,0,$month, $day,$year);
+      $time_max = mktime(23,59,59,$month, $day,$year);
+    if(count($_REQUEST['month'])){
+      $query = 'SELECT DISTINCT f.field_rainfall_send_time_value, f.entity_id
+                    FROM {field_data_field_rainfall_send_time} f ';
+      $query .= ' LEFT JOIN {field_data_field_rainfall_station} fs ON fs.entity_id=f.entity_id';
+      $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\' ';
+     
+      // Set station
+      if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
+      if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.$time_min .' AND  f.field_rainfall_send_time_value <= '.$time_max;
+      $query .= ' GROUP BY f.field_rainfall_send_time_value';
+      
+      // Result is returned as a iterable object that returns a stdClass object on each iteration
+      $result = db_query($query);
+      //dpm($query);
+      $in_array = array();
+      foreach ($result as $record) {
+        $in_array[] = $record->entity_id;
+       // dpm($record);
+      }
+    }
+    else $in_array = array(-1);
+    //dpm($in_array);
+    if(count($in_array)) {
+
+      $new_condition = array();
+      $new_condition['field']= 'node.nid';
+      $new_condition['value'] = $in_array;
+      $new_condition['operator'] = 'in';
+      $view-> query->where[1]['conditions'][] = $new_condition;
+    } 
+    return;
+  }
+  
   if($view->name == 'view_list_user' ) {
 		global $user;
 		$account = user_load($user->uid);
@@ -294,8 +401,29 @@ function datalogger_views_pre_render(&$view) {
 	//view: hien thi cac tram do mưa theo khu vuc thuc hien lenh
 	//view: hien thi cac tram do mưa theo khu vuc tren ban do
 	//view: hien thi cac lenh da thuc hien  theo khu vuc
-	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'||$view->name == 'search_rainfall' || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	|| $view->name=="view_bieu_do_du_lieu_mua") {
-		global $user;
+	else if($view->name == "view_list_stations" || $view->name == "view_map_stations" || $view->name == "view_map_alarm_stations" 
+    || $view->name == 'view_command_send_station' || $view->name == 'view_station_rainfall_statistics' || $view->name == 'rainfall_chart'
+    
+    ||$view->name == 'search_rainfall' // thong ke luong mua theo bang
+    
+    || $view->name == "view_modems" ||$view->name == "view_rainfall_default"	
+    ||$view->name == "view_map_station_deactive"||$view->name == "view_map_alarm_stations_rainfall" ||$view->name == "view_rainfall_chart_hour"	
+    || $view->name=="view_bieu_do_du_lieu_mua") {
+    //return;
+		//dpm($view);
+    //$query->add_groupby('field_data_field_rainfall_send_time.field_rainfall_send_time_value');
+    //dpm($view);
+   /*  $search = array('ORDER BY');
+    $replace = array('GROUP BY field_data_field_rainfall_send_time_field_rainfall_send_time ORDER BY');
+    $view->build_info['query'] = str_replace($search, 
+                                             $replace, 
+                                             $view->build_info['query']);
+    $view->build_info['count_query'] = str_replace($search, 
+                                                   $replace, 
+                                               $view->build_info['count_query']); */
+                                              // dpm($query);
+                //$query->groupby = array('field_data_field_rainfall_send_time_field_rainfall_send_time');
+    global $user;
 		$account = user_load($user->uid);
 		if(in_array('administrator', array_values($user->roles))){      
         $query->where[1]['conditions'][2]['value'] = array(north_central_region,mid_central_region,
@@ -353,12 +481,12 @@ function datalogger_views_pre_render(&$view) {
       $time_max = str_replace ('T',' ',$time_max);
       // Doi thoi gian ve timezone UTC vi khi query module date goi lenh :
       // SeT @@session.time_zone = '+00:00'
-      dpm($time_max);
-      dpm($time_min);
+      ///dpm($time_max);
+      ///dpm($time_min);
 			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'] = date("Y-m-d\TH:i",strtotime($time_min) - 7 * 3600 );
 			$query->where[1]['conditions'][$filter_date]['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value1'] = date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600);
-      dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
-      dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
+      //dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
+      //dpm(date("Y-m-d\TH:i",strtotime($time_max) - 7 * 3600));
 		}
 		// */
   }

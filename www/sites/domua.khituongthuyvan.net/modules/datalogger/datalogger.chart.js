@@ -157,8 +157,8 @@ function afterSetExtremes(e) {
 	var chart = jQuery('#edit-person div.fieldset-wrapper').highcharts();
 	var station = jQuery('#edit-station').val();
 	//console.log(range, e);
-	e.max =  e.max + delta_timezone ;
-	e.min = e.min + delta_timezone ;
+	//e.max =  e.max + delta_timezone ;
+	//e.min = e.min + delta_timezone ;
 	chart.showLoading('Đang nạp dữ liệu...');
 	jQuery.getJSON('/js/manage/chart/rainfalls?start='+ Math.round(e.min) + '&station='+ station  +
 			'&end='+ Math.round(e.max) +'&callback=?', function(data) {

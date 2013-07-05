@@ -592,8 +592,8 @@ function _datalogger_chart_rainfall_form_js() {
     }
     if (!$end) $end = time() * 1000;
     
-    $start_argument =  date("Y-m-d\TH:i:s",($start/1000) - 7 * 3600);
-    $end_argument =  date("Y-m-d\TH:i:s",($end/1000) - 7 * 3600);
+    $start_argument =  date("Y-m-d\TH:i:s",($start/1000) - 2*7 * 3600);
+    $end_argument =  date("Y-m-d\TH:i:s",($end/1000) - 2*7 * 3600);
 
     $view = views_get_view('search_rainfall');
     $view->set_display('page_1');
@@ -605,16 +605,13 @@ function _datalogger_chart_rainfall_form_js() {
     
     $view->pre_execute();
     $view->execute();
-    //dpm($view);
+    //dpm($view->result);
     //return $view->render();
     $rows = array();
     foreach($view->result as $k=>$v){
       //if($v->field_data_field_rainfall_send_time_field_rainfall_send_time==0) continue;field_data_field_rainfall_total_hour_node_entity_type
-      $rows[$v->field_data_field_rainfall_send_time_field_rainfall_send_time] = '['.$v->field_data_field_rainfall_send_time_field_rainfall_send_time*1000 .','.$v->field_field_rainfall_total_hour[0]['raw']['value'] ./* ','.'100'.','.'100'.','.'100'. */ ']';
+      $rows[$v->field_data_field_rainfall_send_time_field_rainfall_send_time] = '['.($v->field_data_field_rainfall_send_time_field_rainfall_send_time+7*3600)*1000 .','.$v->field_field_rainfall_total_hour[0]['raw']['value'] . ',' . $v->nid.','.'100'.','.'100'.  ']';
     }
-  
-  
-  
   //$rows=array('[1318535940000,413.05,11.05, 100.00,100.00]', '[1318539990000,44.05,413.05, 100.00,100.00]');
   echo "/* console.log(' start = $start, end = $end, startTime = $startTime, endTime = $endTime '); */";
   echo $callback ."([\n" . join(",\n", $rows) . "\n]);";
