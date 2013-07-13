@@ -1415,7 +1415,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 	foreach($stations as $station){
 		$station_name[$station->nid] = $station->node_title;
 	}
-  
+  //sort($station_name );
     
   global $khuvuc;
   

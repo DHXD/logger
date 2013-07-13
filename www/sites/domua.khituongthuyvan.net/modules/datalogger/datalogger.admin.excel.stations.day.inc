@@ -1,12 +1,12 @@
 <?php
 function _datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day){
+
   error_reporting(0);
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel.php';
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel/IOFactory.php';
 	module_load_include('inc', 'datalogger', 'datalogger.admin');
 
 	$number = count($station_nids);
-  
 	//lay du lieu cua tram
 	foreach($station_nids as $nid){
     //print($nid);
@@ -15,23 +15,60 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 		$max_total_rainfall_in_day = 0;
 		$max_total_time_rainfall_in_day = 0;
 		$hours_in_day = array();
-		$rainfalls = views_get_view_result('view_rainfall_admin','page', $nid, $day);
+    
+    // Binhnt Code here
+    $query = 'SELECT DISTINCT f.field_rainfall_send_time_value, f.entity_id, 
+                            fm.field_rainfall_measuring_value, n.title
+                      FROM {field_data_field_rainfall_send_time} f ';
+    $query .= ' LEFT JOIN {field_data_field_rainfall_station} fs ON fs.entity_id=f.entity_id';
+    //field_data_field_rainfall_measuring
+     $query .= ' LEFT JOIN {field_data_field_rainfall_measuring} fm ON fm.entity_id=f.entity_id';
+      $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
+    $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\'  AND n.type=\'rainfall\'';
+    $query .= '  AND fs.field_rainfall_station_nid = '. $nid;
+    // month day year
+    /* dpm($day);
+  dpm(substr($day, -2, 2));
+  dpm(substr($day,-4, 2));
+  dpm(substr($day, 0, 4));
+  return; */
+    $time_min = mktime(0,0,0,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));   
+    $time_max = mktime(23,59,59,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
+    
+    // Set station
+    //if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
+    if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.$time_min .' AND  f.field_rainfall_send_time_value <= '.$time_max;
+    $query .= ' GROUP BY f.field_rainfall_send_time_value';
+    // Result is returned as a iterable object that returns a stdClass object on each iteration
+    $result = db_query($query);
+    
+    //dpm($query);return;
+    
+    $in_array = array();
+    foreach ($result as $record) {
+      $in_array[$record->entity_id] = $record;
+      //dpm($day);
+    }
+   
+    // End Binhnt Code Her
+    
+		//$rainfalls = views_get_view_result('view_rainfall_admin','page', $nid, $day);
     
     //digi_debug(count($rainfalls), 0, 1);
     
-		if(count(rainfalls) > 0){
-			foreach($rainfalls as $rainfall){
+		if(count(in_array) > 0){
+			foreach($in_array as $rainfall){
         //dpm($rainfall);
-				$hour = (int)substr($rainfall->node_title, -8, 2);
+				$hour = (int)substr($rainfall->title, -8, 2);
         
-        $minute = (int)substr($rainfall->node_title, -5, 2);
-        $second = (int)substr($rainfall->node_title, -2, 2);
+        $minute = (int)substr($rainfall->title, -5, 2);
+        $second = (int)substr($rainfall->title, -2, 2);
         if($minute =='00' && $second == '00'){
           if($hour == '00') $hour = '23';
           else $hour -=1;
         }
         
-				$rainfall_measuring = (float)$rainfall->field_field_rainfall_measuring[0]['rendered']['#markup'];
+				$rainfall_measuring = (float)$rainfall->field_rainfall_measuring_value;
 				if($rainfall_measuring > 0){
 					$hours_in_day[$hour][] = $rainfall;
 					$total_rainfall_in_day += $rainfall_measuring;
@@ -51,7 +88,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$max_rainfall_in_hour = 0; 
 				if($number_for > 0){
 					for($j = 0; $j < $number_for; $j++){
-						$rainfall_measuring = (float)$hours_in_day[$i][$j]->field_field_rainfall_measuring[0]['rendered']['#markup'];
+						$rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value;
 						$total_rainfall_in_hour += $rainfall_measuring;
 						$time_rainfall_in_hour +=10;
 						$max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
