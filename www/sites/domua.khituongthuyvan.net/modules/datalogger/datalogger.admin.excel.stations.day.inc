@@ -32,8 +32,8 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
   dpm(substr($day,-4, 2));
   dpm(substr($day, 0, 4));
   return; */
-    $time_min = mktime(0,0,0,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));   
-    $time_max = mktime(23,59,59,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
+    $time_min = mktime(0,10,0,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));   
+    $time_max = mktime(24,00,00,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
     
     // Set station
     //if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
@@ -218,12 +218,13 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 		'bold' => true
 		)
 	);
-
+ 
 	for($index = 0; $index < $number*2; $index++){
 		if($index%2 == 0){
 			$objPHPExcel->getActiveSheet()->setCellValue('A'.($index+7), $stations[$index/2]['station_name']);
 			for($j = 0; $j < 24 ; $j++){
 				$total = $stations[$index/2]['hours_in_day'][$j]['total_rainfall_in_hour'];
+        
 				$time = $stations[$index/2]['hours_in_day'][$j]['time_rainfall_in_hour'];
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($index+7),$total);
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($index+8),$time);
@@ -234,7 +235,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 			}
 		}
 	}
-	
+
 	$objPHPExcel->getActiveSheet()->setCellValue('B2',$region);//khu vuc
 	$objPHPExcel->getActiveSheet()->setCellValue('J2',$province);//tinh
 	
