@@ -658,11 +658,11 @@ function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
   $region = $form['stations_fieldset']['selectArea']['#options'][$form_state['values']['selectArea']];
   //$province = $form['stations_fieldset']['selectProvince']['province']['#options'][$form_state['values']['province']];
   $province = array();
-  for($sotinh = 0; $sotinh < count($form_state['values']['province']); $sotinh++){
-    $tentinh = $form_state['values']['province'][0];
+  if(count($form_state['values']['province'])) 
+    foreach($form_state['values']['province'] as $tentinh){  
     //dpm($tentinh);
     array_push($province, $form['stations_fieldset']['selectProvince']['province']['#options'][$tentinh]);
-  }
+  }  
   //dpm($form);
   //dpm($form_state);
   $station_nids = array();

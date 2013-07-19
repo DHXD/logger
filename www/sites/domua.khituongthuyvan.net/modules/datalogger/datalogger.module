@@ -1245,43 +1245,6 @@ function count_tinh_khu_vuc($tenkhuvuc){
 	  $sotinh = $views->total_rows;
    
 }          
-/*	
-function datalogger_node_insert($node) {
-
-	if ($node->type == 'province') {
-  
-	  $tenkhuvuc = $node->field_tinh_khu_vuc['und'][0]['value'];
-	  $views = _datalogger_views_get_view_result('khuvuc', 'block_1', array($tenkhuvuc), FALSE, TRUE);
-	  $sotinh = $views->total_rows;
-    
-    $node = node_load($khuvuc_id[$tenkhuvuc]);
-    //node_object_prepare($node);
-    $node->field_khuvuc_sotinh['und'][0]['value'] = $sotinh;
-    $node = node_submit($node);   
-    node_save($node);
-    //dpm($sotinh);
-    
-	} 
-  
-  /*station
-  if ($node->type == 'station') {
-  
-	  $tentinh = $node->field_tinh_khu_vuc['und'][0]['value'];
-	  $views = _datalogger_views_get_view_result('ql_tram', 'block_1', array($tentinh), FALSE, TRUE);
-	  $sotinh = $views->total_rows;
-    
-    $node = node_load($tentinh);
-    //node_object_prepare($node);
-    $node->field_khuvuc_sotinh['und'][0]['value'] = $sotinh;
-    $node = node_submit($node);
-    //dpm('b');
-    
-    node_save($node);
-    //dpm('c');
-    //dpm($sotinh);
-    
-	}
-}*/
 
 function _datalogger_views_get_view_result($viewname, $display_id = NULL, $args = NULL, $content_only = false, $data_only = false) {
   $view = views_get_view($viewname);

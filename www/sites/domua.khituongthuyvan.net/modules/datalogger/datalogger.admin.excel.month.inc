@@ -40,9 +40,9 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
   $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\'  AND n.type=\'rainfall\'';
   $query .= '  AND fs.field_rainfall_station_nid = '. $nid;
-  $time_min = mktime(0,0,0,substr($month, -2), 1,$year);
+  $time_min = mktime(0,10,0,substr($month, -2), 1,$year);
   $month_days_number = cal_days_in_month(CAL_GREGORIAN, substr($month, -2), $year);
-  $time_max = mktime(23,59,59,substr($month, -2), $month_days_number,$year);
+  $time_max = mktime(24,00,00,substr($month, -2), $month_days_number,$year);
   
   // Set station
   //if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
@@ -208,12 +208,14 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	$k = 1;
 	//gan gia tri mac dinh cho cac o
 	// /*
-  
-	for($i = 0; $i < $month_days_number; $i++){
+  if($month_days_number == 30) $binhnt_day_of_month = $month_days_number ;
+  if($month_days_number == 31) $binhnt_day_of_month = $month_days_number - 2;
+  else $binhnt_day_of_month = $month_days_number;
+	for($i = 0; $i < $binhnt_day_of_month; $i++){
 		if($i%2 == 0){
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(65).($i+6), $k++);
 			for($j = 0; $j < 24; $j++){
-				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+6), '-');
+				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+6), '-');        
         $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '-');
 			}
 			$objPHPExcel->getActiveSheet()->mergeCells('A'.($i+6).':B'.($i+7));
@@ -288,7 +290,9 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 		)
 	);
 	$day_in_month = 1;
+  
 	for($day = 0; $day < $month_days_number - 1; $day++){
+  
 		if($day%2 == 0){
 			for($j = 0; $j < 24 ; $j++){
 				$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
@@ -305,9 +309,12 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
           
 				}
 			}
+     
 			$day_in_month++;
+     
 		}
 	}
+
   $str_rainfall = array();
   $str_time = array();
   for($j = 0; $j < 24; $j++){

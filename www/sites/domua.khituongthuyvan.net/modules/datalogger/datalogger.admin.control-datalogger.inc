@@ -417,8 +417,8 @@ function _command_form($form, &$form_state) {
       $form['command_fieldset']['set_level']= array(
       '#type' => 'textfield',
       '#title' => t('Level'),
-      '#default_value' => '100.0',
-      '#maxlength' => 4,
+      '#default_value' => '100',
+      '#maxlength' => 6,
       '#required' => true,
       );    
       break;
@@ -1204,6 +1204,11 @@ function _datalogger_send_command($nid, $select, $form, &$form_state) {
           // dsm(strlen($message));
           // $arg = array('Get Datalogger phiê Version','35', _datalogger_result($message),'');
           $arg = array('Thiết lập thời gian và lượng mưa cảnh báo', 'A:ALARM INTERVAL:', _datalogger_result($message,'A:ALARM INTERVAL:'), '', $nid);
+        
+          $node = node_load($nid);
+          $node->field_station_alarm_rainfall_tim['und'][0]['value'] = $interval;
+          $node->field_station_alarm_rainfall['und'][0]['value'] = $level;
+          node_save($node);
           break;
         case 37 :
           $sms = 'S' . $code . 'GET  '.DATEymdHis.'A:ALARM INTERVAL:?                                          ';
