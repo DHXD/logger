@@ -240,7 +240,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 	}
 
 	$objPHPExcel->getActiveSheet()->setCellValue('B2',$region);//khu vuc
-	$objPHPExcel->getActiveSheet()->setCellValue('J2',$province);//tinh
+	$objPHPExcel->getActiveSheet()->setCellValue('J2',$province[0]);//tinh
 	
 	$objPHPExcel->getActiveSheet()->setCellValue('S2',substr($day,-2));//ngay
 	$objPHPExcel->getActiveSheet()->setCellValue('V2',substr($month,-2));//thang
@@ -251,7 +251,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 	/** Include PHPExcel_IOFactory */
   $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
   header('Content-type: application/vnd.ms-excel');
-  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa trong ngày - Trạm ' . $station->title . ' - Tinh '.$province[0].' - ' . date('m',time()) . '-' . date('Y',time()) . '.xls"');
+  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa trong ngày - Tinh '.$province[0].' - ' . date('m',time()) . '-' . date('Y',time()) . '.xls"');
   $objWriter->save('php://output');
   //$abc = file_directory_temp() . '/Bao cao du lieu mua trong ngay_' . time() . '.xls';
   //$objWriter->save($abc);
