@@ -1117,13 +1117,20 @@ function _datalogger_new_sms_form() {
  
   // Table header
   $header = array(
+    // "sort": A default sort order for this column ("asc" or "desc"). 
+    // Only one column should be given a default sort order because table 
+    // sorting only applies to one column at a time.
+    
     array('data' => t('No.')),		
-    array('data' => t('Station Name'), 'field' => 'StationName', 'sort' => 'ASC'),
-    array('data' => t('Receiving Date Time'), 'field' => 'UpdatedInDB', 'sort' => 'ASC'),
-    array('data' => t('Sender Number'), 'field' => 'SenderNumber', 'sort' => 'ASC'),
+    array('data' => t('Station Name'), 'field' => 'StationName', /*, 'sort' => 'ASC'*/),
+    array('data' => t('Receiving Date Time'), 'field' => 'UpdatedInDB', 'sort' => 'desc'),  // default sort this column
+    array('data' => t('Sender Number'), 'field' => 'SenderNumber', /*'sort' => 'ASC'*/),
     array('data' => t('Message content')),
-		array('data' => t('Modem'), 'field' => 'RecipientID', 'sort' => 'ASC'),
-    array('data' => t('Processed'), 'field' => 'Processed', 'sort' => 'ASC'),
+		array('data' => t('Modem'), 'field' => 'RecipientID', /*'sort' => 'ASC'*/),
+    array('data' => t('Processed'), 'field' => 'Processed'/*, 'sort' => 'ASC'*/),
+    
+    
+    
   );
  
   // Setting the sort conditions
@@ -1134,8 +1141,7 @@ function _datalogger_new_sms_form() {
     else
       $sort = 'DESC';
 
-    $order = 'UpdatedInDB';
-    
+    $order = 'UpdatedInDB';    
     // Which column will be sorted
     foreach ($header as $h) {
       if ($h['data'] == $_GET['order'] && isset($h['field'])) {
@@ -1144,7 +1150,7 @@ function _datalogger_new_sms_form() {
       }
     }
   } else {
-    $sort = 'ASC';
+    $sort = 'DESC';
     $order = 'UpdatedInDB';
   }
  
@@ -1170,10 +1176,12 @@ function _datalogger_new_sms_form() {
   $query->orderBy($order, $sort);
  
   // Pagination
-  $query = $query->extend('TableSort')->extend('PagerDefault')->limit(50);
+  $query = $query->extend('TableSort')->extend('PagerDefault')->orderByHeader($header)->limit(50);
 	
   // Executing query
   $result = $query->execute();
+  
+  //dpm($query);
   
   db_set_active(); // without the paramater means set back to the default for the site
   
@@ -1211,7 +1219,7 @@ function _datalogger_new_sms_form() {
     array(
       'header' => $header,
       'rows' => $rows,
-      'attributes' => array(),
+      'attributes' => array('class' => array('sms-table')),
       'sticky' => true,
       'caption' => '',
       'colgroups' => array(),
