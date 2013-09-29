@@ -508,6 +508,10 @@ function datalogger_views_pre_render(&$view) {
 			$query->where[1]['conditions'][2]['operator'] = 'IN';
 		}
   }
+  else if ($view->name == 'view_users_permission') {		// quan ly user	
+	global $khuvuc;
+	$query->where[1]['conditions'][1]['value'] = $khuvuc[0];	
+  }
 	
 }
 
