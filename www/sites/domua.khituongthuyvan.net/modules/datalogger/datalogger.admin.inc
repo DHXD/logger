@@ -1184,7 +1184,9 @@ function _datalogger_new_sms_form() {
 
   // Executing query
   $result = $query->execute();
+
   // dpq($query); 
+
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
   db_set_active(); // without the paramater means set back to the default for the site
