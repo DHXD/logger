@@ -5,6 +5,7 @@
   
   switch($_SERVER['SERVER_NAME']) {
   case '113.160.225.111':  
+  case '192.168.100.101':
     $khuvuc = array('mid_central_region','KHU VỰC TRUNG TRUNG BỘ', 2);
     $admin_khuvuc = array('khuvuctrungtrungbo', 'root');
     break;

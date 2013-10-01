@@ -15,7 +15,7 @@
  */
 Drupal.theme.prototype.openlayersPopup = function(feature) {
   var output = '';
-
+	console.log(feature);
 	output += '<div class="menu"><ul>';
 	output += '<li><a class="hide" href="/station/'+feature.attributes.title.replace(/\s+/g,'-')+'"><b>Trạm '+feature.attributes.title+'</b></a></li>';
 	output += '<li><a class="hide">Thông tin trạm</a>';
@@ -45,8 +45,8 @@ Drupal.theme.prototype.openlayersPopup = function(feature) {
 	output += '<li><a title="Lượng mưa 24h: '+feature.attributes.field_station_rain_24+'">Lượng mưa 24h: <b>'+feature.attributes.field_station_rain_24+'</b></a></li>';
 	output += '<li><a title="Lượng mưa gần nhất: '+feature.attributes.field_station_rain_nearest+'">Lượng mưa gần nhất: <b>'+feature.attributes.field_station_rain_nearest+'</b></a></li>';
 	output += '<li><a title="Thời gian truyền tin: '+feature.attributes.field_rainfall_time_send_sms+'">Thời gian truyền tin: <b>'+feature.attributes.field_rainfall_time_send_sms+'</b></a></li>';
-	output += '<li><a title="Báo cáo dữ liệu mưa" href="/manage/report/rainfalls/month"><b>Báo cáo dữ liệu mưa</b></a></li>';
-	output += '<li><a title="Thống kê số lương mưa theo bảng" href="/views/statistics"><b>Thống kê số lương mưa theo bảng</b></a></li>';
+	output += '<li><a title="Báo cáo dữ liệu mưa" href="/manage/report/rainfalls/month/'+feature.attributes.nid+'"><b>Báo cáo dữ liệu mưa</b></a></li>';
+	output += '<li><a title="Thống kê số lương mưa theo bảng" href="/views/statistics/search/'+feature.attributes.nid+'"><b>Thống kê số lương mưa theo bảng</b></a></li>';
 	output += '<li><a title="Thống kê số lượng mưa theo biểu đồ" href="/manager/bieu-do-mua-theo-gio"><b>Thống kê số lượng mưa theo biểu đồ</b></a></li>';
 	output += '</ul>';
 	output += '<!--[if lte IE 6]></td></tr></table></a><![endif]--></li>';
