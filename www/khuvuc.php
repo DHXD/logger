@@ -28,11 +28,12 @@
     $admin_khuvuc = array('khuvucnambo', 'root');
     break;
     
-   case '113.162.141.98':
+   case '113.162.141.214':
   case 'kttvtaynguyen.dyndns.org':
    $khuvuc = array('central_highlands','KHU VỰC TÂY NGUYÊN', 5);
     $admin_khuvuc = array('khuvuctaynguyen', 'root');
-    break; 
+    break;
+  	
   case 'admin.domua.khituongthuyvan.net':
     $khuvuc = array('cron','KHU VỰC CRON', 0);
     $admin_khuvuc = array('khuvuc_cron', 'root');
