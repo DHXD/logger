@@ -277,6 +277,7 @@ function datalogger_views_pre_render(&$view) {
     return ;
   }
  if($view->current_display=='page'&&$view->name=='search_rainfall'){
+  //dpm($view);
   foreach ($query->where[1]['conditions'] as $k=>$v){      
     if(isset($v['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'])){
 
@@ -492,7 +493,7 @@ function datalogger_views_pre_render(&$view) {
   }
 	//view: quan ly thong tin tram
 	
-	if($view->name == "view_list_stations_role_manage") {
+	else if($view->name == "view_list_stations_role_manage") {
 		global $user;
 		if (!in_array('administrator', array_values($user->roles))) {
 			$account = user_load($user->uid);
@@ -507,6 +508,13 @@ function datalogger_views_pre_render(&$view) {
 							south_central_region,south_region,central_highlands);
 			$query->where[1]['conditions'][2]['operator'] = 'IN';
 		}
+  }
+  else if ($view->name == 'view_users_permission') {		// quan ly user	
+
+    global $khuvuc;
+    $query->where[1]['conditions'][1]['value'] = $khuvuc[0];	// dat lai khu vuc cho view
+
+	
   }
 	
 }
@@ -719,31 +727,7 @@ $items['gammu/sentitems/error'] = array(
 		'type' => MENU_NORMAL_ITEM, 		
 	);
 	
-	/*$items['views/statistics/manage/report/rainfalls/all/station'] = array(
-    'title' => 'Statistics of rainfall during the day',
-		'page callback' => 'drupal_get_form',
-    'page arguments' => array(
-        '_datalogger_report_rainfall_all_station_in_day_form'
-    ),
-    'file' => 'datalogger.admin.inc',
-		'access callback' => '_datalogger_menu_access_callback_manage_data',
-		'type' => MENU_LOCAL_TASK, 
-		'weight' => -25,
-	);*/
 	
-  
-  /*$items['manage/report/rainfalls/year'] = array(
-    'title' => 'Report annual rainfall data',
-		'page callback' => 'drupal_get_form',
-    'page arguments' => array(
-        '_datalogger_report_rainfall_year_form'
-    ),
-    'file' => 'datalogger.admin.inc',
-		'access callback' => '_datalogger_menu_access_callback_manage_data',
-		'type' => MENU_LOCAL_TASK,
-		'weight' => -23,
-  );
-  */
 
 
 /**
@@ -1013,6 +997,14 @@ $items['gammu/sentitems/error'] = array(
     'file' => 'datalogger.pages.inc',
     'access callback' => TRUE,
   );
+  
+  
+  $items['export/ftp/%'] = array(
+    'title' => 'FTP Export',
+    'page callback' => '_datalogger_ftp_export',
+    'file' => 'datalogger.admin.export.inc',
+    'access callback' => TRUE,
+  );  
  
   return $items;
 }
@@ -1356,6 +1348,13 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   
   if (!$station_name || !is_array($station_name)) $station_name = array();
   $default_station  = $is_dev ? 2976 : (isset($form_state['values']['station']) ? $form_state['values']['station']: key($station_name));
+  if(arg(4)){
+    $default_station = arg(4);
+    $x= node_load($default_station);
+    //dpm($x);
+    $value_select_province = $x->field_station_province_city['und'][0]['value'];
+  };
+  //dpm($value_select_province);
   
 	$form['stations_fieldset']['selectProvince']['province'] = array(
 		'#type' => 'select',
@@ -1380,11 +1379,14 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   $stations = views_get_view_result('view_station_filter_parameter', Null, 	$value_select_area, 'all', 'all');
   $station_name = array();
 	foreach($stations as $station){
-		$station_name[$station->nid] = $station->node_title;
+		$station_name[$station->nid] = $station->node_title;   
+    //dpm($station);
 	}
+  
   //sort($station_name );
     
   global $khuvuc;
+  
   
   // add provinces to Drupal.settings
   $provinces = array();
@@ -1393,7 +1395,9 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 					//$form['stations_fieldset']['field_station_province_city_value']['#options'] = $provinces;
   
   _datalogger_alter_add_js_stations($provinces);
-	
+	//dpm($default_station);
+  
+  
 	$form['stations_fieldset']['selectStation']['station'] = array(
 		 '#type' => 'select',
 		 '#title' => t('Select station: '),
@@ -1542,7 +1546,13 @@ function digi_debug($s, $exit=0, $file=0)
 	if ($exit) exit;
 }
 
-
+/*
+ * Called from Batch API.
+ */
+function _datalogger_ftp_txt($tram) {
+   module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+  _datalogger_ftp_txt_export_inc($tram);
+}
 
 
    
