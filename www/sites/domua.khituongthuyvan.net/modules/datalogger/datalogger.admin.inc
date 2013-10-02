@@ -658,11 +658,11 @@ function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
   $region = $form['stations_fieldset']['selectArea']['#options'][$form_state['values']['selectArea']];
   //$province = $form['stations_fieldset']['selectProvince']['province']['#options'][$form_state['values']['province']];
   $province = array();
-  for($sotinh = 0; $sotinh < count($form_state['values']['province']); $sotinh++){
-    $tentinh = $form_state['values']['province'][0];
+  if(count($form_state['values']['province'])) 
+    foreach($form_state['values']['province'] as $tentinh){  
     //dpm($tentinh);
     array_push($province, $form['stations_fieldset']['selectProvince']['province']['#options'][$tentinh]);
-  }
+  }  
   //dpm($form);
   //dpm($form_state);
   $station_nids = array();
@@ -1117,13 +1117,17 @@ function _datalogger_new_sms_form() {
  
   // Table header
   $header = array(
+    // "sort": A default sort order for this column ("asc" or "desc"). 
+    // Only one column should be given a default sort order because table 
+    // sorting only applies to one column at a time.
+    
     array('data' => t('No.')),		
-    array('data' => t('Station Name'), 'field' => 'StationName', 'sort' => 'ASC'),
-    array('data' => t('Receiving Date Time'), 'field' => 'UpdatedInDB', 'sort' => 'ASC'),
-    array('data' => t('Sender Number'), 'field' => 'SenderNumber', 'sort' => 'ASC'),
+    array('data' => t('Station Name'), /*'field' => 'StationName', /*, 'sort' => 'ASC'*/),
+    array('data' => t('Receiving Date Time'), 'field' => 'UpdatedInDB', 'sort' => 'desc'),  // default sort this column
+    array('data' => t('Sender Number'), 'field' => 'SenderNumber', /*'sort' => 'ASC'*/),
     array('data' => t('Message content')),
-		array('data' => t('Modem'), 'field' => 'RecipientID', 'sort' => 'ASC'),
-    array('data' => t('Processed'), 'field' => 'Processed', 'sort' => 'ASC'),
+		array('data' => t('Modem'), 'field' => 'RecipientID', /*'sort' => 'ASC'*/),
+    array('data' => t('Processed'), 'field' => 'Processed'/*, 'sort' => 'ASC'*/),
   );
  
   // Setting the sort conditions
@@ -1134,8 +1138,7 @@ function _datalogger_new_sms_form() {
     else
       $sort = 'DESC';
 
-    $order = 'UpdatedInDB';
-    
+    $order = 'UpdatedInDB';    
     // Which column will be sorted
     foreach ($header as $h) {
       if ($h['data'] == $_GET['order'] && isset($h['field'])) {
@@ -1144,7 +1147,7 @@ function _datalogger_new_sms_form() {
       }
     }
   } else {
-    $sort = 'ASC';
+    $sort = 'DESC';
     $order = 'UpdatedInDB';
   }
  
@@ -1158,31 +1161,45 @@ function _datalogger_new_sms_form() {
   db_set_active('YourDatabaseKey');
   
   // Query object
+  /*
   $query = db_select("datalogger_node", "n");
+  
   $query->innerJoin("datalogger_field_data_field_station_sim_number", "s", "n.nid = s.entity_id");
+  
   $query->innerJoin("inbox", "i", "CONCAT('0', substr(i.SenderNumber, 4)) = s.field_station_sim_number_value");
-	
+  
   // Adding fields
   $query->addField('n', 'title', 'StationName');
+  */
+  
+  $query = db_select("inbox", "i");
+  
   $query->fields('i', array('UpdatedInDB','SenderNumber', 'RecipientID', 'TextDecoded', 'Processed'));
  
   // Set order by
   $query->orderBy($order, $sort);
  
   // Pagination
-  $query = $query->extend('TableSort')->extend('PagerDefault')->limit(50);
-	
+  $query = $query->extend('TableSort')->extend('PagerDefault')->orderByHeader($header)->limit(50);
+
   // Executing query
   $result = $query->execute();
+
+  // dpq($query); 
+
+  //$num_rows = $query->countQuery()->execute()->fetchField();
   
   db_set_active(); // without the paramater means set back to the default for the site
   
+  //return '123';
+  
   // Looping for filling the table rows
+  
+  $numbers = array();
   while($row = $result->fetchObject()) {
   
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
-
     // highlight
     //Xử lý tin nhắn được yêu cầu:88byte
     if($len_sms == 88) {
@@ -1190,8 +1207,9 @@ function _datalogger_new_sms_form() {
     }
     //Xử lý bản tin đo mưa tự động:140byte
     elseif($len_sms == 140) {
-      $sms = _datalogger_regex_rain($sms);      
+      $sms = _datalogger_regex_rain($sms); 
     }
+	
 		
     // Adding the rows
     //$rows[] = array($data->title, $data->type);
@@ -1200,25 +1218,50 @@ function _datalogger_new_sms_form() {
 			$row -> StationName,
 			$row -> UpdatedInDB,
 			$row -> SenderNumber,
-			$sms,
+			$sms,			
 			$row -> RecipientID,
-      $row -> Processed ? t('Yes') : t('No'),
+			$row -> Processed ? t('Yes') : t('No'),
 			);
+	$numbers[] = '0' . substr($row->SenderNumber, 3);
   }
+  
+  // lay tram
+  $query = db_select("node", "n");
+  
+  $query->innerJoin("field_data_field_station_sim_number", "s", "n.nid = s.entity_id");
+  
+  // Adding fields
+  $query->addField('n', 'title', 'StationName');
+  $query->addField('s', 'field_station_sim_number_value', 'number');
+  
+  $query->condition('s.field_station_sim_number_value', $numbers, 'IN');
+  
+  $result = $query->execute();
+  
+  while($r = $result->fetchObject()) {
+	//dpm($r);
+	foreach ($rows as &$row) {
+		if ('0' . substr($row[3], 3) == $r->number) {	
+      $row[1] = $r->StationName;
+      //break;
+    }
+	}
+  }
+  
 	
   // Setting the output of the field
   $output = theme('pager').theme_table(
     array(
       'header' => $header,
       'rows' => $rows,
-      'attributes' => array(),
+      'attributes' => array('class' => array('sms-table')),
       'sticky' => true,
       'caption' => '',
       'colgroups' => array(),
       'empty' => t("Table has no row!") // The message to be displayed if table is empty
     )
   ).theme('pager');
- 
+  
   // Returning the output
   return $output;
 }
@@ -1288,7 +1331,7 @@ function _datalogger_new_outbox_form (){
 	
   // Executing query
   $result = $query->execute();
-  
+  dpm("aaaaaaaaaaaaa");
   db_set_active(); // without the paramater means set back to the default for the site
   
   // Looping for filling the table rows
