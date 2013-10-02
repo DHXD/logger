@@ -40,9 +40,12 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
   $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\'  AND n.type=\'rainfall\'';
   $query .= '  AND fs.field_rainfall_station_nid = '. $nid;
-  $time_min = mktime(0,0,0,substr($month, -2), 1,$year);
+  $time_min = mktime(0,10,0,substr($month, -2), 1,$year);
   $month_days_number = cal_days_in_month(CAL_GREGORIAN, substr($month, -2), $year);
-  $time_max = mktime(23,59,59,substr($month, -2), $month_days_number,$year);
+  $time_max = mktime(24,00,00,substr($month, -2), $month_days_number,$year);
+  
+  //$time_test = mktime(00,00,00, 9 , 19, $year);
+  //dpm($time_test);
   
   // Set station
   //if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
@@ -51,20 +54,28 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   // Result is returned as a iterable object that returns a stdClass object on each iteration
   $result = db_query($query);
   
-  //dpm($query);return;
+  //dpm($query);//return;
   
   $in_array = array();
   foreach ($result as $record) {
-    $day = '';
-     //dpm($record->field_rainfall_send_time_value);
-     
+    //dpm($record->field_rainfall_send_time_value);
+    
     $day =  date('d',$record->field_rainfall_send_time_value );
+    
+    $hour = (int)substr($record->title, -8, 2); 
+    $minute = (int)substr($record->title, -5, 2);
+    if ($hour == '00' && $minute == '00') {           // first hour minute -> chuyen sang ngay hom truoc
+      $day--;
+      if ($day <1 ) continue;
+      $record->title = sprintf("%02d/%02d/%04d 23:60:00", $day, $month, $year);
+    }     
+    
     if (!isset($in_array[$day])) $in_array[$day] = array();
     $in_array[$day][$record->entity_id] = $record;
     //dpm($day);
   }
   
-  ///dpm($in_array['25']);return ;
+  //dpm($in_array);return ;
 	for($day = 1; $day <= $month_days_number; $day++){
     
     $dem_luong_mua_trong_dot[$day-1] = array();
@@ -117,7 +128,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				}
 			}
       
-			for($i = 23; $i >= 0; $i--){
+      //if ($day == 18) dpm($hours_in_day);
+			for($i = 23; $i >= 0; $i--) {
 				$number = count($hours_in_day[$i]);
 				$total_rainfall_in_hour = 0;
 				$time_rainfall_in_hour = 0;
@@ -173,8 +185,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     drupal_set_message(t('Rainfall stations in the no data to report'),'error');
     return;
   }
-  //dpm($day_of_month[21]);
-  //return;
+  
+  //dpm($day_of_month[18]);  return;
   
   $objPHPExcel = new PHPExcel();
   $objPHPExcel->getProperties()->setCreator("Datalogger")
@@ -208,12 +220,14 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	$k = 1;
 	//gan gia tri mac dinh cho cac o
 	// /*
-  
-	for($i = 0; $i < $month_days_number; $i++){
+  if($month_days_number == 30) $binhnt_day_of_month = $month_days_number ;
+  if($month_days_number == 31) $binhnt_day_of_month = $month_days_number - 2;
+  else $binhnt_day_of_month = $month_days_number;
+	for($i = 0; $i < $binhnt_day_of_month; $i++){
 		if($i%2 == 0){
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(65).($i+6), $k++);
 			for($j = 0; $j < 24; $j++){
-				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+6), '-');
+				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+6), '-');        
         $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '-');
 			}
 			$objPHPExcel->getActiveSheet()->mergeCells('A'.($i+6).':B'.($i+7));
@@ -288,7 +302,9 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 		)
 	);
 	$day_in_month = 1;
+  
 	for($day = 0; $day < $month_days_number - 1; $day++){
+  
 		if($day%2 == 0){
 			for($j = 0; $j < 24 ; $j++){
 				$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
@@ -305,9 +321,12 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
           
 				}
 			}
+     
 			$day_in_month++;
+     
 		}
 	}
+
   $str_rainfall = array();
   $str_time = array();
   for($j = 0; $j < 24; $j++){
@@ -712,13 +731,15 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	$objPHPExcel->getActiveSheet()->setCellValue('I10', $max_time_in_phase);
     //return 'aaaa';
 	
+  $objPHPExcel->setActiveSheetIndex(0);   // back to first sheet
+  
 	/** Include PHPExcel_IOFactory */  
   $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
   
   //return;
   
   header('Content-type: application/vnd.ms-excel');
-  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa - Trạm ' . $name_station->title . ' - ' . substr($month,-2,2) . '-' . $year . '.xls"');
+  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa theo tháng (BKT14) - Trạm ' . $name_station->title . ' - ' . substr($month,-2,2) . '-' . $year . '.xls"');
   $objWriter->save('php://output');
   //$f = file_directory_temp() . '/Bao cao du lieu mua_' . time() . '.xls';
   //$objWriter->save($f);
