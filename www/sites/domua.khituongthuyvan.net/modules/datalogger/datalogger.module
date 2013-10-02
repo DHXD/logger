@@ -1194,10 +1194,14 @@ function _datalogger_return_city2($arg = null){
 
 
 function _datalogger_them_tinh(){
+  global $khuvuc;
 
-  $khuvuc = _datalogger_return_city2();
+  $khuvuc_ = _datalogger_return_city2();
   
-  foreach ($khuvuc as $k => $cactinh) {
+  foreach ($khuvuc_ as $k => $cactinh) {
+  
+    if ($k == $khuvuc[0])
+    
     foreach ($cactinh as $matinh => $tentinh) {
     
       $node = new stdClass();

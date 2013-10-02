@@ -18,6 +18,7 @@
    
   case '117.6.129.235':
   case 'bactrungbo.dnsdynamic.net':
+  case '192.168.100.48':
     $khuvuc = array('north_central_region','KHU VỰC BẮC TRUNG BỘ', 1);
     $admin_khuvuc = array('khuvucbactrungbo', 'root');
     break;
