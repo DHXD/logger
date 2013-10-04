@@ -1236,16 +1236,20 @@ function _datalogger_new_sms_form() {
   
   $result = $query->execute();
   
+  //dpm($rows);
+  
   while($r = $result->fetchObject()) {
-	//dpm($r);
 	foreach ($rows as &$row) {
+	//dpm($r->number . '------------' . '0' . substr($row[3], 3));
 		if ('0' . substr($row[3], 3) == $r->number) {
 			$row[1] = $r->StationName;
-			break;
+			//break;
 		}
+		//dpm('0' . substr($row[3], 3,3));
+		
 	}
   }
-  
+  dpm($rows);
 	
   // Setting the output of the field
   $output = theme('pager').theme_table(
