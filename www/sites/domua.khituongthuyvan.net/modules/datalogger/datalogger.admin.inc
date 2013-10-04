@@ -2114,5 +2114,4 @@ function digipro_views_get_view_result($viewname, $display_id = NULL, $args = NU
         '%viewname' => $viewname
     ));
   }
-}
-
+}//////////
