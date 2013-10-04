@@ -227,6 +227,7 @@ function _export_excel($args){
     // //năm
     // $objPHPExcel->getActiveSheet()->setCellValue('I1', substr($year_month,0,4));//tháng
     $objPHPExcel->getActiveSheet()->setCellValue('G1',date('m',time()));
+    
     //năm
     $objPHPExcel->getActiveSheet()->setCellValue('I1', date('Y',time()));
     $objPHPExcel->getActiveSheet()->setCellValue('H8' , '=MAX(B8:B152)');
