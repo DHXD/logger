@@ -528,6 +528,11 @@ function datalogger_views_pre_render(&$view) {
  
  
 function datalogger_block_info() {
+
+  $blocks['map'] = array(
+    'info' => t('Bản đồ'),
+   // 'cache' => DRUPAL_NO_CACHE,
+  );
   // This example comes from node.module.
   $blocks['tree'] = array(
     'info' => t('Trạm'),
@@ -614,7 +619,90 @@ function datalogger_block_view($delta = '') {
          return $block;
       }
     break; 
+    
+    // bản đồ
+    case 'map':
+      $block['subject'] = t('');
+
+      $block['content'] = _datalogger_map();
+      return $block;
+
+    break; 
   }
+}
+// bản đồ
+function _datalogger_map() {
+  $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
+ 
+  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
+ // drupal_add_js('http://www.vietbando.com/maps/API/VBDMapAPI.js?key=hb9ruvojenyRZ+WnS2J/RNWP34V/iF6oabFlTqpaFYw=', 'inline');
+  drupal_add_js( <<< EEE
+  function loadMap()
+{
+	var station = [];
+	station[0] = new Object();
+	station[0].name ="Tram Huong Nguyen";
+	station[0].status=0;
+	station[0].lat=16.12583;
+	station[0].lon=108.00917;
+	
+	station[1] = new Object();
+	station[1].name ="Tram Huong Son";
+	station[1].status=1;
+	station[1].lat=16.78861;
+	station[1].lon=106.85556;
+	
+	station[2] = new Object();
+	station[2].name ="Tram Huong Phu";
+	station[2].status=2;
+	station[2].lat=16.21139;
+	station[2].lon=107.72861;
+    if (VBrowserIsCompatible())
+    { 
+		var map = new VMap(document.getElementById('container'));
+		 map.setCenter(new VLatLng(16.8152328, 106.680505), 7); 
+		//var map = new VMap(document.getElementById('container');
+		
+		for(var i=0;i<station.length;i++){
+			if(station[i].status==0){
+				var pt = new VLatLng(station[i].lat,station[i].lon);
+		 		var marker = new VMarker(pt, new VIcon("images/0.png", new VSize(32, 32)), false);
+				map.addOverlay(marker);
+				VEvent.addListener(marker, 'click', function(obj, latlng) { 
+				   obj.openInfoWindow('Bạn vừa click lên marker'); 
+			   });
+
+			}else if(station[i].status==1){
+				var pt = new VLatLng(station[i].lat,station[i].lon);
+		 		var marker = new VMarker(pt, new VIcon("images/1.png", new VSize(32, 32)), false);
+				map.addOverlay(marker);
+				map.openInfoWindow(pt, station[i].name);
+
+			}else if(station[i].status==2){
+				var pt = new VLatLng(station[i].lat,station[i].lon);
+		 		var marker = new VMarker(pt, new VIcon("images/2.png", new VSize(32, 32)), false);
+				map.addOverlay(marker);
+				VEvent.addListener(marker, 'click', function(obj, latlng) { 
+				   obj.openInfoWindow('Bạn vừa click lên marker'); 
+			   });
+			}
+		}
+       
+      
+    }
+}
+EEE
+  
+ , 'inline');
+  $html = <<< ABC
+  
+  <div id="container" style="height:500px; width:930px;position:relative; margin:10px; border:1px #b1c4d5 solid;"></div>
+  <script>
+    loadMap();
+  </script>
+ABC;
+
+  return $html;
 }
 function datalogger_action_info() {
 	GLOBAL $options_commands;
@@ -1488,7 +1576,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 	  //"#markup" => t("For better rendering, downloaded file format will be Excel 2007. If you cannot read XLSX file format, please download and install Microsoft compability pack at: <a href='http://www.microsoft.com/en-us/download/details.aspx?id=3'>http://www.microsoft.com/en-us/download/details.aspx?id=3</a>."),    
 		// '#weight' => 12,
   ); 
-	return $from;
+	return $form;
 }
 
 

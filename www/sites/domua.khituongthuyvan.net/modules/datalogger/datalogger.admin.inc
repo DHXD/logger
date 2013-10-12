@@ -1245,7 +1245,6 @@ function _datalogger_new_sms_form() {
       $row[1] = $r->StationName;
       //break;
     }
-	}
   }
   
 	
@@ -2114,3 +2113,5 @@ function digipro_views_get_view_result($viewname, $display_id = NULL, $args = NU
   }
 }
 
+
+////
