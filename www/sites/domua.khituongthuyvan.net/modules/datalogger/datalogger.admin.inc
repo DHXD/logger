@@ -1243,7 +1243,7 @@ function _datalogger_new_sms_form() {
 	foreach ($rows as &$row) {
 		if ('0' . substr($row[3], 3) == $r->number) {	
       $row[1] = $r->StationName;
-      break;
+      //break;
     }
 	}
   }
