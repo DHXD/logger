@@ -1241,11 +1241,11 @@ function _datalogger_new_sms_form() {
   while($r = $result->fetchObject()) {
 	//dpm($r);
 	foreach ($rows as &$row) {
-		if ('0' . substr($row[3], 3) == $r->number) {	
-      $row[1] = $r->StationName;
-      break;
+      if ('0' . substr($row[3], 3) == $r->number) {	
+        $row[1] = $r->StationName;
+        //break;
+      }
     }
-	}
   }
   
 	
@@ -2114,3 +2114,5 @@ function digipro_views_get_view_result($viewname, $display_id = NULL, $args = NU
   }
 }
 
+
+////
