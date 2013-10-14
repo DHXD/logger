@@ -7,7 +7,6 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
  
 	_datalogger_select_area_province_station($form, $form_state);
   
-  
 	$form['stations_fieldset']['day']['#access']=FALSE;
 	
 	$form["submit2"] = array(
@@ -16,7 +15,7 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
       "#submit" => array(
           "_datalogger_report_rainfall_month2_submit"
       ),
-  ); 
+  );
   return $form;
 }
 
@@ -26,15 +25,18 @@ function _datalogger_report_rainfall_month2_submit(&$form, &$form_state) {
 	$nid = $form_state['values']['station'];
 	$year = $form_state['values']['year'];	
   $month = $form_state['values']['month'];
-  
-  //dpm($form_state['values']);
-  
 	if($month < 10){
 		$month = '0'.$month;
 	}
 	$year_month = $year.$month;
 	
+<<<<<<< HEAD
 	
+=======
+	//dpm($month);
+	// kiem tra trong ham _datalogger_export_rainfall_month_excel().
+	///$rainfalls = views_get_view_result('view_export_excel','default', $nid, $year, $year_month, 'all');
+>>>>>>> 5cf12dfc81d861052fe84d46c658894c00513407
 	
 	/*if(count($rainfalls) <= 0){
 		drupal_set_message(t('Rainfall stations in the no data to report'),'error');
@@ -130,14 +132,8 @@ function _datalogger_calculate_total_rain_hour_inc(&$nodes) {
       $node->field_rainfall_op_idx['und'][0]['value'] = $op_idx;
       
       node_save($node);
-      
-
-    }
-    
+    } 
   }
-    
-  
-  
   return 'helloworld';
 }
 
