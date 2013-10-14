@@ -537,7 +537,10 @@ function datalogger_block_info() {
     'info' => t(''),
    
   );
-
+  $blocks['vietbando'] = array(
+    'info' => t('Việt Bản đồ'),
+  );
+  
   return $blocks;
 }
 
@@ -562,6 +565,7 @@ function test3($batdau, $ketthuc)
   $result .= '</ul></div>';
   return $result;
 }
+
 function datalogger_block_view($delta = '') {
   switch($delta){
     case 'tree':
@@ -614,6 +618,10 @@ function datalogger_block_view($delta = '') {
          return $block;
       }
     break; 
+	case 'vietbando':
+      $block['subject'] = t('');
+      $block['content'] = 'abcxyz';
+      break;
   }
 }
 function datalogger_action_info() {
@@ -1004,10 +1012,18 @@ $items['gammu/sentitems/error'] = array(
     'page callback' => '_datalogger_ftp_export',
     'file' => 'datalogger.admin.export.inc',
     'access callback' => TRUE,
-  );  
+  ); 
+  
+  $items['vietbandomap'] = array(
+    'title' => 'Kiểm tra bản đồ',
+    'page callback' => '_datalogger_vietbando',
+    'file' => 'datalogger.pages.vietbando.inc',
+    'access callback' => TRUE,
+  );  //End vietbando 
  
   return $items;
 }
+
 
 function _datalogger_menu_access_callback_node($permission, $node) {
   return user_access($permission) && $node->type == 'station';
