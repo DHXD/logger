@@ -8,6 +8,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 
 	module_load_include('inc', 'datalogger', 'datalogger.admin');
   
+  //dpm('aaaaaa');
+  
   $co_mua = false;
   
   
@@ -23,6 +25,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	else{
 		$name_station = '';
 	}
+  
   
 	$dem_luong_mua_trong_dot = array();
 	//lay du lieu cua tram
