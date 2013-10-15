@@ -29,7 +29,6 @@ function _datalogger_report_rainfall_month2_submit(&$form, &$form_state) {
 		$month = '0'.$month;
 	}
 	$year_month = $year.$month;
-  dpm($year_month);
 	
 	//dpm($month);
 	// kiem tra trong ham _datalogger_export_rainfall_month_excel().

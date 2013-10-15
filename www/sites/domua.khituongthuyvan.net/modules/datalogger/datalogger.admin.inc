@@ -737,7 +737,6 @@ function test_view(){
 	$number = '01634766847';
 	$result = _datalogger_get_station('view_command_send', $number);
 	$node_command = node_load($result[0]->nid);	
-  dpm($node_command);
 	return '';
 }
 
@@ -753,12 +752,17 @@ function _datalogger_check_inbox() {
   
   $result = db_query("SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10");
   
+  //$result = db_query("SELECT * FROM inbox WHERE Processed={$processed}  LIMIT 0,10");
+  
+  
+  //dpm($result[0]->ID);
+  
   header('Content-Type: text/plain');
   
   foreach ($result as $row) {
-    //tin nhắn từ datalogger
+    // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
-    
+
     print "Inbox ID: {$row->ID}\n";
     
 		$number = _datalogger_convert_number($row->SenderNumber);
@@ -766,8 +770,8 @@ function _datalogger_check_inbox() {
     $smsID = $row->ID;
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
-      
       //Xử lý tin nhắn được yêu cầu:88byte
+      
       if($len_sms == 88){
         print "Command.\n";
         
@@ -783,19 +787,17 @@ function _datalogger_check_inbox() {
       
         switch ($number) {
 	
-        default:
-          // Chèn bản tin vào bảng đo mưa
-          // dsm('into 140');
-          _datalogger_separate_sms($sms,$number, $id_inbox);
-          // Cập nhật các bản tin đã xử lý
-          _datalogger_update_process_inbox(1, $id_inbox);
-          //return $sms;
-          
-          // xuat ra txt
-          module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-          $tram = _datalogger_return_nid($number);
-          _datalogger_ftp_txt_export_inc($tram);
-        }
+          default:
+            // Chèn bản tin vào bảng đo mưa
+            // dsm('into 140');
+            _datalogger_separate_sms($sms,$number, $id_inbox);
+            // Cập nhật các bản tin đã xử lý
+            _datalogger_update_process_inbox(1, $id_inbox);
+            //Xuat file txt tu dong
+            module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+            $tram = _datalogger_return_nid($number);
+            _datalogger_ftp_txt_export_inc($tram);
+          }
       }			
 			else {
         print "Other.\n";
@@ -805,13 +807,9 @@ function _datalogger_check_inbox() {
 		else{
 			_datalogger_update_process_inbox(2, $id_inbox);
 		}
-    
     flush (); // flush the output buffer
   }
-  
-  
-  //return '123';
-  
+	// return 'Ok';
   print "Ok.";
   drupal_exit();
 }
@@ -1143,7 +1141,7 @@ function _datalogger_new_sms_form() {
     else
       $sort = 'DESC';
 
-    $order = 'UpdatedInDB';
+    $order = 'UpdatedInDB';    
     // Which column will be sorted
     foreach ($header as $h) {
       if ($h['data'] == $_GET['order'] && isset($h['field'])) {
@@ -1186,11 +1184,9 @@ function _datalogger_new_sms_form() {
  
   // Pagination
   $query = $query->extend('TableSort')->extend('PagerDefault')->orderByHeader($header)->limit(50);
-
+  
   // Executing query
-  $result = $query->execute();
-
-  dpq($query);
+  $result = $query->execute(); 
 
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
@@ -1242,7 +1238,7 @@ function _datalogger_new_sms_form() {
   $query->condition('s.field_station_sim_number_value', $numbers, 'IN');
   
   $result = $query->execute();
-  
+  //dpq($query);
   while($r = $result->fetchObject()) {
 	//dpm($r);
 	foreach ($rows as &$row) {
@@ -1336,7 +1332,7 @@ function _datalogger_new_outbox_form (){
 	
   // Executing query
   $result = $query->execute();
-  
+  dpm("aaaaaaaaaaaaa");
   db_set_active(); // without the paramater means set back to the default for the site
   
   // Looping for filling the table rows
@@ -1393,14 +1389,12 @@ function _datalogger_new_sentitems_form(){
     no => t('No.'),
 		station_name => t('Station Name'),
     receiving_date_time => t('Sending Date Time'),
-    //delivery_date_time =>t('Delivery Date Time'),
     destination_number => t('Destination Number'),
     message_content => t('Message content'),
 		Modem => t('Modem'),
     status => t('Status'),
   );
-  
-  $num_per_page = 500;
+  $num_per_page = 50;
   $offset=$num_per_page*$page;
 	$total = db_query("SELECT COUNT(*) total FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT 0,500");
 	$number_rows = $total->fetch()->total;
@@ -1411,22 +1405,24 @@ function _datalogger_new_sentitems_form(){
 	
   $result = db_query("SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT ". $offset.",".$num_per_page."");
 	
-  $rows = array();
+  /*$query = "SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC";
+  $result = pager_query(db_rewrite_sql($query));*/
   
-  while($row = $result->fetchObject()) {
-    $number = $row->DestinationNumber;
+  $rows = array();
+  while($row = $result->fetchObject()){
+		$number = $row->DestinationNumber;
 		$station = views_get_view_result('view_station_find', Null, $number );
     
-		if(!empty($station)) {
+		if(!empty($station)){
 			$station_name = $station[0]->node_title;
 		}
-
+		
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
 
     // highlight
     
-    //Xử lý tin nhắn được yêu cầu :88byte
+    //X? lý tin nh?n du?c yêu c?u:88byte232323233
     if($len_sms == 88) {
       $sms = '<span style="color:blue;font-weight:bold">' . $sms . '</span>';
     }
@@ -1434,22 +1430,21 @@ function _datalogger_new_sentitems_form(){
     elseif($len_sms == 140) {
       $sms = _datalogger_regex_rain($sms);      
     }			
-    if($row -> Status == "SendingOKNoReport") {
+    
+    if($row->Status == "SendingOKNoReport") {
       $status = "Thành công";
-    }
+    }    
     else {
       $status = "Lỗi";
     }
+    
     $rows[] = array (
 			$offset+=1,
 			$station_name,
-			//$row -> UpdatedInDB,
       $row -> SendingDateTime,
-      //$row -> DeliveryDateTime,
 			$number,
 			$sms,
 			$row -> SenderID,
-      //$row -> Status,
       $status,
 			);
 
@@ -1466,7 +1461,6 @@ function _datalogger_new_sentitems_form(){
       "empty" => t("Table has no row!") // The message to be displayed if table is empty
     )
   ).theme("pager");
-  //).theme('pager', array('quantity' => $total));
 	
   $prevpage = $page - 1;
   $nextpage = $page + 1;
@@ -1480,7 +1474,6 @@ function _datalogger_new_sentitems_form(){
 			$output = $output . l(t("last >>"),"gammu/sentitems/new/".($last - 1));
 		}
 	}
-  
   return $output;
 }
 
