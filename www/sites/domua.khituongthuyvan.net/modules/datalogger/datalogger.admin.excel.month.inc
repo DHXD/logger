@@ -293,7 +293,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   $objPHPExcel->getActiveSheet()->getStyle('A2:B5')->getFont()->setSize(9);
 	//chen du lieu vao bao cao
 	$objPHPExcel->getActiveSheet()->setCellValue('E1', $name_station->title);
-	$objPHPExcel->getActiveSheet()->setCellValue('K1', substr($month,-1,2));
+	$objPHPExcel->getActiveSheet()->setCellValue('K1', substr($month,-2));
 	$objPHPExcel->getActiveSheet()->setCellValue('O1',$year);
 	
 	$font_bold = array(
