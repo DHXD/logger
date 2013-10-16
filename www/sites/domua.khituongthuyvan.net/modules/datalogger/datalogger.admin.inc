@@ -6,14 +6,9 @@ foreach($stations as $station){
 	$station_name[$station->nid] = $station->node_title;
 }
 
-global $clearTime;
-$clearTime = array('00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00');
-
+global $clearTime;    // khai báo trong file module.
 global $clearTime3;
-$clearTime3 = array(h0 => '00:00:00',h1 => '01:00:00',h2 => '02:00:00', h3 => '03:00:00',h4 => '04:00:00',h5 => '05:00:00',h6 => '06:00:00',h7 => '07:00:00', h8 => '08:00:00', h9 => '09:00:00', h10 => '10:00:00', h11 => '11:00:00', h12 => '12:00:00', h13 => '13:00:00', h14 => '14:00:00', h15 => '15:00:00', h16 => '16:00:00', h17 => '17:00:00', h18 => '18:00:00', h19 => '19:00:00', h20 => '20:00:00',h21 => '21:00:00',h22 =>'22:00:00', h23 => '23:00:00');
-
 global $clearTime2;
-$clearTime2 = array('0000','0100','0200','0300','0400','0500','0600','0700','0800','0900','1000','1100','1200','1300','1400','1500','1600','1700','1800','1900','2000','2100','2200','2300');
 
 global $datalogger_pattern;
 $datalogger_pattern = array(
@@ -783,19 +778,17 @@ function _datalogger_check_inbox() {
       
         switch ($number) {
 	
-        default:
-          // Chèn bản tin vào bảng đo mưa
-          // dsm('into 140');
-          _datalogger_separate_sms($sms,$number, $id_inbox);
-          // Cập nhật các bản tin đã xử lý
-          _datalogger_update_process_inbox(1, $id_inbox);
-          //return $sms;
-          
-          // xuat ra txt
-          module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-          $tram = _datalogger_return_nid($number);
-          _datalogger_ftp_txt_export_inc($tram);
-        }
+          default:
+            // Chèn bản tin vào bảng đo mưa
+            // dsm('into 140');
+            _datalogger_separate_sms($sms,$number, $id_inbox);
+            // Cập nhật các bản tin đã xử lý
+            _datalogger_update_process_inbox(1, $id_inbox);
+            //Xuat file txt tu dong
+            module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+            $tram = _datalogger_return_nid($number);
+            _datalogger_ftp_txt_export_inc($tram);
+          }
       }			
 			else {
         print "Other.\n";
@@ -1186,11 +1179,9 @@ function _datalogger_new_sms_form() {
  
   // Pagination
   $query = $query->extend('TableSort')->extend('PagerDefault')->orderByHeader($header)->limit(50);
-
+  
   // Executing query
   $result = $query->execute();
-
-  //dpq($query);
 
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
@@ -1242,7 +1233,7 @@ function _datalogger_new_sms_form() {
   $query->condition('s.field_station_sim_number_value', $numbers, 'IN');
   
   $result = $query->execute();
-  
+  //dpq($query);
   while($r = $result->fetchObject()) {
 	//dpm($r);
 	foreach ($rows as &$row) {
@@ -1393,6 +1384,7 @@ function _datalogger_new_sentitems_form(){
     no => t('No.'),
 		station_name => t('Station Name'),
     receiving_date_time => t('Sending Date Time'),
+
     //delivery_date_time =>t('Delivery Date Time'),
     destination_number => t('Destination Number'),
     message_content => t('Message content'),
@@ -1411,16 +1403,18 @@ function _datalogger_new_sentitems_form(){
 	
   $result = db_query("SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT ". $offset.",".$num_per_page."");
 	
-  $rows = array();
+  /*$query = "SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC";
+  $result = pager_query(db_rewrite_sql($query));*/
   
-  while($row = $result->fetchObject()) {
-    $number = $row->DestinationNumber;
+  $rows = array();
+  while($row = $result->fetchObject()){
+		$number = $row->DestinationNumber;
 		$station = views_get_view_result('view_station_find', Null, $number );
     
-		if(!empty($station)) {
+		if(!empty($station)){
 			$station_name = $station[0]->node_title;
 		}
-
+		
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
 
@@ -1434,22 +1428,21 @@ function _datalogger_new_sentitems_form(){
     elseif($len_sms == 140) {
       $sms = _datalogger_regex_rain($sms);      
     }			
+
     if($row -> Status == "SendingOKNoReport") {
       $status = "Thành công";
     }
     else {
       $status = "Lỗi";
     }
+	
     $rows[] = array (
 			$offset+=1,
 			$station_name,
-			//$row -> UpdatedInDB,
       $row -> SendingDateTime,
-      //$row -> DeliveryDateTime,
 			$number,
 			$sms,
 			$row -> SenderID,
-      //$row -> Status,
       $status,
 			);
 
@@ -1466,7 +1459,6 @@ function _datalogger_new_sentitems_form(){
       "empty" => t("Table has no row!") // The message to be displayed if table is empty
     )
   ).theme("pager");
-  //).theme('pager', array('quantity' => $total));
 	
   $prevpage = $page - 1;
   $nextpage = $page + 1;
