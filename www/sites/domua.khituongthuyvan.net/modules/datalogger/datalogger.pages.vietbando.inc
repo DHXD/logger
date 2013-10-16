@@ -115,7 +115,7 @@ MANG;
 				var pt = new VLatLng(station[i].lat,station[i].lon);
 				if(station[i].trangthai==1){
 					if(station[i].canhbao == 0){
-						markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/orange.png", new VSize(15, 15)), false);
+						markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/orange1.png", new VSize(15, 15)), false);
 					}else{
 						if(station[i].canhbaostatus == 0){
 							markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/blue.png", new VSize(15, 15)), false);
@@ -248,8 +248,8 @@ MANG;
 				//var tram[tram.length] = station[i].tentram; 
 				//console.log(station[i].sdt);
 				
-				if(station[i].sdt.toString().indexOf(input) == -1){
-					console.log('--------------');
+				if(station[i].sdt.toString().indexOf(input) > -1){
+					console.log('3--------------');
 					console.log(station[i].sdt);
 					//var tentram = station[i].tentram.toLowerCase();
 					console.log(station[i].sdt.indexOf(input));

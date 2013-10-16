@@ -663,7 +663,7 @@ function datalogger_action_info() {
 }
 
 /**
- * Action function for _datalogger_calculate_total_rain_hour.
+ * Action function for _datalogger_calculate_total_rain_hour.command/0/23
  */
 function _datalogger_calculate_total_rain_hour(&$entity, $context = array()) {
   //dpm($entity);

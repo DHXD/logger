@@ -321,6 +321,8 @@ function _command_form($form, &$form_state) {
 			'#options' => $timeInterval,
 			'#default_value' => 0,
       );
+			//$node->field_field_station_transmission_speed[0]['rendered']['#markup'] = $timeInterval;
+			//node_save($node);
       break;
     case 24 :
       // $title =  t('Get Data Send Interval Minutes');
@@ -1074,6 +1076,8 @@ function _datalogger_send_command($nid, $select, $form, &$form_state) {
           $arg = array('Thiết lập thời gian truyền dữ liệu','C:INTERVAL:', _datalogger_result($message,'C:INTERVAL:'),'',$nid);
           // dsm(strlen($message));
           // dsm($message);
+					$node->field_field_station_transmission_speed[0]['rendered']['#markup'] = $interval;
+					node_save($node);
           break;
         case 24 :
           // $title =  t('Get Data Send Interval Minutes');
