@@ -787,14 +787,17 @@ function _datalogger_check_inbox() {
       
         switch ($number) {
 	
-        default:
-          // Chèn bản tin vào bảng đo mưa
-          // dsm('into 140');
-          _datalogger_separate_sms($sms,$number, $id_inbox);
-          // Cập nhật các bản tin đã xử lý
-          _datalogger_update_process_inbox(1, $id_inbox);
-          //return $sms;
-        }
+          default:
+            // Chèn bản tin vào bảng đo mưa
+            // dsm('into 140');
+            _datalogger_separate_sms($sms,$number, $id_inbox);
+            // Cập nhật các bản tin đã xử lý
+            _datalogger_update_process_inbox(1, $id_inbox);
+            //Xuat file txt tu dong
+            module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+            $tram = _datalogger_return_nid($number);
+            _datalogger_ftp_txt_export_inc($tram);
+          }
       }			
 			else {
         print "Other.\n";
@@ -1181,11 +1184,9 @@ function _datalogger_new_sms_form() {
  
   // Pagination
   $query = $query->extend('TableSort')->extend('PagerDefault')->orderByHeader($header)->limit(50);
-
+  
   // Executing query
-  $result = $query->execute();
-
-  // dpq($query); 
+  $result = $query->execute(); 
 
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
@@ -1237,7 +1238,7 @@ function _datalogger_new_sms_form() {
   $query->condition('s.field_station_sim_number_value', $numbers, 'IN');
   
   $result = $query->execute();
-  
+  //dpq($query);
   while($r = $result->fetchObject()) {
 	//dpm($r);
 	foreach ($rows as &$row) {
@@ -1388,7 +1389,6 @@ function _datalogger_new_sentitems_form(){
     no => t('No.'),
 		station_name => t('Station Name'),
     receiving_date_time => t('Sending Date Time'),
-    delivery_date_time =>t('Delivery Date Time'),
     destination_number => t('Destination Number'),
     message_content => t('Message content'),
 		Modem => t('Modem'),
@@ -1408,24 +1408,21 @@ function _datalogger_new_sentitems_form(){
   /*$query = "SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC";
   $result = pager_query(db_rewrite_sql($query));*/
   
-  
   $rows = array();
   while($row = $result->fetchObject()){
-		$number = $row->SenderNumber;
+		$number = $row->DestinationNumber;
 		$station = views_get_view_result('view_station_find', Null, $number );
+    
 		if(!empty($station)){
 			$station_name = $station[0]->node_title;
 		}
-		else{
-			$station_name = null;	
-		}
-    
+		
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
 
     // highlight
     
-    //X? lý tin nh?n du?c yêu c?u:88byte
+    //X? lý tin nh?n du?c yêu c?u:88byte232323233
     if($len_sms == 88) {
       $sms = '<span style="color:blue;font-weight:bold">' . $sms . '</span>';
     }
@@ -1434,28 +1431,25 @@ function _datalogger_new_sentitems_form(){
       $sms = _datalogger_regex_rain($sms);      
     }			
     
+    if($row->Status == "SendingOKNoReport") {
+      $status = "Thành công";
+    }    
+    else {
+      $status = "Lỗi";
+    }
+    
     $rows[] = array (
 			$offset+=1,
 			$station_name,
-			//$row -> UpdatedInDB,
       $row -> SendingDateTime,
-      $rorw -> DeliveryDateTime,
 			$number,
 			$sms,
-			$row -> RecipientID,
-      $row -> Status,
+			$row -> SenderID,
+      $status,
 			);
 
   }
 	
-  /*$retval = theme('table', array(
-                'header' => $headers,
-                'rows' => $rows
-                 ));*/
-                 
-     
-  
-     
 	$output = theme_table(
     array(
       "header" => $headers,
@@ -1467,18 +1461,17 @@ function _datalogger_new_sentitems_form(){
       "empty" => t("Table has no row!") // The message to be displayed if table is empty
     )
   ).theme("pager");
-  //).theme('pager', array('quantity' => $total));
 	
   $prevpage = $page - 1;
   $nextpage = $page + 1;
   if($page > 0){
-    $output = $output . l(t("<< first"),"gammu/sentintems/new");
-    $output = $output . l(t("< previous"),"gammu/sentintems/new/".$prevpage). "  ";
+    $output = $output . l(t("<< first"),"gammu/sentitems/new");
+    $output = $output . l(t("< previous"),"gammu/sentitems/new/".$prevpage). "  ";
   }
 	if($number_rows > $num_per_page){
 		if($nextpage < $last){
-			$output = $output . l(t("next >"),"gammu/sentintems/new/".$nextpage);
-			$output = $output . l(t("last >>"),"gammu/sentintems/new/".($last - 1));
+			$output = $output . l(t("next >"),"gammu/sentitems/new/".$nextpage);
+			$output = $output . l(t("last >>"),"gammu/sentitems/new/".($last - 1));
 		}
 	}
   return $output;
