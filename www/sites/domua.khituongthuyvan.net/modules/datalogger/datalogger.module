@@ -623,12 +623,12 @@ function datalogger_block_view($delta = '') {
          return $block;
       }
     break; 
-<<<<<<< HEAD
-	case 'vietbando':
+
+    case 'vietbando':
       $block['subject'] = t('');
       $block['content'] = 'abcxyz';
       break;
-=======
+
     
     // bản đồ
     case 'map':
@@ -638,7 +638,7 @@ function datalogger_block_view($delta = '') {
       return $block;
 
     break; 
->>>>>>> 5cf12dfc81d861052fe84d46c658894c00513407
+
   }
 }
 // bản đồ
