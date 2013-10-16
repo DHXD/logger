@@ -3,6 +3,15 @@
 global $khuvuc; 
 global $admin_khuvuc;    
 require 'khuvuc.php';
+
+global $clearTime;
+$clearTime = array('00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00');
+
+global $clearTime3;
+$clearTime3 = array(h0 => '00:00:00',h1 => '01:00:00',h2 => '02:00:00', h3 => '03:00:00',h4 => '04:00:00',h5 => '05:00:00',h6 => '06:00:00',h7 => '07:00:00', h8 => '08:00:00', h9 => '09:00:00', h10 => '10:00:00', h11 => '11:00:00', h12 => '12:00:00', h13 => '13:00:00', h14 => '14:00:00', h15 => '15:00:00', h16 => '16:00:00', h17 => '17:00:00', h18 => '18:00:00', h19 => '19:00:00', h20 => '20:00:00',h21 => '21:00:00',h22 =>'22:00:00', h23 => '23:00:00');
+
+global $clearTime2;
+$clearTime2 = array('0000','0100','0200','0300','0400','0500','0600','0700','0800','0900','1000','1100','1200','1300','1400','1500','1600','1700','1800','1900','2000','2100','2200','2300');
         
 /**
  *Author:hungnm0302
@@ -542,7 +551,10 @@ function datalogger_block_info() {
     'info' => t(''),
    
   );
-
+  $blocks['vietbando'] = array(
+    'info' => t('Việt Bản đồ'),
+  );
+  
   return $blocks;
 }
 
@@ -567,6 +579,7 @@ function test3($batdau, $ketthuc)
   $result .= '</ul></div>';
   return $result;
 }
+
 function datalogger_block_view($delta = '') {
   switch($delta){
     case 'tree':
@@ -619,6 +632,14 @@ function datalogger_block_view($delta = '') {
          return $block;
       }
     break; 
+
+
+    case 'vietbando':
+      $block['subject'] = t('');
+      $block['content'] = 'abcxyz';
+      break;
+
+
     
     // bản đồ
     case 'map':
@@ -628,82 +649,10 @@ function datalogger_block_view($delta = '') {
       return $block;
 
     break; 
+
   }
 }
-// bản đồ
-function _datalogger_map() {
-  $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
- 
-  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
- // drupal_add_js('http://www.vietbando.com/maps/API/VBDMapAPI.js?key=hb9ruvojenyRZ+WnS2J/RNWP34V/iF6oabFlTqpaFYw=', 'inline');
-  drupal_add_js( <<< EEE
-  function loadMap()
-{
-	var station = [];
-	station[0] = new Object();
-	station[0].name ="Tram Huong Nguyen";
-	station[0].status=0;
-	station[0].lat=16.12583;
-	station[0].lon=108.00917;
-	
-	station[1] = new Object();
-	station[1].name ="Tram Huong Son";
-	station[1].status=1;
-	station[1].lat=16.78861;
-	station[1].lon=106.85556;
-	
-	station[2] = new Object();
-	station[2].name ="Tram Huong Phu";
-	station[2].status=2;
-	station[2].lat=16.21139;
-	station[2].lon=107.72861;
-    if (VBrowserIsCompatible())
-    { 
-		var map = new VMap(document.getElementById('container'));
-		 map.setCenter(new VLatLng(16.8152328, 106.680505), 7); 
-		//var map = new VMap(document.getElementById('container');
-		
-		for(var i=0;i<station.length;i++){
-			if(station[i].status==0){
-				var pt = new VLatLng(station[i].lat,station[i].lon);
-		 		var marker = new VMarker(pt, new VIcon("images/0.png", new VSize(32, 32)), false);
-				map.addOverlay(marker);
-				VEvent.addListener(marker, 'click', function(obj, latlng) { 
-				   obj.openInfoWindow('Bạn vừa click lên marker'); 
-			   });
 
-			}else if(station[i].status==1){
-				var pt = new VLatLng(station[i].lat,station[i].lon);
-		 		var marker = new VMarker(pt, new VIcon("images/1.png", new VSize(32, 32)), false);
-				map.addOverlay(marker);
-				map.openInfoWindow(pt, station[i].name);
-
-			}else if(station[i].status==2){
-				var pt = new VLatLng(station[i].lat,station[i].lon);
-		 		var marker = new VMarker(pt, new VIcon("images/2.png", new VSize(32, 32)), false);
-				map.addOverlay(marker);
-				VEvent.addListener(marker, 'click', function(obj, latlng) { 
-				   obj.openInfoWindow('Bạn vừa click lên marker'); 
-			   });
-			}
-		}
-       
-      
-    }
-}
-EEE
-  
- , 'inline');
-  $html = <<< ABC
-  
-  <div id="container" style="height:500px; width:930px;position:relative; margin:10px; border:1px #b1c4d5 solid;"></div>
-  <script>
-    loadMap();
-  </script>
-ABC;
-
-  return $html;
-}
 function datalogger_action_info() {
 	GLOBAL $options_commands;
   
@@ -730,7 +679,7 @@ function datalogger_action_info() {
 }
 
 /**
- * Action function for _datalogger_calculate_total_rain_hour.
+ * Action function for _datalogger_calculate_total_rain_hour.command/0/23
  */
 function _datalogger_calculate_total_rain_hour(&$entity, $context = array()) {
   //dpm($entity);
@@ -1090,12 +1039,22 @@ $items['gammu/sentitems/error'] = array(
   $items['export/ftp/%'] = array(
     'title' => 'FTP Export',
     'page callback' => '_datalogger_ftp_export',
+    // 'page callback' => _datalogger_ftp_txt_export_inc,
     'file' => 'datalogger.admin.export.inc',
     'access callback' => TRUE,
-  );  
+  ); 
+  
+  $items['view/stations/bando'] = array(
+    'title' => 'Map of automatic rainfall stations in 2012',
+    'page callback' => '_datalogger_vietbando',
+    'file' => 'datalogger.pages.vietbando.inc',
+    'access callback' => TRUE,
+  );  //End vietbando 
+	
  
   return $items;
 }
+
 
 function _datalogger_menu_access_callback_node($permission, $node) {
   return user_access($permission) && $node->type == 'station';
