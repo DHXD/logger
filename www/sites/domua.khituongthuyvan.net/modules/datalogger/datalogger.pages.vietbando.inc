@@ -58,16 +58,21 @@ function _datalogger_vietbando() {
 		//Vi do
 		station[$k].vido = "{$row ->_field_data['nid']['entity']->field_station_longgitude['und'][0]['value']}";
 		//SDT
-		station[$k].sdt = {$row->field_field_station_sim_number[0]['rendered']['#markup']};
+		station[$k].sdt = "{$row->field_field_station_sim_number[0]['rendered']['#markup']}";
 		//Dien ap
 		station[$k].dienap = '';
 		//Luong mua 24h
-		station[$k].luongmua24h = "0.0mm";
+		station[$k].luongmua24h ="{$row->field_field_station_rain_24[0]['rendered']['#markup']}";
 		//Luong mua gan nhat
-		station[$k].luongmuagannhat = "0.0mm";
+		station[$k].luongmuagannhat ="{$row->field_field_station_rain_nearest[0]['rendered']['#markup']}";
 		//Trang thai
 		station[$k].trangthai ={$row->field_field_station_status[0]['rendered']['#access']} ;
-					
+		//Thoi gian truyen tin
+		station[$k].thoigiantruyentin = "{$row->field_field_station_transmission_speed[0]['rendered']['#markup']}";
+		
+		if(station[$k].thoigiantruyentin == ""){
+			station[$k].thoigiantruyentin = "Chưa có dữ liệu";	
+		}		
 MANG;
 		if(count($row->field_field_station_alarm) == 0){
 			//Binh thuong
@@ -121,7 +126,7 @@ MANG;
 				}else{
 					markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/black.png", new VSize(15, 15)), false);
 				}
-				
+		
 		 		map.addOverlay(markers[i]);
 				
 				contentString[i] = '<div style =" width: 200px; height: 100px"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 751;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 1; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
@@ -161,17 +166,17 @@ MANG;
 				contentString[i] += '">Tình trạng: <b>';
 				contentString[i] += 'Không';
 				contentString[i] += '</b></a></li><li><a title="Lượng mưa 24h: ';
-				contentString[i] += '0.0mm';
+				contentString[i] += station[i].luongmua24h;
 				contentString[i] += '">Lượng mưa 24h: <b>';
-				contentString[i] += '0.0mm';
+				contentString[i] += station[i].luongmua24h;
 				contentString[i] += '</b></a></li><li><a title="Lượng mưa gần nhất: ';
-				contentString[i] += '0.0mm';
+				contentString[i] +=station[i].luongmuagannhat;
 				contentString[i] += '">Lượng mưa gần nhất: <b>';
-				contentString[i] += '0.0mm';
+				contentString[i] += station[i].luongmuagannhat;
 				contentString[i] += '</b></a></li><li><a title="Thời gian truyền tin: ';
 				contentString[i] += 'null';
 				contentString[i] += '">Thời gian truyền tin: <b>';
-				contentString[i] += 'null';
+				contentString[i] += station[i].thoigiantruyentin;
 				contentString[i] += '</b></a></li><li><a title="Báo cáo dữ liệu mưa" href="';
 				contentString[i] += '/manage/report/rainfalls/month/';
 				contentString[i] += station[i].nid;
@@ -182,18 +187,7 @@ MANG;
 				contentString[i] += '/manager/bieu-do-mua-theo-gio';
 				contentString[i] += '"><b>Thống kê số lượng mưa theo biểu đồ</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li></ul></div></div></div></div>';
 				  contentString[i] += '';
-				/*
-				contentString[i] += '<div id="popup_FrameDecorationDiv_0" style="position: absolute; overflow: hidden; width: 216px; height: 116px; left: 0px; bottom: 21px; right: 22px; top: 10px;"><img id="popup_FrameDecorationImg_0" src="/sites/domua.khituongthuyvan.net/modules/features/openlayers/themes/default_dark/img/cloud-popup-relative.png" style="width: 1276px; height: 736px; position: absolute; left: 0px; top: 0px;"></div>';
-				*/
-				/*
-				contentString[i] += '<div id="popup_FrameDecorationDiv_1" style="position: absolute; overflow: hidden; width: 22px; height: 116px; bottom: 21px; right: 0px; top: 10px;"><img id="popup_FrameDecorationImg_1" src="/sites/domua.khituongthuyvan.net/modules/features/openlayers/themes/default_dark/img/cloud-popup-relative.png" style="width: 1276px; height: 736px; position: absolute; left: -1238px; top: 0px;"></div>';
-				*/
-				/*
-				contentString[i] += '<div id="popup_FrameDecorationDiv_2" style="position: absolute; overflow: hidden; width: 216px; height: 21px; left: 0px; bottom: 22px; right: 22px;"><img id="popup_FrameDecorationImg_2" src="/sites/domua.khituongthuyvan.net/modules/features/openlayers/themes/default_dark/img/cloud-popup-relative.png" style="width: 1276px; height: 736px; position: absolute; left: 0px; top: -629px;"></div>';
-				*/
-				/*
-				contentString[i] += '<div id="popup_FrameDecorationDiv_3" style="position: absolute; overflow: hidden; width: 22px; height: 21px; bottom: 22px; right: 0px;"><img id="popup_FrameDecorationImg_3" src="/sites/domua.khituongthuyvan.net/modules/features/openlayers/themes/default_dark/img/cloud-popup-relative.png" style="width: 1276px; height: 736px; position: absolute; left: -1238px; top: -629px;"></div></div>';
-				*/
+			
 				contentString[i] += '';		
 			}
 			
@@ -213,10 +207,124 @@ MANG;
 				var marker = markers[i];
 				var currentIndex = i;
 				addInfoMarker(currentIndex);
-				
 			}
 			
 		}
+		/*
+		*SearchId
+		*/
+		function searchTenTram(input,station){
+			//var str ="ha he hi";
+			//console.log('--------------');
+			//console.log(str.indexOf("hi"));
+			var keys = [];
+			var result = [];
+			//console.log(input);
+			//var abc = ["Mot","Hai","Ba"] 
+			var tram = [];
+			for(var i = 0;i < station.length;i++){
+				//var tram[tram.length] = station[i].tentram; 
+				
+				if(station[i].tentram.toLowerCase().indexOf(input.toLowerCase()) > -1){
+					console.log(station[i].tentram);
+					//var tentram = station[i].tentram.toLowerCase();
+					console.log(station[i].tentram.toLowerCase().indexOf(input.toLowerCase()));
+					return i;
+					break;
+				}
+			}		
+		}
+		function searchSdtTram(input,station){
+			//var str ="ha he hi";
+			console.log('1--------------');
+			//console.log(str.indexOf("hi"));
+			var keys = [];
+			var result = [];
+			//console.log(input);
+			//var abc = ["Mot","Hai","Ba"] 
+			var tram = [];
+			for(var i = 0;i < station.length;i++){
+				console.log('2--------------');
+				//var tram[tram.length] = station[i].tentram; 
+				//console.log(station[i].sdt);
+				
+				if(station[i].sdt.toString().indexOf(input) == -1){
+					console.log('--------------');
+					console.log(station[i].sdt);
+					//var tentram = station[i].tentram.toLowerCase();
+					console.log(station[i].sdt.indexOf(input));
+					return i;
+					break;
+				}
+				
+			}	
+			//console.log('---------------------------------------------');
+			//console.log(station[0].sdt.toString().indexOf("163"));	
+			//return;
+		}
+		/**
+		*
+		*/
+		jQuery(document).ready(function($) {
+			$( "#olvm-search-btn" ).click(function() {
+				console.log('ok');
+				var tentram = $("#olvm-title-txt").val();
+				console.log(tentram);
+				var sdt = $("#olvm-phone-txt").val();
+				console.log(sdt);
+				if(tentram == '' && sdt == ''){
+					return;
+				}else if(tentram != '' && sdt ==''){
+					var result = searchTenTram(tentram,station);
+					console.log(result);
+					var lat = station[result].lat;
+					console.log(lat);
+					var lon = station[result].lon;
+					console.log(lon);
+					var pt = new VLatLng(lat,lon);
+					console.log(pt);
+					//map.SetCenter(pt,7);	
+					map.setCenter(new VLatLng(lat,lon),8);
+					markers[result].openInfoWindow(contentString[result]);
+				}else if(tentram == '' && sdt !=''){
+					var result = searchSdtTram(sdt,station);
+					console.log(result);
+					console.log(result);
+					var lat = station[result].lat;
+					console.log(lat);
+					var lon = station[result].lon;
+					console.log(lon);
+					var pt = new VLatLng(lat,lon);
+					console.log(pt);
+					//map.SetCenter(pt,7);	
+					map.setCenter(new VLatLng(lat,lon),8);
+					markers[result].openInfoWindow(contentString[result]);
+				}else if(tentram !='' && sdt !=''){
+					return;
+				}
+			});
+			//Focus
+			jQuery(document).ready(function(){
+				$("#olvm-title-txt").focus(function(){
+						$(this).prev("label").hide();
+						//$('label.label-hide[for="' + $(this)[0].id + '"]').hide();
+					}).blur(function() {
+						if($(this).val() == '') {
+							//$('label.label-hide[for="' + $(this)[0].id + '"]').show();
+							$(this).prev("label").show();
+						}
+				});
+					$("#olvm-phone-txt").focus(function(){
+						$(this).prev("label").hide();
+						//$('label.label-hide[for="' + $(this)[0].id + '"]').hide();
+					}).blur(function() {
+						if($(this).val() == '') {
+							//$('label.label-hide[for="' + $(this)[0].id + '"]').show();
+							$(this).prev("label").show();
+						}
+				});
+			});
+		});		
 MANG2;
 
 	$s.="}";
