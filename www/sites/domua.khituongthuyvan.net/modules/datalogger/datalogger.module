@@ -1090,6 +1090,7 @@ $items['gammu/sentitems/error'] = array(
   $items['export/ftp/%'] = array(
     'title' => 'FTP Export',
     'page callback' => '_datalogger_ftp_export',
+    // 'page callback' => _datalogger_ftp_txt_export_inc,
     'file' => 'datalogger.admin.export.inc',
     'access callback' => TRUE,
   );  
