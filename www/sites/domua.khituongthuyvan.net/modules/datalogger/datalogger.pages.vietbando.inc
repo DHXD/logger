@@ -8,7 +8,7 @@ function _datalogger_map() {
 	//return $view[0]->field_field_station_longgitude[0]['raw']['safe_value'];
 	$s = '';
 	
-	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
+	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=';
 	
   drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
@@ -40,7 +40,7 @@ function _datalogger_vietbando() {
 	//echo $rows[0]->field_field_station_alarm;
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
 
-  $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
+  $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=';
 	
   drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
@@ -124,7 +124,7 @@ MANG;
 	$s.= <<< MANG2
 		if (VBrowserIsCompatible() ) { 
 			var map = new VMap(document.getElementById('container'));
-			map.setCenter(new VLatLng(16.8152328, 106.680505), 7);
+			map.setCenter(new VLatLng(18.8152328, 105.680505), 7);
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
