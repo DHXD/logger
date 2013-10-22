@@ -10,7 +10,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   
   $co_mua = false;
   
-  
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel/IOFactory.php';
   $name_qtv = $form_state['values']['txtNameQTV'];
 	$name_nlb = $form_state['values']['txtNameNLB'];
@@ -33,34 +32,30 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
                     FROM {field_data_field_rainfall_send_time} f ';
   $query .= ' LEFT JOIN {field_data_field_rainfall_station} fs ON fs.entity_id=f.entity_id';
   //field_data_field_rainfall_measuring
-   $query .= ' LEFT JOIN {field_data_field_rainfall_measuring} fm ON fm.entity_id=f.entity_id';
-    $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
+  $query .= ' LEFT JOIN {field_data_field_rainfall_measuring} fm ON fm.entity_id=f.entity_id';
+  $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
   $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\'  AND n.type=\'rainfall\'';
   $query .= '  AND fs.field_rainfall_station_nid = '. $nid;
   $time_min = mktime(0,10,0,substr($month, -2), 1,$year);
   $month_days_number = cal_days_in_month(CAL_GREGORIAN, substr($month, -2), $year);
   $time_max = mktime(24,00,00,substr($month, -2), $month_days_number,$year);
   
-  //$time_test = mktime(00,00,00, 9 , 19, $year);
-  //dpm($time_test);
-  
-  // Set station
-  //if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
   if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.$time_min .' AND  f.field_rainfall_send_time_value <= '.$time_max;
   $query .= ' GROUP BY f.field_rainfall_send_time_value';
   // Result is returned as a iterable object that returns a stdClass object on each iteration
   $result = db_query($query);
   
-  //dpm($query);//return;
-  
   $in_array = array();
   foreach ($result as $record) {
-    //dpm($record->field_rainfall_send_time_value);
-    
-    $day =  date('d',$record->field_rainfall_send_time_value );
-    
+    $day =  intval(date('d',$record->field_rainfall_send_time_value));
     $hour = (int)substr($record->title, -8, 2); 
     $minute = (int)substr($record->title, -5, 2);
+    // dpm($day, "day"); dpm($hour, "hour"); dpm($minute, "minute");
+    // if ($day == '01' && $hour == '00') {
+      // $day--;
+      // $day = date('d',$record->field_rainfall_send_time_value + 3600);
+      // break;
+    // }
     if ($hour == '00' && $minute == '00') {           // first hour minute -> chuyen sang ngay hom truoc
       $day--;
       if ($day <1 ) continue;
@@ -69,37 +64,25 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     
     if (!isset($in_array[$day])) $in_array[$day] = array();
     $in_array[$day][$record->entity_id] = $record;
-    //dpm($day);
   }
-  
-  //dpm($in_array);return ;
+  //return ;
 	for($day = 1; $day <= $month_days_number; $day++){
     
     $dem_luong_mua_trong_dot[$day-1] = array();
-		if(($day) < 10){
-			$day_time = '0'.($day);
-		}
-		else{
-			$day_time = $day;
-		}
-    
+	
+		$day_time = ($day) < 10 ? '0'.($day) : $day;
+		
 		$max_rainfall_in_day = 0;
 		$max_total_rainfall_in_day = 0;
 		$max_total_time_rainfall_in_day = 0;
 		$hours_in_day = array();
     $month_day = $month.$day_time;
-    //dpm($month_day);
-    
-    //if ($day == 20) dpm($rainfalls);
-    //dpm($rainfalls);
     
 		if(count($in_array) > 0){
       $co_mua = true;
       
-			foreach($in_array[$day_time] as $rainfall){
+			foreach($in_array[$day] as $rainfall){
      
-        //$rainfall = $rainfall[0];
-        //dpm($rainfall->node_title);
 				$hour = (int)substr($rainfall->title, -8, 2); 
         $minute = (int)substr($rainfall->title, -5, 2);
         $second = (int)substr($rainfall->title, -2, 2);
@@ -147,7 +130,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 						'total_rainfall_in_hour' => 0,
 						'time_rainfall_in_hour' => 0);
 				}
-				
 			}
 		}
 		else{
@@ -193,7 +175,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
                  ->setDescription("Document for Office 2007 XLSX")
                  ->setKeywords("Datalogger")
                  ->setCategory("Datalogger");
-	//$objPHPExcel->setActiveSheetIndex();
   
 	$objPHPExcel->setActiveSheetIndex(0);
   
@@ -216,16 +197,16 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   $objPHPExcel->getActiveSheet()->setCellValue('Y1', 'Trang 2');
 	$k = 1;
 	//gan gia tri mac dinh cho cac o
-	// /*
-  if($month_days_number == 30) $binhnt_day_of_month = $month_days_number ;
+
+  if($month_days_number == 30) $binhnt_day_of_month = $month_days_number;
   if($month_days_number == 31) $binhnt_day_of_month = $month_days_number - 2;
   else $binhnt_day_of_month = $month_days_number;
 	for($i = 0; $i < $binhnt_day_of_month; $i++){
 		if($i%2 == 0){
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(65).($i+6), $k++);
 			for($j = 0; $j < 24; $j++){
-				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+6), '-');        
-        $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '-');
+				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+6), '+');
+        $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '+');
 			}
 			$objPHPExcel->getActiveSheet()->mergeCells('A'.($i+6).':B'.($i+7));
 			$objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+6), '=SUM(C'.($i+6).':Z'.($i+6).')');
@@ -233,9 +214,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 		}
 		
 	}
-
-	//$objPHPExcel->getActiveSheet()->getStyle('A38')->getAlignment()->setTextRotation(90);
-
 
 	$objPHPExcel->getActiveSheet()->mergeCells('A1:B1');
 	$objPHPExcel->getActiveSheet()->mergeCells('Y1:AA1');
@@ -256,7 +234,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 
 	$sharedStyle1 = new PHPExcel_Style();
 	$sharedStyle1->applyFromArray(
-		array(//'fill' 	=> array(
+		array(
 				'borders' => array(
                   'top'	=> array('style' => PHPExcel_Style_Border::BORDER_THIN),
                   'left'	=> array('style' => PHPExcel_Style_Border::BORDER_THIN),
@@ -265,7 +243,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 								)
 			 ));
 	$objPHPExcel->getActiveSheet()->setSharedStyle($sharedStyle1, 'A1:AA35');
-  //$objPHPExcel->getActiveSheet()->setSharedStyle($sharedStyle1, 'C36:AA37');
   
 	//chinh vi tri cac cell 
 	$objPHPExcel->getActiveSheet()->getStyle('A1:AA37')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -280,7 +257,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   $objPHPExcel->getActiveSheet()->setTitle('Trang 2');
 	//thiet lap chieu cao cac row
   $objPHPExcel->getActiveSheet()->getRowDimension('1')->setRowHeight(40);
-  for ($i=2;$i<37;$i++) { 
+  for ($i=2;$i<37;$i++) {
     $objPHPExcel->getActiveSheet()->getRowDimension($i)->setRowHeight(19);
   }
 	// 
@@ -306,6 +283,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 			for($j = 0; $j < 24 ; $j++){
 				$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 				$time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
+        //dpm($day_of_month[$day_in_month]['hours_in_day'][$j]);
         if(!$total) $total = '-';
         if(!$time) $time = '-';
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+6),$total);
@@ -313,30 +291,33 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				if($total > 0 && $time > 0){
 					$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->applyFromArray($font_bold);
 					$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+7))->applyFromArray($font_bold);
-          //number decimal
           $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->getNumberFormat()->setFormatCode('0.0');
-          
 				}
 			}
-     
 			$day_in_month++;
-     
 		}
 	}
-
+  
+  // dpm(intval($month));
+  // $now = getdate();
+  // $h = $now["hours"];
+  // $d = $now["mday"]; $m = $now["mon"]; $y = $now["year"];
+  // $timee = intval(sprintf("%4d%02d%02d%02d", $y, $m, $d, $h));
+  // dpm($timee);  return;
+  
+  
   $str_rainfall = array();
   $str_time = array();
   for($j = 0; $j < 24; $j++){
 
 		for($i = 0; $i <= 28; $i++){
-			if($i%2 == 0){
+			if($i % 2 == 0){
         $str_rainfall[$j] += $objPHPExcel->getActiveSheet()->getCell(chr(67+$j).($i+6))->getValue();
         $str_time[$j] += $objPHPExcel->getActiveSheet()->getCell(chr(67+$j).($i+7))->getValue();
 			}
 		}
 	}
   
-	
   //bat dau trang 3
   
   $objPHPExcel->createSheet();
@@ -345,13 +326,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	$objPHPExcel->getActiveSheet()->setCellValue('I1', 'Tháng');
 	$objPHPExcel->getActiveSheet()->setCellValue('M1', 'Năm');
 	$objPHPExcel->getActiveSheet()->setCellValue('A2', 'Ngày \Giờ');
-  
-  
-	// $month_days_number = cal_days_in_month(CAL_GREGORIAN, substr($month, -2), $year);
-	/*++++++++++++++tao sheet 1++++++++++++++++++++++++*/
-	// $objPHPExcel->createSheet();
-	//sheet tu 0
-	
   
 	//thiet lap header
 	for($i =0; $i < 24; $i++){
@@ -364,9 +338,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	$objPHPExcel->getActiveSheet()->setCellValue('AA3', 'mm');
 	$objPHPExcel->getActiveSheet()->setCellValue('AA4', 'phút');
 	$objPHPExcel->getActiveSheet()->setCellValue('AA5', '25');
-	//$k = ceil($month_days_number/2) +1;
+  
 	//gan gia tri mac dinh cho cac o
-	// /*
 	for($i = 0; $i < $month_days_number*2 - 30; $i++){
     
 		if($i%2 == 0){
@@ -386,10 +359,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	$objPHPExcel->getActiveSheet()->setCellValue('B'.($month_days_number+7), 'mm');
 	$objPHPExcel->getActiveSheet()->setCellValue('B'.($month_days_number+8), 'Phút');
   $objPHPExcel->getActiveSheet()->setCellValue('Y1', 'Trang 3');
-	
-	// $mm =0;
-	// $minute = 0;
-	
 	
 	$objPHPExcel->getActiveSheet()->mergeCells('A'.($month_days_number + 7).':A'.($month_days_number + 8));
 	$objPHPExcel->getActiveSheet()->mergeCells('A2:B5');
@@ -460,8 +429,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   
 	for($i = 15; $i <= $month_days_number ; $i++){
     // binhnt edited here
-    $day = ($i - 15)*2 ;
-		//if($day%2 == 0){
+    $day = ($i - 15) * 2;
 			for($j = 0; $j < 24 ; $j++){
 				$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 				$time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
@@ -745,4 +713,4 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   
   drupal_exit();
 }
-
+////////////////////////
