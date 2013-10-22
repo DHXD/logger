@@ -8,7 +8,7 @@ function _datalogger_map() {
 	//return $view[0]->field_field_station_longgitude[0]['raw']['safe_value'];
 	$s = '';
 	
-	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6cw0rgxJLuxG';
+	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
 	
   drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
@@ -17,6 +17,14 @@ function _datalogger_map() {
   <div id="container" style="height:500px; width:930px;position:relative; margin:10px; border:1px #b1c4d5 solid;"></div>
   <div id"test"></div>
   <script>
+    function loadMap()
+    {
+        if (VBrowserIsCompatible())
+        {
+           var map = new VMap(document.getElementById('container'));
+           map.setCenter(new VLatLng(10.8152328, 106.680505), 4);
+        }
+    }
     loadMap();
   </script>
 ABC;
@@ -28,14 +36,15 @@ function _datalogger_vietbando() {
 	$rows = views_get_view_result('viet_ban_do');
 	
 	
-	dpm($rows);
+	//dpm($rows);
 	//echo $rows[0]->field_field_station_alarm;
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
 
-	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=5lJdIlKaLKfA1UMwdmzgbRYOTt/AH+9wl6NQH/f0pue8AFCloQ7qJw==';
+  $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
 	
   drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
-  	$s = "  function loadMap() {";
+  
+  $s = "  function loadMap() {";
 	$s .= "var station = [];\n";
 	
 	foreach ($rows as $k => $row) {
@@ -50,9 +59,9 @@ function _datalogger_vietbando() {
 		//Dia chi
 		station[$k].diachi = "{$row ->field_field_station_address[0]['rendered']['#markup']}";
 		//Lat
-		station[$k].lat = {$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lat']};
+		station[$k].lat = "{$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lat']}";
 		//Lon
-		station[$k].lon = {$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lon']};
+		station[$k].lon = "{$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lon']}";
 		//Kinh do
 		station[$k].kinhdo = "{$row->_field_data['nid']['entity']->field_station_latitude['und'][0]['value']}";
 		//Vi do
@@ -69,7 +78,7 @@ function _datalogger_vietbando() {
 		station[$k].trangthai ={$row->field_field_station_status[0]['rendered']['#access']} ;
 		//Thoi gian truyen tin
 		station[$k].thoigiantruyentin = "{$row->field_field_station_transmission_speed[0]['rendered']['#markup']}";
-		
+		station[$k].tinhtrang = "{$row->field_field_station_alarm[0]['rendered']['#markup']}";
 		if(station[$k].thoigiantruyentin == ""){
 			station[$k].thoigiantruyentin = "Chưa có dữ liệu";	
 		}		
@@ -87,21 +96,28 @@ MANG;
 			station[$k].canhbao = 1;
 			
 MANG;
-			if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_rainfall'){
-				//Mua
+			if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_false'){
+				//Binh Thuong
 				$s .= <<< MANG
 				
-				station[$k].canhbaostatus = 0;
+				station[$k].canhbao = 0;
+			
+MANG;
+			}else if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_rainfall'){
+				//Mua 	
+				$s .= <<< MANG
+				
+				station[$k].canhbao = 1;
 			
 MANG;
 			}else if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_true'){
-				//Mua to	
+      //Mua to	
 				$s .= <<< MANG
 				
-				station[$k].canhbaostatus = 1;
+				station[$k].canhbao = 2;
 			
 MANG;
-			}
+      }
 		}
 	}
 	
@@ -116,13 +132,11 @@ MANG;
 				if(station[i].trangthai==1){
 					if(station[i].canhbao == 0){
 						markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/orange1.png", new VSize(15, 15)), false);
-					}else{
-						if(station[i].canhbaostatus == 0){
-							markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/blue.png", new VSize(15, 15)), false);
-						}else{
-							markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/red.png", new VSize(15, 15)), false);
-						}	
-					}
+					}else if(station[i].canhbao == 1){
+            markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/blue.png", new VSize(15, 15)), false);
+					}else if(station[i].canhbao == 2){
+            markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/red.png", new VSize(15, 15)), false);
+          }
 				}else{
 					markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/black.png", new VSize(15, 15)), false);
 				}
@@ -164,7 +178,7 @@ MANG;
 				contentString[i] += '</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li><li><a class="hide">Thông tin lượng mưa</a><!--[if lte IE 6]><a>Thông tin lượng mưa<table><tr><td><![endif]--><ul><li><a title="Tình trạng: ';
 				contentString[i] += 'undefined';
 				contentString[i] += '">Tình trạng: <b>';
-				contentString[i] += 'Không';
+				contentString[i] += station[i].tinhtrang;
 				contentString[i] += '</b></a></li><li><a title="Lượng mưa 24h: ';
 				contentString[i] += station[i].luongmua24h;
 				contentString[i] += '">Lượng mưa 24h: <b>';
