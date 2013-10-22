@@ -1362,7 +1362,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 	foreach($account->field_station_region['und'] as $region){
 		if ($form_state['lock-region'] && $region['value'] == $form_state['values']['selectArea'] || !$form_state['lock-region']) 
       $regions[$region['value']] = _datalogger_return_area($region['value']);
-	}
+	} 
 	
 	$value_select_area = isset($form_state['values']['selectArea']) ? $form_state['values']['selectArea'] : key($regions);
   $form['stations_fieldset']['selectArea'] = array(
@@ -1528,13 +1528,24 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   );
   
   
+  
   $form["notice_excel_2007"] = array(      
-      '#prefix' => '<div class="" style="margin-bottom: 15px; clear: both">',
+    '#prefix' => '<div class="" style="margin-bottom: 15px; clear: both">',
 	  '#suffix' => '</div>', 
     "#markup" => '',
 	  //"#markup" => t("For better rendering, downloaded file format will be Excel 2007. If you cannot read XLSX file format, please download and install Microsoft compability pack at: <a href='http://www.microsoft.com/en-us/download/details.aspx?id=3'>http://www.microsoft.com/en-us/download/details.aspx?id=3</a>."),    
 		// '#weight' => 12,
   ); 
+  
+  $form["notice_excel_2007_tudong"] = array(
+    '#prefix' => '<div class="" style="margin-bottom: 15px; clear: both">',
+	  '#suffix' => '</div>',
+    "#markup" => '',
+	  //"#markup" => t("For better rendering, downloaded file format will be Excel 2007. If you cannot read XLSX file format, please download and install Microsoft compability pack at: <a href='http://www.microsoft.com/en-us/download/details.aspx?id=3'>http://www.microsoft.com/en-us/download/details.aspx?id=3</a>."),    
+		// '#weight' => 12,
+  ); 
+  
+  
 	return $form;
 }
 
