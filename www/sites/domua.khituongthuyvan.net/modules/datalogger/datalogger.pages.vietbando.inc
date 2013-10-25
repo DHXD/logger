@@ -75,7 +75,7 @@ function _datalogger_vietbando() {
 		//Luong mua gan nhat
 		station[$k].luongmuagannhat ="{$row->field_field_station_rain_nearest[0]['rendered']['#markup']}";
 		//Trang thai
-		station[$k].trangthai ={$row->field_field_station_status[0]['rendered']['#access']} ;
+		station[$k].trangthai ="{$row->field_field_station_status[0]['raw']['value']} ";
 		//Thoi gian truyen tin
 		station[$k].thoigiantruyentin = "{$row->field_field_station_transmission_speed[0]['rendered']['#markup']}";
 		station[$k].tinhtrang = "{$row->field_field_station_alarm[0]['rendered']['#markup']}";
@@ -129,7 +129,7 @@ MANG;
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
 				var pt = new VLatLng(station[i].lat,station[i].lon);
-				if(station[i].trangthai==1){
+				if(station[i].trangthai== "station_active"){
 					if(station[i].canhbao == 0){
 						markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/orange1.png", new VSize(15, 15)), false);
 					}else if(station[i].canhbao == 1){
