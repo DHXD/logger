@@ -3,8 +3,11 @@
  * Menu page callback.
  */
 function _datalogger_map() {
-	$view = views_get_view_result('viet_ban_do');
-	dpm($view);
+	//$view = views_get_view_result('viet_ban_do');
+	//dpm($view);
+	$content_type = "abc";
+  	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
+		dpm($all_nodes);
 	//return $view[0]->field_field_station_longgitude[0]['raw']['safe_value'];
 	$s = '';
 	
@@ -27,8 +30,11 @@ ABC;
 function _datalogger_vietbando() {
 	$rows = views_get_view_result('viet_ban_do');
 	
-	
-	dpm($rows);
+	//$content_type = "station";
+  //$all_nodes = node_load_multiple(array(), array('type' => $content_type));
+
+	//dpm($all_nodes);	
+	//dpm($rows);
 	//echo $rows[0]->field_field_station_alarm;
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
 
@@ -50,9 +56,9 @@ function _datalogger_vietbando() {
 		//Dia chi
 		station[$k].diachi = "{$row ->field_field_station_address[0]['rendered']['#markup']}";
 		//Lat
-		station[$k].lat = {$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lat']};
+		station[$k].lat = "{$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lat']}";
 		//Lon
-		station[$k].lon = {$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lon']};
+		station[$k].lon = "{$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lon']}";
 		//Kinh do
 		station[$k].kinhdo = "{$row->_field_data['nid']['entity']->field_station_latitude['und'][0]['value']}";
 		//Vi do
@@ -66,7 +72,7 @@ function _datalogger_vietbando() {
 		//Luong mua gan nhat
 		station[$k].luongmuagannhat ="{$row->field_field_station_rain_nearest[0]['rendered']['#markup']}";
 		//Trang thai
-		station[$k].trangthai ={$row->field_field_station_status[0]['rendered']['#access']} ;
+		station[$k].trangthai ="{$row->field_field_station_status[0]['raw']['value']}" ;
 		//Thoi gian truyen tin
 		station[$k].thoigiantruyentin = "{$row->field_field_station_transmission_speed[0]['rendered']['#markup']}";
 		
@@ -113,7 +119,7 @@ MANG;
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
 				var pt = new VLatLng(station[i].lat,station[i].lon);
-				if(station[i].trangthai==1){
+				if(station[i].trangthai=='station_active'){
 					if(station[i].canhbao == 0){
 						markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/orange1.png", new VSize(15, 15)), false);
 					}else{
