@@ -164,7 +164,41 @@ MANG;
 	$s.= <<< MANG2
 		if (VBrowserIsCompatible() ) { 
 			var map = new VMap(document.getElementById('container'));
+MANG2;
+	switch($full_url){
+		case "http://admin.domua.khituongthuyvan.net/" :
+			$s.=<<<MANG2
 			map.setCenter(new VLatLng(18.8152328, 105.680505), 7);
+MANG2;
+		break;	
+		case "http://117.6.129.235:8181/" ://Bac Trung Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(10.8152328, 106.680505), 7);
+MANG2;
+		break;
+		case "http://113.160.225.111:8181/" ://Trung Trung Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(16.8152328, 105.680505), 7);
+MANG2;
+		break;
+		case "http://kttvntb.gov.vn:8181/" : //Nam Trung Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
+MANG2;
+		break;
+		case "http://kttvtaynguyen.dyndns.org/" : //Tay Nguyen ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
+MANG2;
+		break;
+		case "http://210.245.110.15:8181/" : //Nam Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(10.8152328, 105.680505), 7);
+MANG2;
+		break;
+	}
+	
+	$s.=<<<MANG2
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
