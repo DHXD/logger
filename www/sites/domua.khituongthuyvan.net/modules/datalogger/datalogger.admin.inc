@@ -853,7 +853,7 @@ function _datalogger_check_inbox() {
     flush (); // flush the output buffer
   }
 	// return 'Ok';
-	_datalogger_check_status_30_minutes();
+	//_datalogger_check_status_30_minutes();
   print "Ok.";
 	
 	

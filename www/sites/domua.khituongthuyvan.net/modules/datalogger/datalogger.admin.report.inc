@@ -9,6 +9,14 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
   
 	$form['stations_fieldset']['day']['#access']=FALSE;
 	
+	$form["submit1"] = array(
+      "#type" => "submit",
+      "#value" => t("Report"),
+      "#submit" => array(
+          "_datalogger_report_rainfall_month2_submit"
+      ),
+  );
+	/*
 	$form["submit2"] = array(
       "#type" => "submit",
       "#value" => t("Report"),
@@ -16,6 +24,7 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
           "_datalogger_report_rainfall_month2_submit"
       ),
   );
+	*/
   return $form;
 }
 

@@ -1076,8 +1076,10 @@ function _datalogger_send_command($nid, $select, $form, &$form_state) {
           $arg = array('Thiết lập thời gian truyền dữ liệu','C:INTERVAL:', _datalogger_result($message,'C:INTERVAL:'),'',$nid);
           // dsm(strlen($message));
           // dsm($message);
-					$node->field_field_station_transmission_speed[0]['rendered']['#markup'] = $interval;
-					node_save($node);
+			$node = node_load($nid);
+          $node->field_station_transmission_speed['und'][0]['value'] = $interval;
+          //$node->field_station_alarm_rainfall['und'][0]['value'] = $level;
+          node_save($node);
           break;
         case 24 :
           // $title =  t('Get Data Send Interval Minutes');
