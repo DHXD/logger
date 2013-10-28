@@ -6,14 +6,9 @@ foreach($stations as $station){
 	$station_name[$station->nid] = $station->node_title;
 }
 
-global $clearTime;
-$clearTime = array('00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00');
-
+global $clearTime;    // khai báo trong file module.
 global $clearTime3;
-$clearTime3 = array(h0 => '00:00:00',h1 => '01:00:00',h2 => '02:00:00', h3 => '03:00:00',h4 => '04:00:00',h5 => '05:00:00',h6 => '06:00:00',h7 => '07:00:00', h8 => '08:00:00', h9 => '09:00:00', h10 => '10:00:00', h11 => '11:00:00', h12 => '12:00:00', h13 => '13:00:00', h14 => '14:00:00', h15 => '15:00:00', h16 => '16:00:00', h17 => '17:00:00', h18 => '18:00:00', h19 => '19:00:00', h20 => '20:00:00',h21 => '21:00:00',h22 =>'22:00:00', h23 => '23:00:00');
-
 global $clearTime2;
-$clearTime2 = array('0000','0100','0200','0300','0400','0500','0600','0700','0800','0900','1000','1100','1200','1300','1400','1500','1600','1700','1800','1900','2000','2100','2200','2300');
 
 global $datalogger_pattern;
 $datalogger_pattern = array(
@@ -745,14 +740,19 @@ function _datalogger_convert_number($number){
 	return $sim_number;
 }
 
+
 //Ham lay thoi gian truyen tin
-function _datalogger_check_report_time($nid, $value){
+
+function _datalogger_check_report_time($nid,$value){
+
 	$node = node_load($nid);
 	$node->field_station_report_time['und'][0]['value'] = $value;
 	node_save($node);
 }
 
+
 //Kiem tra trang thai sau 30 phut
+
 function _datalogger_check_status_30_minutes(){
 		//$content_type("viet_");
 		$content_type = "station";
@@ -773,12 +773,14 @@ function _datalogger_check_status_30_minutes(){
           node_save($node);
 					
 				}		
-			
-		}	
+
+		}
+		
 }
 
 function _datalogger_check_inbox() {
-	
+ 
+
   $cron = (arg(3) == 'remote');
   
   $processed = 0;
@@ -798,18 +800,19 @@ function _datalogger_check_inbox() {
     print "Inbox ID: {$row->ID}\n";
     
 		$number = _datalogger_convert_number($row->SenderNumber);
-		
+
+    
+
 		$sms = $row->TextDecoded;
     $smsID = $row->ID;
-		
-		
-		//Lay thoi gian nhan tin
-		 module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-		$tram_nid = _datalogger_return_nid($number);
-		$value = $row->UpdatedInDB;
-		_datalogger_check_report_time($tram_nid, $value);
-		
-		
+    
+    //Lay thoi gian nhan tin
+    module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+    $tram_nid = _datalogger_return_nid($number);
+    $value = $row->UpdatedInDB;
+	_datalogger_check_report_time($tram_nid, $value);
+    
+
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
       //Xử lý tin nhắn được yêu cầu:88byte
@@ -852,15 +855,16 @@ function _datalogger_check_inbox() {
 		}
     flush (); // flush the output buffer
   }
+   
 	// return 'Ok';
 	//_datalogger_check_status_30_minutes();
   print "Ok.";
-	
 	
 	//Check status station in 30 minitues.
 	_datalogger_check_status_30_minutes();
 	
 	
+
   drupal_exit();
 }
 
@@ -1444,7 +1448,7 @@ function _datalogger_new_sentitems_form(){
 		Modem => t('Modem'),
     status => t('Status'),
   );
-  $num_per_page = 50;
+  $num_per_page = 500;
   $offset=$num_per_page*$page;
 	$total = db_query("SELECT COUNT(*) total FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT 0,500");
 	$number_rows = $total->fetch()->total;
@@ -1497,7 +1501,6 @@ function _datalogger_new_sentitems_form(){
 			$row -> SenderID,
       $status,
 			);
-
   }
 	
 	$output = theme_table(

@@ -8,6 +8,16 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
 	_datalogger_select_area_province_station($form, $form_state);
   
 	$form['stations_fieldset']['day']['#access']=FALSE;
+  
+  $active = array(0 => 'Báo cáo BKT14', 1 => 'BKT14 Tự động');
+  $form['settings']['active'] = array(
+    '#type' => 'radios',
+    '#title' => 'Chọn loại báo cáo',
+    '#default_value' => isset($node->active) ? $node->active : 0,
+    '#options' => $active,
+    //'#description' => t('When a poll is closed, visitors can no longer vote for it.'),
+    //'#access' => $admin,
+  );
 	
 	$form["submit1"] = array(
       "#type" => "submit",
@@ -24,7 +34,11 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
           "_datalogger_report_rainfall_month2_submit"
       ),
   );
+
 	*/
+
+  
+  
   return $form;
 }
 
@@ -62,9 +76,6 @@ function _datalogger_calculate_total_rain_hour_inc(&$nodes) {
   $names = array();
   
   set_time_limit ( 360);
-  
-  //dpm('calc...');
-  //dpm($nodes);
   
   if (is_object($nodes))  $nodes = array(0 => $nodes);
   
