@@ -743,7 +743,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 ////////////////////////
 
 function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form_state){
-  //error_reporting(E_ALL ^ E_NOTICE);
+   //error_reporting(E_ALL ^ E_NOTICE);
   error_reporting(0);
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel.php';
 
@@ -952,31 +952,32 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
 		)
 	);
 	$objPHPExcel->setActiveSheetIndex(0);
-  
-  $objPHPExcel->getActiveSheet()->setCellValue('H1', 'LƯỢNG GIÁNG THUỶ GIỜ QUAN TRẮC TỰ ĐỘNG HÀNG THÁNG');
-	$objPHPExcel->getActiveSheet()->setCellValue('A2', 'Trạm:');
-  $objPHPExcel->getActiveSheet()->setCellValue('A3', 'Giờ');
-	$objPHPExcel->getActiveSheet()->setCellValue('B2', $name_station->title);
-	$objPHPExcel->getActiveSheet()->setCellValue('D2', 'Kinh độ:');
-	$objPHPExcel->getActiveSheet()->setCellValue('F2', $name_station->field_station_longgitude['und'][0]['value']);
-	$objPHPExcel->getActiveSheet()->setCellValue('G2', 'Vĩ độ:');
-	$objPHPExcel->getActiveSheet()->setCellValue('I2', $name_station->field_station_latitude['und'][0]['value']);
-	$objPHPExcel->getActiveSheet()->setCellValue('J2', 'Đơn vị:');
-	
-	$objPHPExcel->getActiveSheet()->setCellValue('L2', 'Tháng:');
-	$objPHPExcel->getActiveSheet()->setCellValue('M2', substr($month,-2,2));
-	$objPHPExcel->getActiveSheet()->setCellValue('N2', 'Năm:');
-	$objPHPExcel->getActiveSheet()->setCellValue('O2', $year);
-	
+  $objPHPExcel->getActiveSheet()->setTitle('Trang 1');
+	//thiet lap chieu cao cac row
+ $objPHPExcel->getActiveSheet()->setCellValue('H1', 'LƯỢNG GIÁNG THUỶ GIỜ QUAN TRẮC TỰ ĐỘNG HÀNG THÁNG');
+	$objPHPExcel->getActiveSheet()->setCellValue('A3', 'Trạm:'.$name_station->title);
+  $objPHPExcel->getActiveSheet()->mergeCells('A3:D3');
+  $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Giờ:');
+  $objPHPExcel->getActiveSheet()->getStyle('A7')->applyFromArray($styleThinBlackBorderOutline);
+	$objPHPExcel->getActiveSheet()->setCellValue('G3', 'Kinh độ:'.$name_station->field_station_longgitude['und'][0]['value']);
+  $objPHPExcel->getActiveSheet()->mergeCells('G3:J3');
+  $objPHPExcel->getActiveSheet()->setCellValue('L3', 'Vĩ độ:'.$name_station->field_station_latitude['und'][0]['value']);
+  $objPHPExcel->getActiveSheet()->mergeCells('L3:N3');
+	$objPHPExcel->getActiveSheet()->setCellValue('A4', 'Đơn vị:mm');
+  $objPHPExcel->getActiveSheet()->mergeCells('A4:B4');
+	$objPHPExcel->getActiveSheet()->setCellValue('G4', 'Tháng:'.substr($month,-2,2));
+  $objPHPExcel->getActiveSheet()->mergeCells('G4:H4');
+	$objPHPExcel->getActiveSheet()->setCellValue('L4', 'Năm:'.$year);
+	$objPHPExcel->getActiveSheet()->mergeCells('L4:M4');
 	//Thiet lap header
 	for($i=0; $i<14; $i++){
-		$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$i).'3',$i+1);
-    $objPHPExcel->getActiveSheet()->getStyle(chr(66+$i).'3')->applyFromArray($styleThinBlackBorderOutline);
+		$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$i).'7',$i+1);
+    $objPHPExcel->getActiveSheet()->getStyle(chr(66+$i).'7')->applyFromArray($styleThinBlackBorderOutline);
     //$objPHPExcel->getActiveSheet()->getStyle(chr(66+$i).'3')->setWidth(10);
 	}
   for($i=0; $i<$month_days_number; $i++){
-    $objPHPExcel->getActiveSheet()->setCellValue('A'.($i+4),$i+1);
-    $objPHPExcel->getActiveSheet()->getStyle('A'.($i+4),$i+1)->applyFromArray($styleThinBlackBorderOutline);
+    $objPHPExcel->getActiveSheet()->setCellValue('A'.($i+8),$i+1);
+    $objPHPExcel->getActiveSheet()->getStyle('A'.($i+8),$i+1)->applyFromArray($styleThinBlackBorderOutline);
   }
   
   //Gan gia tri cho cac o
@@ -984,149 +985,198 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
 	$day_in_month = 1;
 	
 	for($day=0; $day<$month_days_number; $day++){
-		$objPHPExcel->getActiveSheet()->setCellValue('A'.($day+4),$day+1);
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.($day+8),$day+1);
 		for($j=0; $j<14; $j++){
 			$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 			if(!$total) $total = '-';
-			$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j).($day+4),$total);
-      $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j).($day+4))->applyFromArray($styleThinBlackBorderOutline);
+			$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j).($day+8),$total);
+      $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j).($day+8))->applyFromArray($styleThinBlackBorderOutline);
 		}
 		$day_in_month++;
 	}
   
   $objPHPExcel->getActiveSheet()->getStyle('H1')->applyFromArray($styleAlignments);
-  $objPHPExcel->getActiveSheet()->getStyle('F2')->applyFromArray($styleAlignments_right);
-	$objPHPExcel->getActiveSheet()->getStyle('I2')->applyFromArray($styleAlignments_right);
-	$objPHPExcel->getActiveSheet()->getStyle('A3:O34')->applyFromArray($styleAlignments);
+  //$objPHPExcel->getActiveSheet()->getStyle('F2')->applyFromArray($styleAlignments_right);
+	//$objPHPExcel->getActiveSheet()->getStyle('I2')->applyFromArray($styleAlignments_right);
+	$objPHPExcel->getActiveSheet()->getStyle('A7:O38')->applyFromArray($styleAlignments);
   //$objPHPExcel->getActiveSheet()->getStyle('A3:O34')->setWidth(5);
   //$objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(7);
   for($i=0; $i<15; $i++){
-		$objPHPExcel->getActiveSheet()->getColumnDimension(chr(65+$i))->setWidth(7);
+		$objPHPExcel->getActiveSheet()->getColumnDimension(chr(65+$i))->setWidth(5);
 	}
   
+  for($i=7; $i<39; $i++){
+    $objPHPExcel->getActiveSheet()
+    ->getRowDimension($i)
+    ->setRowHeight(20);
+  }
   //-----------------------------------------------------------------------------------------------
 	//Sheet 2
 	//------------------------------------------------------------------------------------------------
   
   $objPHPExcel->createSheet();
 	$objPHPExcel->setActiveSheetIndex(1);
-	
+	 $objPHPExcel->getActiveSheet()->setTitle('Trang 2');
+	//thiet lap chieu cao cac row
   $objPHPExcel->getActiveSheet()->setCellValue('H1', 'LƯỢNG GIÁNG THUỶ GIỜ QUAN TRẮC TỰ ĐỘNG HÀNG THÁNG');
-	$objPHPExcel->getActiveSheet()->setCellValue('A2', 'Trạm:');
-  $objPHPExcel->getActiveSheet()->setCellValue('A3', 'Giờ:');
-	$objPHPExcel->getActiveSheet()->setCellValue('B2', $name_station->title);
-	$objPHPExcel->getActiveSheet()->setCellValue('D2', 'Kinh độ:');
-	$objPHPExcel->getActiveSheet()->setCellValue('F2', $name_station->field_station_longgitude['und'][0]['value']);
-	$objPHPExcel->getActiveSheet()->setCellValue('G2', 'Vĩ độ:');
-	$objPHPExcel->getActiveSheet()->setCellValue('I2', $name_station->field_station_latitude['und'][0]['value']);
-	$objPHPExcel->getActiveSheet()->setCellValue('J2', 'Đơn vị:');
-	
-	$objPHPExcel->getActiveSheet()->setCellValue('L2', 'Tháng:');
-	$objPHPExcel->getActiveSheet()->setCellValue('M2', substr($month,-2,2));
-	$objPHPExcel->getActiveSheet()->setCellValue('N2', 'Năm:');
-	$objPHPExcel->getActiveSheet()->setCellValue('O2', $year);
-  
+	$objPHPExcel->getActiveSheet()->setCellValue('A3', 'Trạm:'.$name_station->title);
+  $objPHPExcel->getActiveSheet()->mergeCells('A3:D3');
+  $objPHPExcel->getActiveSheet()->setCellValue('A7', 'Giờ:');
+  $objPHPExcel->getActiveSheet()->getStyle('A7')->applyFromArray($styleThinBlackBorderOutline);
+	$objPHPExcel->getActiveSheet()->setCellValue('G3', 'Kinh độ:'.$name_station->field_station_longgitude['und'][0]['value']);
+  $objPHPExcel->getActiveSheet()->mergeCells('G3:J3');
+  $objPHPExcel->getActiveSheet()->setCellValue('L3', 'Vĩ độ:'.$name_station->field_station_latitude['und'][0]['value']);
+  $objPHPExcel->getActiveSheet()->mergeCells('L3:M3');
+	$objPHPExcel->getActiveSheet()->setCellValue('A4', 'Đơn vị:mm');
+  $objPHPExcel->getActiveSheet()->mergeCells('A4:B4');
+	$objPHPExcel->getActiveSheet()->setCellValue('G4', 'Tháng:'.substr($month,-2,2));
+  $objPHPExcel->getActiveSheet()->mergeCells('G4:H4');
+	$objPHPExcel->getActiveSheet()->setCellValue('L4', 'Năm:'.$year);
+
   //Thiet lap header
   $j = 0;
 	for($day=14; $day<24; $day++){
 		
-		$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j).'3',$day+1);
+		$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j).'7',$day+1);
+    $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j).'7')->applyFromArray($styleThinBlackBorderOutline);
 		$j ++;
 	}
-  $objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j).'3',"Tổng số");
-  $objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j+1).'3',"Max 60ph");
-  $objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j+2).'3',"Max 30ph");
+  $objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j).'7',"Tổng số");
+  $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j).'7')->applyFromArray($styleThinBlackBorderOutline);
+  $objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j+1).'7',"Max 60ph");
+  $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j+1).'7')->applyFromArray($styleThinBlackBorderOutline);
+  $objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j+2).'7',"Max 30ph");
+  $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j+2).'7')->applyFromArray($styleThinBlackBorderOutline);
   $day_in_month = 1;
 	for($day=0; $day<$month_days_number; $day++){
-		$objPHPExcel->getActiveSheet()->setCellValue('A'.($day+4),$day+1);
-    $objPHPExcel->getActiveSheet()->getStyle('A'.($day+4))->applyFromArray($styleThinBlackBorderOutline);
+		$objPHPExcel->getActiveSheet()->setCellValue('A'.($day+8),$day+1);
+    $objPHPExcel->getActiveSheet()->getStyle('A'.($day+8))->applyFromArray($styleThinBlackBorderOutline);
+   
     for($j=14; $j<24; $j++){
 			$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 			if(!$total) $total = '-';
-			$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j-14).($day+4),$total);
-      $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j-14).($day+4))->applyFromArray($styleThinBlackBorderOutline);
+			$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j-14).($day+8),$total);
+      $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j-14).($day+8))->applyFromArray($styleThinBlackBorderOutline);
 		}
 		$day_in_month++;
 	}
   
+  //Lay tong so luong mua
+  $day_in_month = 1; 
+  $sum_rainfall_in_day = array($month_days_number);
+  for($day=0; $day<$month_days_number; $day++){
+    
+    $sum_rainfall_in_day[$day] = 0;
+    for($j=0; $j<24; $j++){
+       $total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
+       if(!$total) $total = 0; 
+       $sum_rainfall_in_day[$day] += $total;
+    }
+    $day_in_month++;
+  }
+  //In trong muc "Tong so" max30, max 60
+  for($day = 0; $day < $month_days_number; $day++){	
+		$objPHPExcel->getActiveSheet()->setCellValue('M'.($day+8), $day_of_month[$day]['max_rainfall_in_day'] ? $day_of_month[$day]['max_rainfall_in_day'] : '-');
+    $objPHPExcel->getActiveSheet()->getStyle('M'.($day+8))->applyFromArray($styleThinBlackBorderOutline);
+    
+    $objPHPExcel->getActiveSheet()->setCellValue('L'.($day+8), $sum_rainfall_in_day[$day]);
+    $objPHPExcel->getActiveSheet()->getStyle('L'.($day+8))->applyFromArray($styleThinBlackBorderOutline);
+    
+	}
+  //Style
   $objPHPExcel->getActiveSheet()->getStyle('H1')->applyFromArray($styleAlignments);
-  $objPHPExcel->getActiveSheet()->getStyle('F2')->applyFromArray($styleAlignments_right);
-	$objPHPExcel->getActiveSheet()->getStyle('I2')->applyFromArray($styleAlignments_right);
-  $objPHPExcel->getActiveSheet()->getStyle('A3:N34')->applyFromArray($styleAlignments);
+  //$objPHPExcel->getActiveSheet()->getStyle('F2')->applyFromArray($styleAlignments_right);
+	//$objPHPExcel->getActiveSheet()->getStyle('I2')->applyFromArray($styleAlignments_right);
+  $objPHPExcel->getActiveSheet()->getStyle('A7:N38')->applyFromArray($styleAlignments);
   for($i=0; $i<11; $i++){
-		$objPHPExcel->getActiveSheet()->getColumnDimension(chr(65+$i))->setWidth(7);
+		$objPHPExcel->getActiveSheet()->getColumnDimension(chr(65+$i))->setWidth(5);
 	}
 	for($i=0; $i<3; $i++){
 		$objPHPExcel->getActiveSheet()->getColumnDimension(chr(76+$i))->setWidth(10);
 	}
-  
+   for($i=7; $i<39; $i++){
+    $objPHPExcel->getActiveSheet()
+    ->getRowDimension($i)
+    ->setRowHeight(20);
+  }
   //-----------------------------------------------------------------------------------------------
 	//Sheet 3
 	//------------------------------------------------------------------------------------------------
   
   $objPHPExcel->createSheet();
 	$objPHPExcel->setActiveSheetIndex(2);
-	$objPHPExcel->getActiveSheet()->setCellValue('F1', 'BỘ TÀI NGUYÊN VÀ MÔI TRƯỜNG');
-	$objPHPExcel->getActiveSheet()->getStyle('F1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-  $objPHPExcel->getActiveSheet()->getStyle('F1')->getFont()->setName('Times New Roman');
-  $objPHPExcel->getActiveSheet()->getStyle('F1')->getFont()->setSize(11);
-  $objPHPExcel->getActiveSheet()->getStyle('F1')->applyFromArray($font_bold);
-	
-	$objPHPExcel->getActiveSheet()->setCellValue('F2', 'TRUNG TÂM KHÍ TƯỢNG THUỶ VĂN QUỐC GIA');
+   $objPHPExcel->getActiveSheet()->setTitle('Trang 3');
+	//thiet lap chieu cao cac row
+  $objPHPExcel->getActiveSheet()->setCellValue('H6', 'BKT-14');
+  $objPHPExcel->getActiveSheet()->mergeCells('H6:I7');
+  $objPHPExcel->getActiveSheet()->getStyle('H6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+  $objPHPExcel->getActiveSheet()->getStyle('H6')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+  $objPHPExcel->getActiveSheet()->getStyle('H6')->getFont()->setSize(11);
+  $objPHPExcel->getActiveSheet()->getStyle('H6')->applyFromArray($font_bold);
+  
+	$objPHPExcel->getActiveSheet()->setCellValue('F2', 'BỘ TÀI NGUYÊN VÀ MÔI TRƯỜNG');
 	$objPHPExcel->getActiveSheet()->getStyle('F2')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-  $objPHPExcel->getActiveSheet()->getStyle('F1')->getFont()->setName('Times New Roman');
-  $objPHPExcel->getActiveSheet()->getStyle('F1')->getFont()->setSize(12);
+  $objPHPExcel->getActiveSheet()->getStyle('F2')->getFont()->setName('Times New Roman');
+  $objPHPExcel->getActiveSheet()->getStyle('F2')->getFont()->setSize(11);
+  $objPHPExcel->getActiveSheet()->getStyle('F2')->applyFromArray($font_bold);
 	
-	$objPHPExcel->getActiveSheet()->setCellValue('F6', 'BẢNG SỐ LIỆU KHÍ TƯỢNG TỰ ĐỘNG');
-	$objPHPExcel->getActiveSheet()->getStyle('F6')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-  $objPHPExcel->getActiveSheet()->getStyle('F6')->getFont()->setName('Times New Roman');
-  $objPHPExcel->getActiveSheet()->getStyle('F6')->getFont()->setSize(18);
-  $objPHPExcel->getActiveSheet()->getStyle('F6')->applyFromArray($font_bold);
+	$objPHPExcel->getActiveSheet()->setCellValue('F3', 'TRUNG TÂM KHÍ TƯỢNG THUỶ VĂN QUỐC GIA');
+	$objPHPExcel->getActiveSheet()->getStyle('F3')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+  $objPHPExcel->getActiveSheet()->getStyle('F3')->getFont()->setName('Times New Roman');
+  $objPHPExcel->getActiveSheet()->getStyle('F3')->getFont()->setSize(12);
 	
-	$objPHPExcel->getActiveSheet()->setCellValue('F7', 'VỀ LƯỢNG MƯA');
-	$objPHPExcel->getActiveSheet()->getStyle('F7')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-  $objPHPExcel->getActiveSheet()->getStyle('F7')->getFont()->setName('Times New Roman');
-  $objPHPExcel->getActiveSheet()->getStyle('F7')->getFont()->setSize(11);
-  $objPHPExcel->getActiveSheet()->getStyle('F7')->applyFromArray($font_bold);
+	$objPHPExcel->getActiveSheet()->setCellValue('F9', 'BẢNG SỐ LIỆU KHÍ TƯỢNG TỰ ĐỘNG');
+	$objPHPExcel->getActiveSheet()->getStyle('F9')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+  $objPHPExcel->getActiveSheet()->getStyle('F9')->getFont()->setName('Times New Roman');
+  $objPHPExcel->getActiveSheet()->getStyle('F9')->getFont()->setSize(18);
+  $objPHPExcel->getActiveSheet()->getStyle('F9')->applyFromArray($font_bold);
 	
-	$objPHPExcel->getActiveSheet()->setCellValue('E8', 'THÁNG');
-   $objPHPExcel->getActiveSheet()->getStyle('E8')->getFont()->setName('Times New Roman');
-  $objPHPExcel->getActiveSheet()->getStyle('E8')->getFont()->setSize(12);
+	$objPHPExcel->getActiveSheet()->setCellValue('F10', 'VỀ LƯỢNG MƯA');
+	$objPHPExcel->getActiveSheet()->getStyle('F10')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+  $objPHPExcel->getActiveSheet()->getStyle('F10')->getFont()->setName('Times New Roman');
+  $objPHPExcel->getActiveSheet()->getStyle('F10')->getFont()->setSize(11);
+  $objPHPExcel->getActiveSheet()->getStyle('F10')->applyFromArray($font_bold);
+	
+	$objPHPExcel->getActiveSheet()->setCellValue('E11', 'THÁNG');
+   $objPHPExcel->getActiveSheet()->getStyle('E11')->getFont()->setName('Times New Roman');
+  $objPHPExcel->getActiveSheet()->getStyle('E11')->getFont()->setSize(12);
   
   
-	$objPHPExcel->getActiveSheet()->setCellValue('F8', substr($month,-2,2));
-  $objPHPExcel->getActiveSheet()->getStyle('F8')->applyFromArray($styleAlignments_left);
-	$objPHPExcel->getActiveSheet()->setCellValue('G8', 'NĂM');
-   $objPHPExcel->getActiveSheet()->getStyle('G8')->getFont()->setName('Times New Roman');
-  $objPHPExcel->getActiveSheet()->getStyle('G8')->getFont()->setSize(12);
+	$objPHPExcel->getActiveSheet()->setCellValue('F11', substr($month,-2,2));
+  $objPHPExcel->getActiveSheet()->getStyle('F11')->applyFromArray($styleAlignments_left);
+	$objPHPExcel->getActiveSheet()->setCellValue('G11', 'NĂM');
+   $objPHPExcel->getActiveSheet()->getStyle('G11')->getFont()->setName('Times New Roman');
+  $objPHPExcel->getActiveSheet()->getStyle('G11')->getFont()->setSize(12);
   
   
-	$objPHPExcel->getActiveSheet()->setCellValue('H8', $year);
-  $objPHPExcel->getActiveSheet()->getStyle('H8')->applyFromArray($styleAlignments_left);
-	$objPHPExcel->getActiveSheet()->setCellValue('B11', 'Trạm(chữ)');
-  $objPHPExcel->getActiveSheet()->setCellValue('D11', $name_station->title);
-	$objPHPExcel->getActiveSheet()->setCellValue('F11', 'Hạng');
-	$objPHPExcel->getActiveSheet()->setCellValue('H11', '(Mã số):');
-	$objPHPExcel->getActiveSheet()->setCellValue('B12', 'Tỉnh(T.P)');
-	$objPHPExcel->getActiveSheet()->setCellValue('C12', $name_station->field_station_province_city['und'][0]['value']);
+	$objPHPExcel->getActiveSheet()->setCellValue('H11', $year);
+  $objPHPExcel->getActiveSheet()->getStyle('H11')->applyFromArray($styleAlignments_left);
+	$objPHPExcel->getActiveSheet()->setCellValue('B14', 'Trạm(chữ)');
+  $objPHPExcel->getActiveSheet()->setCellValue('D14', $name_station->title);
+	$objPHPExcel->getActiveSheet()->setCellValue('F14', 'Hạng');
+	$objPHPExcel->getActiveSheet()->setCellValue('H14', '(Mã số):');
+	$objPHPExcel->getActiveSheet()->setCellValue('B15', 'Tỉnh(T.P)');
+	$objPHPExcel->getActiveSheet()->setCellValue('C15', $name_station->field_station_province_city['und'][0]['value']);
   
-	$objPHPExcel->getActiveSheet()->setCellValue('B13', 'Vĩ độ bắc :');
+	$objPHPExcel->getActiveSheet()->setCellValue('B16', 'Vĩ độ bắc :');
 	
-	$objPHPExcel->getActiveSheet()->setCellValue('B14', 'Độ cao vườn quan trắc trên mặt biển:');
-	$objPHPExcel->getActiveSheet()->setCellValue('B15', 'Máy số:');
-	$objPHPExcel->getActiveSheet()->setCellValue('E15', 'Kiểu:');
-	$objPHPExcel->getActiveSheet()->setCellValue('H15', 'Nước sản xuất:');
-	$objPHPExcel->getActiveSheet()->setCellValue('B16', 'Họ, tên quan trắc viên:');
-	$objPHPExcel->getActiveSheet()->setCellValue('E16',  $name_qtv );
-	$objPHPExcel->getActiveSheet()->setCellValue('B18', 'Ghi chú:');
-	$objPHPExcel->getActiveSheet()->setCellValue('B21', 'Họ,tên người lập bảng:');
-	$objPHPExcel->getActiveSheet()->setCellValue('E21', $name_nlb);
+	$objPHPExcel->getActiveSheet()->setCellValue('B17', 'Độ cao vườn quan trắc trên mặt biển:');
+	$objPHPExcel->getActiveSheet()->setCellValue('B18', 'Máy số:');
+	$objPHPExcel->getActiveSheet()->setCellValue('E18', 'Kiểu:');
+	$objPHPExcel->getActiveSheet()->setCellValue('H18', 'Nước sản xuất:');
+	$objPHPExcel->getActiveSheet()->setCellValue('B19', 'Họ, tên quan trắc viên:');
+	$objPHPExcel->getActiveSheet()->setCellValue('E19',  $name_qtv );
+	$objPHPExcel->getActiveSheet()->setCellValue('B21', 'Ghi chú:');
+	$objPHPExcel->getActiveSheet()->setCellValue('B24', 'Họ,tên người lập bảng:');
+	$objPHPExcel->getActiveSheet()->setCellValue('E24', $name_nlb);
 	
-	$objPHPExcel->getActiveSheet()->setCellValue('B23', 'Họ, tên và nhận xét của kiểm soát viên:');
-	$objPHPExcel->getActiveSheet()->setCellValue('G23', $name_ks);
-	$objPHPExcel->getActiveSheet()->setCellValue('B25', 'Họ, tên và nhận xét của kiểm soát viên lần cuối:');
-	$objPHPExcel->getActiveSheet()->setCellValue('G25', $name_pt);
- 
+	$objPHPExcel->getActiveSheet()->setCellValue('B26', 'Họ, tên và nhận xét của kiểm soát viên:');
+	$objPHPExcel->getActiveSheet()->setCellValue('G26', $name_ks);
+	$objPHPExcel->getActiveSheet()->setCellValue('B28', 'Họ, tên và nhận xét của kiểm soát viên lần cuối:');
+	$objPHPExcel->getActiveSheet()->setCellValue('G28', $name_pt);
+  
+  $objPHPExcel->getActiveSheet()->getStyle('A1:J34')->applyFromArray($styleThinBlackBorderOutline);
+  
   $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
   
   //return;
