@@ -60,7 +60,7 @@ function _datalogger_vietbando() {
 		case "http://113.160.225.111:8181/" ://Trung Trung Bo ok
 			$url = "E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=";
 		break;
-		case "http://kttvntb.gov.vn:8181/" : //Nam Trung Bo ok
+		case "http://kttvntb.gov.vn:8181:8181/" : //Nam Trung Bo ok
 			$url = "6+ZvZ+bVk7kGAj00YOiWwcamFLHxDOuHjt1PK+LvY4w=";
 		break;
 		case "http://kttvtaynguyen.dyndns.org/" : //Tay Nguyen ok
@@ -181,7 +181,7 @@ MANG2;
 			map.setCenter(new VLatLng(16.8152328, 105.680505), 7);
 MANG2;
 		break;
-		case "http://kttvntb.gov.vn:8181/" : //Nam Trung Bo ok
+		case "http://kttvntb.gov.vn:8181:8181/" : //Nam Trung Bo ok
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
 MANG2;
