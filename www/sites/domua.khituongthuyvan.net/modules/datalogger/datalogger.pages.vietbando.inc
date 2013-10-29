@@ -67,7 +67,7 @@ function _datalogger_vietbando() {
 			$url = "6+ZvZ+bVk7nAf8Ske2bWNvDalMywr5HD5WT957Dk47EkXwf1b0S+dQ==";
 		break;
 		case "http://210.245.110.15:8181/" : //Nam Bo ok
-			$url = "E43pcmZHdUgB7c6vDr0v6cw0rgxJLuxG";
+			$url = "PxVLItwK6WpL/gxKoctolsN6g0viC8l/XlqTfK7KTG4=";
 		break;
 	}
 	
