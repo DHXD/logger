@@ -193,7 +193,7 @@ MANG2;
 			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
 MANG2;
 		break;
-		case "http://210.245.110.15:8181/" : //Nam Bo ok
+		case "http://210.245.110.15:8181:8181/" : //Nam Bo ok
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(10.8152328, 105.680505), 7);
 MANG2;
@@ -201,7 +201,7 @@ MANG2;
 	}
 	
 	$s.=<<<MANG2
-
+      console.log("------------------------");
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
