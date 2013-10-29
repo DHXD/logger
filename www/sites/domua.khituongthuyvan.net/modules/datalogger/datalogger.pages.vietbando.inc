@@ -54,10 +54,10 @@ function _datalogger_vietbando() {
 		case "http://admin.domua.khituongthuyvan.net/" :
 			$url = "5lJdIlKaLKfA1UMwdmzgbRYOTt/AH+9wl6NQH/f0pue8AFCloQ7qJw==";
 		break;	
-		case "http://117.6.129.235:8181/" ://Bac Trung Bo ok
+		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
 			$url = "E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=";
 		break;
-		case "http://113.160.225.111:8181/" ://Trung Trung Bo ok
+		case "http://113.160.225.111:8181:8181/" ://Trung Trung Bo ok
 			$url = "E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=";
 		break;
 		case "http://kttvntb.gov.vn:8181:8181/" : //Nam Trung Bo ok
@@ -171,12 +171,12 @@ MANG2;
 			map.setCenter(new VLatLng(18.8152328, 105.680505), 7);
 MANG2;
 		break;	
-		case "http://117.6.129.235:8181/" ://Bac Trung Bo ok
+		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(10.8152328, 106.680505), 7);
 MANG2;
 		break;
-		case "http://113.160.225.111:8181/" ://Trung Trung Bo ok
+		case "http://113.160.225.111:8181:8181/" ://Trung Trung Bo ok
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(16.8152328, 105.680505), 7);
 MANG2;
