@@ -46,6 +46,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   $result = db_query($query);
   
   $in_array = array();
+  $aaa = 1;
   foreach ($result as $record) {
     $day =  intval(date('d',$record->field_rainfall_send_time_value));
     $hour = (int)substr($record->title, -8, 2); 
@@ -55,13 +56,16 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
       $day--;
       if ($day <1 ) continue;
       $record->title = sprintf("%02d/%02d/%04d 23:60:00", $day, $month, $year);
-    }     
-    
+    }
     if (!isset($in_array[$day])) $in_array[$day] = array();
-    $in_array[$day][$record->entity_id] = $record;
+    //$in_array[$day][$record->entity_id] = $record;
+    $in_array[$day][$hour] = $record;
+    if(!isset($in_aray[$day][$hour])) $aaa++;
   }
   $time_rainfall_last = $record;
-  
+  dpm($in_array);
+  dpm($aaa);
+  return;
   //dpm($record); return;
 	for($day = 1; $day <= $month_days_number; $day++){
     
@@ -108,7 +112,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 			for($i = 23; $i >= 0; $i--) {
 				$number = count($hours_in_day[$i]);
         //dpm($number);
-				$total_rainfall_in_hour = -999;
+				$total_rainfall_in_hour = 0;
 				$time_rainfall_in_hour = 0;
 				$max_rainfall_in_hour = 0;
 				if($number > 0){
@@ -127,7 +131,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				}
 				else{
 					$hours_in_day[$i] = array('max_rainfall_in_hour' => 0, 
-						'total_rainfall_in_hour' => -999,
+						'total_rainfall_in_hour' => 0,
 						'time_rainfall_in_hour' => 0);
 				}
 			}
