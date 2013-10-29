@@ -100,11 +100,9 @@ function _datalogger_vietbando() {
 		
 		station[$k] = new Object();
 		station[$k].tentram = "{$row->node_title}";
-<<<<<<< HEAD
-		station[$k].matram = "{$row->_field_data['nid']['entity']->field_station_code['und'][0]['value']}";
-=======
+
 		station[$k].matram =" {$row->_field_data['nid']['entity']->field_station_code['und'][0]['value']}";
->>>>>>> 7d9dd2bab4a0010d851634dd7f5176f5e8fa6a18
+
 		station[$k].status=0;
 		//Nid
 		station[$k].nid = {$row->nid};
