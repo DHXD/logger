@@ -50,12 +50,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     $day =  intval(date('d',$record->field_rainfall_send_time_value));
     $hour = (int)substr($record->title, -8, 2); 
     $minute = (int)substr($record->title, -5, 2);
-    // dpm($day, "day"); dpm($hour, "hour"); dpm($minute, "minute");
-    // if ($day == '01' && $hour == '00') {
-      // $day--;
-      // $day = date('d',$record->field_rainfall_send_time_value + 3600);
-      // break;
-    // }
+    
     if ($hour == '00' && $minute == '00') {           // first hour minute -> chuyen sang ngay hom truoc
       $day--;
       if ($day <1 ) continue;
@@ -65,7 +60,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     if (!isset($in_array[$day])) $in_array[$day] = array();
     $in_array[$day][$record->entity_id] = $record;
   }
-  //return ;
 	for($day = 1; $day <= $month_days_number; $day++){
     
     $dem_luong_mua_trong_dot[$day-1] = array();
@@ -108,17 +102,20 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				}
 			}
       
-      //if ($day == 18) dpm($hours_in_day);
 			for($i = 23; $i >= 0; $i--) {
 				$number = count($hours_in_day[$i]);
+        
 				$total_rainfall_in_hour = 0;
 				$time_rainfall_in_hour = 0;
-				$max_rainfall_in_hour = 0; 
+				$max_rainfall_in_hour = 0;
 				if($number > 0){
 					for($j = 0; $j < $number; $j++){
 						$rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value ;
+            
+            //if ($total_rainfall_in_hour < 0) $total_rainfall_in_hour = 0;   // truong hop -999
+            
 						$total_rainfall_in_hour += $rainfall_measuring;
-						$time_rainfall_in_hour +=10;
+						$time_rainfall_in_hour += 10;
 						$max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
 					}
 					$hours_in_day[$i] = array('max_rainfall_in_hour' => $max_rainfall_in_hour, 
@@ -135,8 +132,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 		else{
 			for($i = 23; $i >=0; $i--){
 				$hours_in_day[$i] = array('max_rainfall_in_hour' => 0, 
-						'total_rainfall_in_hour' => 0, 
-						'time_rainfall_in_hour' => 0);
+						'total_rainfall_in_hour' => '', 
+						'time_rainfall_in_hour' => '');
 			}
 		}
     //dpm($dem_luong_mua_trong_dot[$day -1]);
@@ -149,7 +146,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
       }
     }
     
-		$day_of_month[$day]= array('max_total_rainfall_in_day' => $max_total_rainfall_in_day,
+		$day_of_month[$day]= array(
+      'max_total_rainfall_in_day' => $max_total_rainfall_in_day,
 			'max_total_time_rainfall_in_day' => $max_total_time_rainfall_in_day, 
 			'max_rainfall_in_day' => $max_rainfall_in_day,
 			'hours_in_day' => $hours_in_day,
@@ -157,6 +155,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
       );
    //dpm($day_of_month[$day]);
 	}
+  
   //dpm($day_of_month[]);
 	/*-----------------------------------------------------------------------------------------------------------*/
 	//dpm($dem_luong_mua_trong_dot[2]);
@@ -283,7 +282,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 			for($j = 0; $j < 24 ; $j++){
 				$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 				$time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
-        //dpm($day_of_month[$day_in_month]['hours_in_day'][$j]);
+        
         if(!$total) $total = '-';
         if(!$time) $time = '-';
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+6),$total);
@@ -293,18 +292,15 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 					$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+7))->applyFromArray($font_bold);
           $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->getNumberFormat()->setFormatCode('0.0');
 				}
+        
+        if(!$total)
+        {
+          dpm("Hehe");
+        }       
 			}
 			$day_in_month++;
 		}
 	}
-  
-  // dpm(intval($month));
-  // $now = getdate();
-  // $h = $now["hours"];
-  // $d = $now["mday"]; $m = $now["mon"]; $y = $now["year"];
-  // $timee = intval(sprintf("%4d%02d%02d%02d", $y, $m, $d, $h));
-  // dpm($timee);  return;
-  
   
   $str_rainfall = array();
   $str_time = array();
@@ -425,7 +421,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 		'bold' => true
 		)
 	);
-	//$day_in_month = 1;
   
 	for($i = 15; $i <= $month_days_number ; $i++){
     // binhnt edited here
@@ -444,9 +439,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				}
 			}
 			$day_in_month++;
-		//}
 	}
-  
 
   for($j = 0; $j < 24; $j++){
 		for($i = 0 ; $i < $month_days_number; $i++){
