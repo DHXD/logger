@@ -8,7 +8,7 @@ function _datalogger_map() {
 	//return $view[0]->field_field_station_longgitude[0]['raw']['safe_value'];
 	$s = '';
 	
-	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
+	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=';
 	
   drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
@@ -32,15 +32,50 @@ ABC;
   return $html;
 }
 
+function full_url()
+{
+    $s = &$_SERVER;
+    $ssl = (!empty($s['HTTPS']) && $s['HTTPS'] == 'on') ? true:false;
+    $sp = strtolower($s['SERVER_PROTOCOL']);
+    $protocol = substr($sp, 0, strpos($sp, '/')) . (($ssl) ? 's' : '');
+    $port = $s['SERVER_PORT'];
+    $port = ((!$ssl && $port=='80') || ($ssl && $port=='443')) ? '' : ':'.$port;
+    $host = isset($s['HTTP_X_FORWARDED_HOST']) ? $s['HTTP_X_FORWARDED_HOST'] : isset($s['HTTP_HOST']) ? $s['HTTP_HOST'] : $s['SERVER_NAME'];
+    return $protocol . '://' . $host . $port . $s['REQUEST_URI'];
+}
+
 function _datalogger_vietbando() {
 	$rows = views_get_view_result('viet_ban_do');
 	
+	$full_url = full_url();
+	//echo $full_url;
+	
+	switch($full_url){
+		case "http://admin.domua.khituongthuyvan.net/" :
+			$url = "5lJdIlKaLKfA1UMwdmzgbRYOTt/AH+9wl6NQH/f0pue8AFCloQ7qJw==";
+		break;	
+		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
+			$url = "E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=";
+		break;
+		case "http://113.160.225.111:8181:8181/" ://Trung Trung Bo ok
+			$url = "E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=";
+		break;
+		case "http://kttvntb.gov.vn:8181:8181/" : //Nam Trung Bo ok
+			$url = "6+ZvZ+bVk7kGAj00YOiWwcamFLHxDOuHjt1PK+LvY4w=";
+		break;
+		case "http://kttvtaynguyen.dyndns.org/" : //Tay Nguyen ok
+			$url = "6+ZvZ+bVk7nAf8Ske2bWNvDalMywr5HD5WT957Dk47EkXwf1b0S+dQ==";
+		break;
+		case "http://210.245.110.15:8181:8181/" : //Nam Bo ok
+			$url = "PxVLItwK6WpL/gxKoctolsN6g0viC8l/TmG1Ij+HgfTIT5uVqSFPgw==";
+		break;
+	}
 	
 	//dpm($rows);
 	//echo $rows[0]->field_field_station_alarm;
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
 
-  $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=';
+  $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=' .$url;
 	
  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
@@ -52,7 +87,7 @@ function _datalogger_vietbando() {
 		
 		station[$k] = new Object();
 		station[$k].tentram = "{$row->node_title}";
-		station[$k].matram = {$row->_field_data['nid']['entity']->field_station_code['und'][0]['value']};
+		station[$k].matram =" {$row->_field_data['nid']['entity']->field_station_code['und'][0]['value']}";
 		station[$k].status=0;
 		//Nid
 		station[$k].nid = {$row->nid};
@@ -129,7 +164,43 @@ MANG;
 	$s.= <<< MANG2
 		if (VBrowserIsCompatible() ) { 
 			var map = new VMap(document.getElementById('container'));
+
+MANG2;
+	switch($full_url){
+		case "http://admin.domua.khituongthuyvan.net/" :
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(18.8152328, 105.680505), 7);
+MANG2;
+		break;	
+		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(18.8152328, 106.680505), 7);
+MANG2;
+		break;
+		case "http://113.160.225.111:8181:8181/" ://Trung Trung Bo ok
+			$s.=<<<MANG2
 			map.setCenter(new VLatLng(16.8152328, 105.680505), 7);
+MANG2;
+		break;
+		case "http://kttvntb.gov.vn:8181:8181/" : //Nam Trung Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
+MANG2;
+		break;
+		case "http://kttvtaynguyen.dyndns.org/" : //Tay Nguyen ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
+MANG2;
+		break;
+		case "http://210.245.110.15:8181:8181/" : //Nam Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(10.8152328, 105.680505), 7);
+MANG2;
+		break;
+	}
+	
+	$s.=<<<MANG2
+
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
@@ -230,61 +301,36 @@ MANG;
 		/*
 		*SearchId
 		*/
-		function searchTenTram(input,station){
-			//var str ="ha he hi";
-			//console.log('--------------');
-			//console.log(str.indexOf("hi"));
-			var keys = [];
-			var result = [];
-			//console.log(input);
-			//var abc = ["Mot","Hai","Ba"] 
-			var tram = [];
-			for(var i = 0;i < station.length;i++){
-				//var tram[tram.length] = station[i].tentram; 
-				
+		function searchTenTram(input,station){		
+			var results = [];
+			for(var i = 0; i < station.length; i++){
 				if(station[i].tentram.toLowerCase().indexOf(input.toLowerCase()) > -1){
-					console.log(station[i].tentram);
-					//var tentram = station[i].tentram.toLowerCase();
-					console.log(station[i].tentram.toLowerCase().indexOf(input.toLowerCase()));
-					return i;
-					break;
+					var k = results.length;
+					results[k] = new Object();
+					results[k].contentString = i;
+					results[k].station = station[i];
 				}
 			}		
+			return results;
 		}
 		function searchSdtTram(input,station){
-			//var str ="ha he hi";
-			console.log('1--------------');
-			//console.log(str.indexOf("hi"));
 			var keys = [];
 			var result = [];
-			//console.log(input);
-			//var abc = ["Mot","Hai","Ba"] 
 			var tram = [];
 			for(var i = 0;i < station.length;i++){
-				console.log('2--------------');
-				//var tram[tram.length] = station[i].tentram; 
-				//console.log(station[i].sdt);
-				
 				if(station[i].sdt.toString().indexOf(input) > -1){
-					console.log('3--------------');
-					console.log(station[i].sdt);
-					//var tentram = station[i].tentram.toLowerCase();
 					console.log(station[i].sdt.indexOf(input));
 					return i;
 					break;
 				}
 				
 			}	
-			//console.log('---------------------------------------------');
-			//console.log(station[0].sdt.toString().indexOf("163"));	
-			//return;
 		}
 		/**
 		*
 		*/
 		jQuery(document).ready(function($) {
 			$( "#olvm-search-btn" ).click(function() {
-				console.log('ok');
 				var tentram = $("#olvm-title-txt").val();
 				console.log(tentram);
 				var sdt = $("#olvm-phone-txt").val();
@@ -292,17 +338,20 @@ MANG;
 				if(tentram == '' && sdt == ''){
 					return;
 				}else if(tentram != '' && sdt ==''){
-					var result = searchTenTram(tentram,station);
-					console.log(result);
-					var lat = station[result].lat;
-					console.log(lat);
-					var lon = station[result].lon;
-					console.log(lon);
-					var pt = new VLatLng(lat,lon);
-					console.log(pt);
-					//map.SetCenter(pt,7);	
-					map.setCenter(new VLatLng(lat,lon),8);
-					markers[result].openInfoWindow(contentString[result]);
+					var results = searchTenTram(tentram,station);
+					if(results.length == 0){
+						return;
+					}else if(results.length == 1){
+						var lat = results[0].station.lat;
+						var lon = results[0].station.lon;
+						console.log(results[0].contentString);
+						var pt = new VLatLng(lat,lon);
+						map.setCenter(new VLatLng(lat,lon),8);
+						console.log(results[0].contentString);
+						markers[results[0].contentString].openInfoWindow(contentString[results[0].contentString]);
+					}else if(results.length >1){
+						confirm_feature(results);
+					}					
 				}else if(tentram == '' && sdt !=''){
 					var result = searchSdtTram(sdt,station);
 					console.log(result);
@@ -333,15 +382,41 @@ MANG;
 				});
 					$("#olvm-phone-txt").focus(function(){
 						$(this).prev("label").hide();
-						//$('label.label-hide[for="' + $(this)[0].id + '"]').hide();
 					}).blur(function() {
 						if($(this).val() == '') {
-							//$('label.label-hide[for="' + $(this)[0].id + '"]').show();
 							$(this).prev("label").show();
 						}
 				});
 			});
 		});		
+		
+		function confirm_feature(features) {
+			feature = features[0];
+			jQuery.msgBox({
+				title: "Tìm kiếm trạm",
+				content: "Tìm thấy trạm "+ feature.station.tentram+". Bạn có muốn di chuyển bản đồ đến trạm "+feature.station.tentram+" không?",
+				type: "confirm",
+				buttons: [{ value: "Yes" }, { value: "No" }, { value: "Cancel"}],
+				success: function (result) {
+					msgBox_result = result;
+					if (result == "Yes") {
+						go_feature(feature);
+					} else if (result == "No"){
+						features.splice(0, 1);
+						if(features.length > 0) confirm_feature(features);
+						
+					}
+				}
+			});
+		}
+		
+		function go_feature(feature){
+			var lat = feature.station.lat;
+			var lon = feature.station.lon;
+			var pt = new VLatLng(lat,lon);
+			map.setCenter(new VLatLng(lat,lon),8);
+			markers[feature.contentString].openInfoWindow(contentString[feature.contentString]);				
+		}
 MANG2;
 
 	$s.="}";

@@ -19,6 +19,14 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
     //'#access' => $admin,
   );
 	
+	$form["submit1"] = array(
+      "#type" => "submit",
+      "#value" => t("Report"),
+      "#submit" => array(
+          "_datalogger_report_rainfall_month2_submit"
+      ),
+  );
+	/*
 	$form["submit2"] = array(
       "#type" => "submit",
       "#value" => t("Report"),
@@ -26,11 +34,9 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
           "_datalogger_report_rainfall_month2_submit"
       ),
   );
-  
-  $form["submit3"] = array(
-      "#type" => "submit",
-      "#value" => t("     BKT 14 Tự động     "),
-  );
+
+	*/
+
   
   
   return $form;

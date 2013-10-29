@@ -554,7 +554,12 @@ function datalogger_block_info() {
   $blocks['vietbando'] = array(
     'info' => t('Việt Bản đồ'),
   );
-  
+  $blocks['testtest'] = array(
+    'info' => t('Chi de test'),
+  );
+	$blocks['excel'] = array(
+		'info' => t('Test excel'),
+	);
   return $blocks;
 }
 
@@ -669,6 +674,7 @@ function datalogger_action_info() {
     
     '_datalogger_calculate_total_rain_hour' => array(
       'type' => 'node',
+      'type' => 'node',
       'label' => ('Calculate total rain hour'),
       'configurable' => FALSE,
 			//'aggregate' => TRUE,
@@ -746,7 +752,7 @@ $items['gammu/sentitems/error'] = array(
   
   $items['manage/chart/rainfalls'] = array(
     'title' => 'Rainfall data chart',
-		'page callback' => 'drupal_get_form',
+	'page callback' => 'drupal_get_form',
     'page arguments' => array(
         '_datalogger_chart_rainfall_form'
     ),
@@ -764,9 +770,6 @@ $items['gammu/sentitems/error'] = array(
 		'type' => MENU_NORMAL_ITEM, 		
 	);
 	
-	
-
-
 /**
 	*Begin date:10-10-12
  *Tạo menu gọi lại menu command
@@ -1057,7 +1060,6 @@ $items['gammu/sentitems/error'] = array(
   $items['export/ftp/%'] = array(
     'title' => 'FTP Export',
     'page callback' => '_datalogger_ftp_export',
-    // 'page callback' => _datalogger_ftp_txt_export_inc,
     'file' => 'datalogger.admin.export.inc',
     'access callback' => TRUE,
   ); 
@@ -1068,8 +1070,20 @@ $items['gammu/sentitems/error'] = array(
     'file' => 'datalogger.pages.vietbando.inc',
     'access callback' => TRUE,
   );  //End vietbando 
+	$items['view/stations/testtest'] = array(
+    'title' => 'Chi de test',
+    'page callback' => '_datalogger_vietbando',
+    'file' => 'datalogger.pages.vietbando.inc',
+    'access callback' => TRUE,
+  );  //End vietbando 
 	
- 
+ $items['view/stations/excel'] = array(
+    'title' => 'Chi de test',
+    'page callback' => '_datalogger_excel',
+    'file' => 'datalogger.pages.excel.inc',
+    'access callback' => TRUE,
+  );  //End Excel test
+	
   return $items;
 }
 

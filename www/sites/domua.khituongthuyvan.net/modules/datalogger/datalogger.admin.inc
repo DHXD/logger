@@ -740,14 +740,19 @@ function _datalogger_convert_number($number){
 	return $sim_number;
 }
 
+
+//Ham lay thoi gian truyen tin
+
 function _datalogger_check_report_time($nid,$value){
+
 	$node = node_load($nid);
 	$node->field_station_report_time['und'][0]['value'] = $value;
 	node_save($node);
 }
 
 
-//Kiem tra trang thai tram 30 phut
+//Kiem tra trang thai sau 30 phut
+
 function _datalogger_check_status_30_minutes(){
 		//$content_type("viet_");
 		$content_type = "station";
@@ -768,12 +773,13 @@ function _datalogger_check_status_30_minutes(){
           node_save($node);
 					
 				}		
+
 		}
 		
 }
 
 function _datalogger_check_inbox() {
-	
+
   $cron = (arg(3) == 'remote');
   
   $processed = 0;
@@ -793,18 +799,21 @@ function _datalogger_check_inbox() {
     print "Inbox ID: {$row->ID}\n";
     
 		$number = _datalogger_convert_number($row->SenderNumber);
-		
+
+
+    
+
 		$sms = $row->TextDecoded;
     $smsID = $row->ID;
-		
-		
-		//Lay thoi gian nhan tin
-		 module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-		$tram_nid = _datalogger_return_nid($number);
-		$value = $row->UpdatedInDB;
-		_datalogger_check_report_time($tram_nid, $value);
-		
-		
+    
+    //Lay thoi gian nhan tin
+    module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+    $tram_nid = _datalogger_return_nid($number);
+    $value = $row->UpdatedInDB;
+	_datalogger_check_report_time($tram_nid, $value);
+    
+
+
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
       //Xử lý tin nhắn được yêu cầu:88byte
@@ -848,14 +857,16 @@ function _datalogger_check_inbox() {
     flush (); // flush the output buffer
   }
 	// return 'Ok';
-	_datalogger_check_status_30_minutes();
+
+	//_datalogger_check_status_30_minutes();
   print "Ok.";
 	
-	
 	//Check status station in 30 minitues.
-	//_datalogger_check_status_30_minutes();
+	_datalogger_check_status_30_minutes();
 	
 	
+
+
   drupal_exit();
 }
 
