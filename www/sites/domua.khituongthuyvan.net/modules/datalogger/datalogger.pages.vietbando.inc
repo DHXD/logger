@@ -204,7 +204,7 @@ MANG2;
 	}
 	
 	$s.=<<<MANG2
->>>>>>> e1b243a914e2c0a7510e32337df0f8363c8c5d47
+
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
