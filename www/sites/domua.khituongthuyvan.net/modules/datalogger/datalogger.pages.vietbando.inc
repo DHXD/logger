@@ -299,61 +299,36 @@ MANG2;
 		/*
 		*SearchId
 		*/
-		function searchTenTram(input,station){
-			//var str ="ha he hi";
-			//console.log('--------------');
-			//console.log(str.indexOf("hi"));
-			var keys = [];
-			var result = [];
-			//console.log(input);
-			//var abc = ["Mot","Hai","Ba"] 
-			var tram = [];
-			for(var i = 0;i < station.length;i++){
-				//var tram[tram.length] = station[i].tentram; 
-				
+		function searchTenTram(input,station){		
+			var results = [];
+			for(var i = 0; i < station.length; i++){
 				if(station[i].tentram.toLowerCase().indexOf(input.toLowerCase()) > -1){
-					console.log(station[i].tentram);
-					//var tentram = station[i].tentram.toLowerCase();
-					console.log(station[i].tentram.toLowerCase().indexOf(input.toLowerCase()));
-					return i;
-					break;
+					var k = results.length;
+					results[k] = new Object();
+					results[k].contentString = i;
+					results[k].station = station[i];
 				}
 			}		
+			return results;
 		}
 		function searchSdtTram(input,station){
-			//var str ="ha he hi";
-			console.log('1--------------');
-			//console.log(str.indexOf("hi"));
 			var keys = [];
 			var result = [];
-			//console.log(input);
-			//var abc = ["Mot","Hai","Ba"] 
 			var tram = [];
 			for(var i = 0;i < station.length;i++){
-				console.log('2--------------');
-				//var tram[tram.length] = station[i].tentram; 
-				//console.log(station[i].sdt);
-				
 				if(station[i].sdt.toString().indexOf(input) > -1){
-					console.log('3--------------');
-					console.log(station[i].sdt);
-					//var tentram = station[i].tentram.toLowerCase();
 					console.log(station[i].sdt.indexOf(input));
 					return i;
 					break;
 				}
 				
 			}	
-			//console.log('---------------------------------------------');
-			//console.log(station[0].sdt.toString().indexOf("163"));	
-			//return;
 		}
 		/**
 		*
 		*/
 		jQuery(document).ready(function($) {
 			$( "#olvm-search-btn" ).click(function() {
-				console.log('ok');
 				var tentram = $("#olvm-title-txt").val();
 				console.log(tentram);
 				var sdt = $("#olvm-phone-txt").val();
@@ -361,17 +336,20 @@ MANG2;
 				if(tentram == '' && sdt == ''){
 					return;
 				}else if(tentram != '' && sdt ==''){
-					var result = searchTenTram(tentram,station);
-					console.log(result);
-					var lat = station[result].lat;
-					console.log(lat);
-					var lon = station[result].lon;
-					console.log(lon);
-					var pt = new VLatLng(lat,lon);
-					console.log(pt);
-					//map.SetCenter(pt,7);	
-					map.setCenter(new VLatLng(lat,lon),8);
-					markers[result].openInfoWindow(contentString[result]);
+					var results = searchTenTram(tentram,station);
+					if(results.length == 0){
+						return;
+					}else if(results.length == 1){
+						var lat = results[0].station.lat;
+						var lon = results[0].station.lon;
+						console.log(results[0].contentString);
+						var pt = new VLatLng(lat,lon);
+						map.setCenter(new VLatLng(lat,lon),8);
+						console.log(results[0].contentString);
+						markers[results[0].contentString].openInfoWindow(contentString[results[0].contentString]);
+					}else if(results.length >1){
+						confirm_feature(results);
+					}					
 				}else if(tentram == '' && sdt !=''){
 					var result = searchSdtTram(sdt,station);
 					console.log(result);
@@ -402,15 +380,41 @@ MANG2;
 				});
 					$("#olvm-phone-txt").focus(function(){
 						$(this).prev("label").hide();
-						//$('label.label-hide[for="' + $(this)[0].id + '"]').hide();
 					}).blur(function() {
 						if($(this).val() == '') {
-							//$('label.label-hide[for="' + $(this)[0].id + '"]').show();
 							$(this).prev("label").show();
 						}
 				});
 			});
 		});		
+		
+		function confirm_feature(features) {
+			feature = features[0];
+			jQuery.msgBox({
+				title: "Tìm kiếm trạm",
+				content: "Tìm thấy trạm "+ feature.station.tentram+". Bạn có muốn di chuyển bản đồ đến trạm "+feature.station.tentram+" không?",
+				type: "confirm",
+				buttons: [{ value: "Yes" }, { value: "No" }, { value: "Cancel"}],
+				success: function (result) {
+					msgBox_result = result;
+					if (result == "Yes") {
+						go_feature(feature);
+					} else if (result == "No"){
+						features.splice(0, 1);
+						if(features.length > 0) confirm_feature(features);
+						
+					}
+				}
+			});
+		}
+		
+		function go_feature(feature){
+			var lat = feature.station.lat;
+			var lon = feature.station.lon;
+			var pt = new VLatLng(lat,lon);
+			map.setCenter(new VLatLng(lat,lon),8);
+			markers[feature.contentString].openInfoWindow(contentString[feature.contentString]);				
+		}
 MANG2;
 
 	$s.="}";
