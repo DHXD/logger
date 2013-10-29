@@ -868,16 +868,11 @@ function _datalogger_check_inbox() {
     
     flush (); // flush the output buffer
   }
-<<<<<<< HEAD
-  
-  
-  //return '123';
-   _datalogger_check_status_30_minutes();
-=======
+
    
 	// return 'Ok';
 	//_datalogger_check_status_30_minutes();
->>>>>>> e1b243a914e2c0a7510e32337df0f8363c8c5d47
+
   print "Ok.";
 	
 	//Check status station in 30 minitues.
