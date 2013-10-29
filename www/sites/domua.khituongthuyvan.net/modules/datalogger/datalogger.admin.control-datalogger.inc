@@ -5,7 +5,7 @@ $timeInterval = array('10', '20', '30', '60', '120', '180', '360');
 
 function _command_form($form, &$form_state) {
   global $user;
-  
+  global $options_commands;
   $module_path = drupal_get_path('module', 'datalogger');
   
   drupal_add_js($module_path . '/datalogger_form_command.js');
@@ -118,6 +118,9 @@ function _command_form($form, &$form_state) {
       'effect' => 'fade',
     ),
   );
+  //cadic
+  global $station_nid;
+  
 	$station_nid = !empty($form_state['values']['station_nid']) ? $form_state['values']['station_nid'] : arg();
   if ($station_nid[1] == 0) $station_nid = null;
 	$form['station_nid'] = array(
@@ -759,7 +762,10 @@ function _command_validate($form, &$form_state) {
 
 
 function _send_command_submit($form, &$form_state) {
-
+//cadic
+  global $station_nid;
+  global $options_commands;
+  
   $nid = intval(arg(1)) ? intval(arg(1)) : $form_state['values']['nid'];
   //dpm $nid;
   if($nid == 0 && $form_state['values']['station']) {
@@ -787,16 +793,38 @@ function _send_command_submit($form, &$form_state) {
 	else{
 		$select = $form_state["values"]["command_selects"];
 	}
-	
+  
+  
   return _datalogger_send_command($nid, $select,$form, $form_state);
 }
 
+function _log_rainfalls($title, $station, $event) {
+  $node = new stdClass();
+  $node->title = $title;
+  $node->type = "log";
+  $node->created = time();
+  $node->changed = $node->created;
+  $node->status = 1; // Published?
+  $node->promote = 0; // Display on front page?
+  $node->sticky = 0; // Display top of page?
+  $node->format = 1; // Filtered HTML?
+  $node->uid = 1; // Content owner uid (author)?
+  $node->language = "und";
 
+  node_object_prepare($node);
+  // $node->field_[$node->language][0]["value"] = $body;
+  $node-> field_event_type[$node->language][0]["value"] = $event;
+  $node->	field_log_tram['und'][0]['nid'] = $station;
+  dpm($node);
+  $node = node_submit($node);
+  node_save($node);
+
+}
 function _datalogger_send_command($nid, $select, $form, &$form_state) {
 	define('DATEymdHis', date('ymdHis',time()));  
   define('DATEymdHi', date('ymdHi',time()));  
   define('DATEYmdHi', date('YmdHi',time()));  
-  
+  global $nids;
   $nids = $form_state['values']['station_nid'];
   
   //dpm(array('nids', $nid));
@@ -1240,6 +1268,11 @@ function _datalogger_send_command($nid, $select, $form, &$form_state) {
           $arg = array('Khởi động lại Datalogger', 'P:RESET', _datalogger_result($message,'P:RESET'),'',$nid);
           break;
       }
+      // cadic
+      global $nids;
+      dpm($form_state);
+      dpm($nids[1]);
+      _log_rainfalls('log', $nids[1], $arg[0]);
 
       
       $type = substr($sms, 7, 3);
