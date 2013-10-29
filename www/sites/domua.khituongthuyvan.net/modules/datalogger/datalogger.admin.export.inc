@@ -210,19 +210,10 @@ function convert_vi_to_en($str) {
 }
 
 function write_to_text($str,$matram, $year, $month, $day, $hour, $path)  {
-  dpm($hour);
-  dpm($day);
-  dpm($month);
-  dpm($year);
   
-  //$file_name = sprintf("%4d-%02d-%02d_%d", $year, $month, $day, $matram);
-  // $hour_1 = hour - 1;
-  // if(hour_1 < 0) {
-    // $day = $day -1;
-  // }
-  $file_name = sprintf("%06d_%4d-%02d-%02d-%02d.00.00", $matram, $year, $month, $day, $hour);
+  $file_name = sprintf("%06d_%4d-%02d-%02d-%02d.00.00", $matram, $year, $month, $day, $hour +1);
   $file = fopen($path . "\\" . $file_name .".txt", 'w');
-  dpm($file_name);
+  //dpm($file_name);
   fwrite($file, $str);
   fclose($file);
 }
