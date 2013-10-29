@@ -173,7 +173,7 @@ MANG2;
 		break;	
 		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
 			$s.=<<<MANG2
-			map.setCenter(new VLatLng(10.8152328, 106.680505), 7);
+			map.setCenter(new VLatLng(18.8152328, 106.680505), 7);
 MANG2;
 		break;
 		case "http://113.160.225.111:8181:8181/" ://Trung Trung Bo ok
