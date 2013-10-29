@@ -741,28 +741,75 @@ function _datalogger_convert_number($number){
 	return $sim_number;
 }
 
+//Ham lay thoi gian truyen tin
+function _datalogger_check_report_time($nid, $value){
+	$node = node_load($nid);
+	$node->field_station_report_time['und'][0]['value'] = $value;
+	node_save($node);
+}
+
+//Kiem tra trang thai sau 30 phut
+function _datalogger_check_status_30_minutes(){
+		//$content_type("viet_");
+		$content_type = "station";
+  	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
+		//$rows = views_get_view_result('viet_ban_do');
+		$now = time();
+		foreach ($all_nodes as $node) {
+				//$last_receive = strtotime($row->UpdatedInDB);
+				
+				if($node->field_station_report_time['und'][0]['value'] ==''){
+						$node->field_station_status['und'][0]['value'] = 'station_deactive';
+						node_save($node);
+				}else{
+					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
+					$diff = ($now - $last_receive)/60;
+					
+          $node->field_station_status['und'][0]['value'] = ($diff > 30 ? 'station_deactive' : 'station_active');
+          node_save($node);
+					
+				}		
+			
+		}	
+}
+
 function _datalogger_check_inbox() {
+	
   $cron = (arg(3) == 'remote');
   
   $processed = 0;
   
-  $result = db_query("SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10");
+  $result = db_query("SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10");	
+  //dpm($rerult[0]->ID);
+  //$result = db_query("SELECT * FROM inbox WHERE Processed={$processed}  LIMIT 0,10");
+	//_check_report_time();
+  //dpm($result[0]->ID);
   
   header('Content-Type: text/plain');
   
   foreach ($result as $row) {
-    //tin nhắn từ datalogger
+    // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
-    
+
     print "Inbox ID: {$row->ID}\n";
     
 		$number = _datalogger_convert_number($row->SenderNumber);
+		
 		$sms = $row->TextDecoded;
     $smsID = $row->ID;
+		
+		
+		//Lay thoi gian nhan tin
+		 module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+		$tram_nid = _datalogger_return_nid($number);
+		$value = $row->UpdatedInDB;
+		_datalogger_check_report_time($tram_nid, $value);
+		
+		
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
-      
       //Xử lý tin nhắn được yêu cầu:88byte
+      
       if($len_sms == 88){
         print "Command.\n";
         
@@ -778,21 +825,6 @@ function _datalogger_check_inbox() {
       
         switch ($number) {
 	
-<<<<<<< HEAD
-        default:
-          // Chèn bản tin vào bảng đo mưa
-          // dsm('into 140');
-          _datalogger_separate_sms($sms,$number, $id_inbox);
-          // Cập nhật các bản tin đã xử lý
-          _datalogger_update_process_inbox(1, $id_inbox);
-          //return $sms;
-          
-          // xuat ra txt
-          module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-          $tram = _datalogger_return_nid($number);
-          _datalogger_ftp_txt_export_inc($tram);
-        }
-=======
           default:
             // Chèn bản tin vào bảng đo mưa
             // dsm('into 140');
@@ -801,10 +833,10 @@ function _datalogger_check_inbox() {
             _datalogger_update_process_inbox(1, $id_inbox);
             //Xuat file txt tu dong
             module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-            $tram = _datalogger_return_nid($number);
-            _datalogger_ftp_txt_export_inc($tram);
+           
+						//_datalogger_
+            _datalogger_ftp_txt_export_inc($tram_nid);
           }
->>>>>>> cccb4843dfff903bb775aa95e51d1b61d842bee1
       }			
 			else {
         print "Other.\n";
@@ -814,14 +846,17 @@ function _datalogger_check_inbox() {
 		else{
 			_datalogger_update_process_inbox(2, $id_inbox);
 		}
-    
     flush (); // flush the output buffer
   }
-  
-  
-  //return '123';
-  
+	// return 'Ok';
+	_datalogger_check_status_30_minutes();
   print "Ok.";
+	
+	
+	//Check status station in 30 minitues.
+	_datalogger_check_status_30_minutes();
+	
+	
   drupal_exit();
 }
 
@@ -1197,13 +1232,10 @@ function _datalogger_new_sms_form() {
   $query = $query->extend('TableSort')->extend('PagerDefault')->orderByHeader($header)->limit(50);
   
   // Executing query
-<<<<<<< HEAD
+
   $result = $query->execute();
 
   //dpq($query);
-=======
-  $result = $query->execute(); 
->>>>>>> cccb4843dfff903bb775aa95e51d1b61d842bee1
 
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
@@ -1406,10 +1438,9 @@ function _datalogger_new_sentitems_form(){
     no => t('No.'),
 		station_name => t('Station Name'),
     receiving_date_time => t('Sending Date Time'),
-<<<<<<< HEAD
+
     //delivery_date_time =>t('Delivery Date Time'),
-=======
->>>>>>> cccb4843dfff903bb775aa95e51d1b61d842bee1
+
     destination_number => t('Destination Number'),
     message_content => t('Message content'),
 		Modem => t('Modem'),
@@ -1427,18 +1458,7 @@ function _datalogger_new_sentitems_form(){
 	
   $result = db_query("SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT ". $offset.",".$num_per_page."");
 	
-<<<<<<< HEAD
-  $rows = array();
-  
-  while($row = $result->fetchObject()) {
-    $number = $row->DestinationNumber;
-		$station = views_get_view_result('view_station_find', Null, $number );
-    
-		if(!empty($station)) {
-			$station_name = $station[0]->node_title;
-		}
 
-=======
   /*$query = "SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC";
   $result = pager_query(db_rewrite_sql($query));*/
   
@@ -1451,17 +1471,15 @@ function _datalogger_new_sentitems_form(){
 			$station_name = $station[0]->node_title;
 		}
 		
->>>>>>> cccb4843dfff903bb775aa95e51d1b61d842bee1
+
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
 
     // highlight
     
-<<<<<<< HEAD
+
     //Xử lý tin nhắn được yêu cầu :88byte
-=======
-    //X? lý tin nh?n du?c yêu c?u:88byte232323233
->>>>>>> cccb4843dfff903bb775aa95e51d1b61d842bee1
+
     if($len_sms == 88) {
       $sms = '<span style="color:blue;font-weight:bold">' . $sms . '</span>';
     }
@@ -1469,14 +1487,6 @@ function _datalogger_new_sentitems_form(){
     elseif($len_sms == 140) {
       $sms = _datalogger_regex_rain($sms);      
     }			
-<<<<<<< HEAD
-    if($row -> Status == "SendingOKNoReport") {
-      $status = "Thành công";
-    }
-    else {
-      $status = "Lỗi";
-    }
-=======
     
     if($row->Status == "SendingOKNoReport") {
       $status = "Thành công";
@@ -1485,22 +1495,16 @@ function _datalogger_new_sentitems_form(){
       $status = "Lỗi";
     }
     
->>>>>>> cccb4843dfff903bb775aa95e51d1b61d842bee1
+
     $rows[] = array (
 			$offset+=1,
 			$station_name,
       $row -> SendingDateTime,
-<<<<<<< HEAD
-      //$row -> DeliveryDateTime,
+
 			$number,
 			$sms,
 			$row -> SenderID,
-      //$row -> Status,
-=======
-			$number,
-			$sms,
-			$row -> SenderID,
->>>>>>> cccb4843dfff903bb775aa95e51d1b61d842bee1
+
       $status,
 			);
 

@@ -28,14 +28,15 @@ function _datalogger_vietbando() {
 	$rows = views_get_view_result('viet_ban_do');
 	
 	
-	dpm($rows);
+	//dpm($rows);
 	//echo $rows[0]->field_field_station_alarm;
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
 
-	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=5lJdIlKaLKfA1UMwdmzgbRYOTt/AH+9wl6NQH/f0pue8AFCloQ7qJw==';
+	$external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=PxVLItwK6WpL/gxKoctolsN6g0viC8l/XlqTfK7KTG4=';
 	
   drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
-  	$s = "  function loadMap() {";
+  
+  $s = "  function loadMap() {";
 	$s .= "var station = [];\n";
 	
 	foreach ($rows as $k => $row) {
@@ -50,9 +51,9 @@ function _datalogger_vietbando() {
 		//Dia chi
 		station[$k].diachi = "{$row ->field_field_station_address[0]['rendered']['#markup']}";
 		//Lat
-		station[$k].lat = {$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lat']};
+		station[$k].lat = "{$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lat']}";
 		//Lon
-		station[$k].lon = {$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lon']};
+		station[$k].lon = "{$row->_field_data['nid']['entity']->field_station_geo_location['und'][0]['lon']}";
 		//Kinh do
 		station[$k].kinhdo = "{$row->_field_data['nid']['entity']->field_station_latitude['und'][0]['value']}";
 		//Vi do
@@ -60,19 +61,24 @@ function _datalogger_vietbando() {
 		//SDT
 		station[$k].sdt = "{$row->field_field_station_sim_number[0]['rendered']['#markup']}";
 		//Dien ap
-		station[$k].dienap = '';
+		station[$k].dienap ="{$row->field_field_station_power[0]['rendered']['#markup']}";
 		//Luong mua 24h
 		station[$k].luongmua24h ="{$row->field_field_station_rain_24[0]['rendered']['#markup']}";
 		//Luong mua gan nhat
 		station[$k].luongmuagannhat ="{$row->field_field_station_rain_nearest[0]['rendered']['#markup']}";
 		//Trang thai
-		station[$k].trangthai ={$row->field_field_station_status[0]['rendered']['#access']} ;
-		//Thoi gian truyen tin
-		station[$k].thoigiantruyentin = "{$row->field_field_station_transmission_speed[0]['rendered']['#markup']}";
-		
-		if(station[$k].thoigiantruyentin == ""){
-			station[$k].thoigiantruyentin = "Chưa có dữ liệu";	
-		}		
+		station[$k].trangthai ="{$row->field_field_station_status[0]['raw']['value']}" ;
+    station[$k].trangthaigiatri ="{$row->field_field_station_status[0]['rendered']['#markup']}" ;
+		//Chu ky truyen tin
+		station[$k].chukytruyentin = "{$row->field_field_station_transmission_speed[0]['rendered']['#markup']}";
+		station[$k].tinhtrang = "{$row->field_field_station_alarm[0]['rendered']['#markup']}";
+		if(station[$k].chukytruyentin == ""){
+			station[$k].chukytruyentin = "Chưa có dữ liệu";	
+		}else{
+      station[$k].chukytruyentin =station[$k].chukytruyentin.concat(" phút");
+      
+    }
+    station[$k].thoigiantruyentin = "{$row->field_field_station_report_time[0]['rendered']['#markup']}";
 MANG;
 		if(count($row->field_field_station_alarm) == 0){
 			//Binh thuong
@@ -87,42 +93,47 @@ MANG;
 			station[$k].canhbao = 1;
 			
 MANG;
-			if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_rainfall'){
-				//Mua
+			if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_false'){
+				//Binh Thuong
 				$s .= <<< MANG
 				
-				station[$k].canhbaostatus = 0;
+				station[$k].canhbao = 0;
+			
+MANG;
+			}else if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_rainfall'){
+				//Mua 	
+				$s .= <<< MANG
+				
+				station[$k].canhbao = 1;
 			
 MANG;
 			}else if($row->field_field_station_alarm[0]['raw']['value'] == 'alarm_true'){
-				//Mua to	
+      //Mua to	
 				$s .= <<< MANG
 				
-				station[$k].canhbaostatus = 1;
+				station[$k].canhbao = 2;
 			
 MANG;
-			}
+      }
 		}
 	}
 	
 	$s.= <<< MANG2
 		if (VBrowserIsCompatible() ) { 
 			var map = new VMap(document.getElementById('container'));
-			map.setCenter(new VLatLng(16.8152328, 106.680505), 7);
+			map.setCenter(new VLatLng(10.8152328, 105.680505), 7);
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
 				var pt = new VLatLng(station[i].lat,station[i].lon);
-				if(station[i].trangthai==1){
+				if(station[i].trangthai=='station_active'){
 					if(station[i].canhbao == 0){
 						markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/orange1.png", new VSize(15, 15)), false);
-					}else{
-						if(station[i].canhbaostatus == 0){
-							markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/blue.png", new VSize(15, 15)), false);
-						}else{
-							markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/red.png", new VSize(15, 15)), false);
-						}	
-					}
+					}else if(station[i].canhbao == 1){
+            markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/blue.png", new VSize(15, 15)), false);
+					}else if(station[i].canhbao == 2){
+            markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/red.png", new VSize(15, 15)), false);
+          }
 				}else{
 					markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/black.png", new VSize(15, 15)), false);
 				}
@@ -148,23 +159,17 @@ MANG;
 				contentString[i] +='</b></a></li><li><a title="Số ĐT">Số ĐT: <b>';
 				contentString[i] += station[i].sdt;
 				contentString[i] += '</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li><li><a class="hide">Trạng thái hoạt động</a><!--[if lte IE 6]><a>Trạng thái hoạt động<table><tr><td><![endif]--><ul><li><a title="Trạng thái: Hoạt Động">Trạng thái: <b>';
-				contentString[i] += 'Hoạt Động';
+				contentString[i] += station[i].trangthaigiatri;
 				contentString[i] += '</b></a></li><li><a title="Điện áp hiện tại: ';
-				contentString[i] += '13.00V';
+				contentString[i] += station[i].dienap;
 				contentString[i] += '">Điện áp hiện tại: <b>';
-				contentString[i] += '13.00V';
-				contentString[i] += '</b></a></li><li><a title="Điện áp ngắt: ';
-				contentString[i] += '11V';
-				contentString[i] += '">Điện áp ngắt: <b>';
-				contentString[i] += '11V';
-				contentString[i] += '</b></a></li><li><a title="Điện áp phóng: ';
-				contentString[i] += '12V';
-				contentString[i] += '">Điện áp phóng: <b>';
-				contentString[i]+= '12V';
-				contentString[i] += '</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li><li><a class="hide">Thông tin lượng mưa</a><!--[if lte IE 6]><a>Thông tin lượng mưa<table><tr><td><![endif]--><ul><li><a title="Tình trạng: ';
+				contentString[i] += station[i].dienap;
+				contentString[i] += '</b></a></li>';
+        
+				contentString[i] += '</ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li><li><a class="hide">Thông tin lượng mưa</a><!--[if lte IE 6]><a>Thông tin lượng mưa<table><tr><td><![endif]--><ul><li><a title="Tình trạng: ';
 				contentString[i] += 'undefined';
 				contentString[i] += '">Tình trạng: <b>';
-				contentString[i] += 'Không';
+				contentString[i] += station[i].tinhtrang;
 				contentString[i] += '</b></a></li><li><a title="Lượng mưa 24h: ';
 				contentString[i] += station[i].luongmua24h;
 				contentString[i] += '">Lượng mưa 24h: <b>';
@@ -173,8 +178,12 @@ MANG;
 				contentString[i] +=station[i].luongmuagannhat;
 				contentString[i] += '">Lượng mưa gần nhất: <b>';
 				contentString[i] += station[i].luongmuagannhat;
-				contentString[i] += '</b></a></li><li><a title="Thời gian truyền tin: ';
-				contentString[i] += 'null';
+				contentString[i] += '</b></a></li><li><a title="Chu kỳ truyền tin: ';
+				contentString[i] += station[i].chukytruyentin;;
+				contentString[i] += '">Chu kỳ truyền tin: <b>';
+				contentString[i] += station[i].chukytruyentin;
+        contentString[i] += '</b></a></li><li><a title="Thời gian truyền tin: ';
+				contentString[i] += station[i].thoigiantruyentin;;
 				contentString[i] += '">Thời gian truyền tin: <b>';
 				contentString[i] += station[i].thoigiantruyentin;
 				contentString[i] += '</b></a></li><li><a title="Báo cáo dữ liệu mưa" href="';
