@@ -57,12 +57,24 @@ function _datalogger_vietbando() {
 		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
 			$url = "E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=";
 		break;
+		case "http://192.168.100.48:8181:8181/" ://Bac Trung Bo ok
+			$url = "E43pcmZHdUidihFQnTP4CE1G6xwG7qEy8G+MvpOPjSE=";
+		break;
+		
 		case "http://113.160.225.111:8181:8181/" ://Trung Trung Bo ok
 			$url = "E43pcmZHdUgB7c6vDr0v6Wr68q59Z7acJs8eK4rSnNE=";
 		break;
+		case "http://192.168.100.101:8181:8181/" ://Trung Trung Bo ok
+			$url = "E43pcmZHdUidihFQnTP4CJtdkyDsS/v6lpaNbNJdod8=";
+		break;
+		
 		case "http://kttvntb.gov.vn:8181:8181/" : //Nam Trung Bo ok
 			$url = "6+ZvZ+bVk7kGAj00YOiWwcamFLHxDOuHjt1PK+LvY4w=";
 		break;
+		case "http://10.152.52.10:8181:8181/" : //Nam Trung Bo ok
+			$url = "E43pcmZHdUgN4UJdBQ1FOJnHWmdWDvfeahGSQ+dGfz0=";
+		break;
+		
 		case "http://kttvtaynguyen.dyndns.org/" : //Tay Nguyen ok
 			$url = "6+ZvZ+bVk7nAf8Ske2bWNvDalMywr5HD5WT957Dk47EkXwf1b0S+dQ==";
 		break;
@@ -175,13 +187,25 @@ MANG2;
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(18.8152328, 106.680505), 7);
 MANG2;
+		case "http://192.168.100.48:8181:8181/" ://Bac Trung Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(18.8152328, 106.680505), 7);
+MANG2;
 		break;
 		case "http://113.160.225.111:8181:8181/" ://Trung Trung Bo ok
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(16.8152328, 105.680505), 7);
 MANG2;
+	case "http://192.168.100.101:8181:8181/" ://Trung Trung Bo ok
+				$s.=<<<MANG2
+				map.setCenter(new VLatLng(16.8152328, 105.680505), 7);
+MANG2;
 		break;
 		case "http://kttvntb.gov.vn:8181:8181/" : //Nam Trung Bo ok
+			$s.=<<<MANG2
+			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
+MANG2;
+		case "http://10.152.52.10:8181:8181/" : //Nam Trung Bo ok
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(12.8152328, 107.680505), 7);
 MANG2;
