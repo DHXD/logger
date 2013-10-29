@@ -741,6 +741,38 @@ function _datalogger_convert_number($number){
 	return $sim_number;
 }
 
+//Ham lay thoi gian truyen tin
+function _datalogger_check_report_time($nid, $value){
+	$node = node_load($nid);
+	$node->field_station_report_time['und'][0]['value'] = $value;
+	node_save($node);
+}
+
+//Kiem tra trang thai sau 30 phut
+function _datalogger_check_status_30_minutes(){
+		//$content_type("viet_");
+		$content_type = "station";
+  	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
+		//$rows = views_get_view_result('viet_ban_do');
+		$now = time();
+		foreach ($all_nodes as $node) {
+				//$last_receive = strtotime($row->UpdatedInDB);
+				
+				if($node->field_station_report_time['und'][0]['value'] ==''){
+						$node->field_station_status['und'][0]['value'] = 'station_deactive';
+						node_save($node);
+				}else{
+					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
+					$diff = ($now - $last_receive)/60;
+					
+          $node->field_station_status['und'][0]['value'] = ($diff > 30 ? 'station_deactive' : 'station_active');
+          node_save($node);
+					
+				}		
+			
+		}	
+}
+
 function _datalogger_check_inbox() {
   $cron = (arg(3) == 'remote');
   
@@ -759,6 +791,13 @@ function _datalogger_check_inbox() {
 		$number = _datalogger_convert_number($row->SenderNumber);
 		$sms = $row->TextDecoded;
     $smsID = $row->ID;
+    
+    //Lay thoi gian nhan tin
+		 module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+		$tram_nid = _datalogger_return_nid($number);
+		$value = $row->UpdatedInDB;
+		_datalogger_check_report_time($tram_nid, $value);
+    
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
       
@@ -798,12 +837,15 @@ function _datalogger_check_inbox() {
 			_datalogger_update_process_inbox(2, $id_inbox);
 		}
     
+    //Kiem tra trang thai sau 30 phut
+   
+    
     flush (); // flush the output buffer
   }
   
   
   //return '123';
-  
+   _datalogger_check_status_30_minutes();
   print "Ok.";
   drupal_exit();
 }
