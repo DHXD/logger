@@ -1467,10 +1467,7 @@ function _datalogger_new_sentitems_form(){
 		Modem => t('Modem'),
     status => t('Status'),
   );
-<<<<<<< HEAD
-  
-=======
->>>>>>> e1b243a914e2c0a7510e32337df0f8363c8c5d47
+
   $num_per_page = 500;
   $offset=$num_per_page*$page;
 	$total = db_query("SELECT COUNT(*) total FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT 0,500");
