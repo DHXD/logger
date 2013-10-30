@@ -748,8 +748,17 @@ function _datalogger_check_report_time($nid,$value){
 
 
 	$node = node_load($nid);
-	$node->field_station_report_time['und'][0]['value'] = $value;
+	$last_value = $node->field_station_report_time['und'][0]['value'];
+	if($last_value == ''){
+		$node->field_station_report_time['und'][0]['value'] = $value;
+	}else{
+		$difference = strtotime($value) - strtotime($last_value);
+		if($difference > 0){
+			$node->field_station_report_time['und'][0]['value'] = $value;
+		}
+	}
 	node_save($node);
+	
 }
 
 
@@ -757,8 +766,8 @@ function _datalogger_check_report_time($nid,$value){
 
 
 function _datalogger_check_status_30_minutes(){
-		//$content_type("viet_");
-		$content_type = "station";
+	//$content_type("viet_");
+	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
@@ -772,8 +781,8 @@ function _datalogger_check_status_30_minutes(){
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
 					$diff = ($now - $last_receive)/60;
 					
-          $node->field_station_status['und'][0]['value'] = ($diff > 90 ? 'station_deactive' : 'station_active');
-          node_save($node);
+				  $node->field_station_status['und'][0]['value'] = ($diff > 90 ? 'station_deactive' : 'station_active');
+				  node_save($node);
 					
 				}		
 
@@ -782,7 +791,6 @@ function _datalogger_check_status_30_minutes(){
 }
 
 function _datalogger_check_inbox() {
- 
 
   $cron = (arg(3) == 'remote');
   
@@ -796,6 +804,7 @@ function _datalogger_check_inbox() {
   
   header('Content-Type: text/plain');
   
+  _datalogger_check_status_30_minutes();
   foreach ($result as $row) {
     // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
@@ -816,6 +825,7 @@ function _datalogger_check_inbox() {
     $value = $row->UpdatedInDB;
 	_datalogger_check_report_time($tram_nid, $value);
     
+
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
@@ -859,7 +869,6 @@ function _datalogger_check_inbox() {
 		}
     flush (); // flush the output buffer
   }
-   
 	// return 'Ok';
 
 	//_datalogger_check_status_30_minutes();
@@ -867,9 +876,10 @@ function _datalogger_check_inbox() {
 	
 
 	//Check status station in 30 minitues.
-	_datalogger_check_status_30_minutes();
 	
 	
+	
+
 
   drupal_exit();
 }
@@ -2061,27 +2071,7 @@ function _datalogger_init_node($title, $field_station_code,
   node_save($node);
 }
 
-function _log_init_node($title, $event) {
-  $node = new stdClass();
-  $node->title = $title;
-  $node->type = "log";
-  $node->created = time();
-  $node->changed = $node->created;
-  $node->status = 1; // Published?
-  $node->promote = 0; // Display on front page?
-  $node->sticky = 0; // Display top of page?
-  $node->format = 1; // Filtered HTML?
-  $node->uid = 1; // Content owner uid (author)?
-  $node->language = "und";
 
-  node_object_prepare($node);
-  // $node->field_[$node->language][0]["value"] = $body;
-  $node->field_event_type[$node->language][0]["value"] = $event;
-
-  $node = node_submit($node);
-  node_save($node);
-
-}
 
 function _datalogger_rainfalls() {
   // for ($i = 1; $i < 227; $i ++) {
@@ -2093,14 +2083,7 @@ function _datalogger_rainfalls() {
 
 }
 
-function _log_rainfalls() {
-  // for ($i = 1; $i < 10; $i ++) {
-  // // _log_init_node("Log - ".$i,"Description - ".$i,"Event type - ".$i);
-  // _log_init_node("Log - ".$i,"Set Auto Power Management Nable");
-  // }
-  return "Finished Create Logs.";
 
-}
 
 
 
