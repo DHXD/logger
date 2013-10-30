@@ -788,7 +788,6 @@ function _datalogger_check_status_30_minutes(){
 }
 
 function _datalogger_check_inbox() {
- 
 
   $cron = (arg(3) == 'remote');
   
@@ -811,6 +810,7 @@ function _datalogger_check_inbox() {
     
 		$number = _datalogger_convert_number($row->SenderNumber);
 
+
     
 
 		$sms = $row->TextDecoded;
@@ -822,6 +822,7 @@ function _datalogger_check_inbox() {
     $value = $row->UpdatedInDB;
 	_datalogger_check_report_time($tram_nid, $value);
     
+
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
@@ -865,8 +866,8 @@ function _datalogger_check_inbox() {
 		}
     flush (); // flush the output buffer
   }
-   
 	// return 'Ok';
+
 	//_datalogger_check_status_30_minutes();
   print "Ok.";
 	
@@ -874,6 +875,7 @@ function _datalogger_check_inbox() {
 	
 	
 	
+
 
   drupal_exit();
 }
@@ -2061,27 +2063,7 @@ function _datalogger_init_node($title, $field_station_code,
   node_save($node);
 }
 
-function _log_init_node($title, $event) {
-  $node = new stdClass();
-  $node->title = $title;
-  $node->type = "log";
-  $node->created = time();
-  $node->changed = $node->created;
-  $node->status = 1; // Published?
-  $node->promote = 0; // Display on front page?
-  $node->sticky = 0; // Display top of page?
-  $node->format = 1; // Filtered HTML?
-  $node->uid = 1; // Content owner uid (author)?
-  $node->language = "und";
 
-  node_object_prepare($node);
-  // $node->field_[$node->language][0]["value"] = $body;
-  $node->field_event_type[$node->language][0]["value"] = $event;
-
-  $node = node_submit($node);
-  node_save($node);
-
-}
 
 function _datalogger_rainfalls() {
   // for ($i = 1; $i < 227; $i ++) {
@@ -2093,14 +2075,7 @@ function _datalogger_rainfalls() {
 
 }
 
-function _log_rainfalls() {
-  // for ($i = 1; $i < 10; $i ++) {
-  // // _log_init_node("Log - ".$i,"Description - ".$i,"Event type - ".$i);
-  // _log_init_node("Log - ".$i,"Set Auto Power Management Nable");
-  // }
-  return "Finished Create Logs.";
 
-}
 
 
 

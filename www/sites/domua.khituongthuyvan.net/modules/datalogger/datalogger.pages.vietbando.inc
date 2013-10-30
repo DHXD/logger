@@ -89,7 +89,7 @@ function _datalogger_vietbando() {
 
   $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=' .$url;
 	
-  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
+ drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
   $s = "  function loadMap() {";
 	$s .= "var station = [];\n";
@@ -176,6 +176,7 @@ MANG;
 	$s.= <<< MANG2
 		if (VBrowserIsCompatible() ) { 
 			var map = new VMap(document.getElementById('container'));
+
 MANG2;
 	switch($full_url){
 		case "http://admin.domua.khituongthuyvan.net/" :
@@ -223,6 +224,7 @@ MANG2;
 	}
 	
 	$s.=<<<MANG2
+
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
