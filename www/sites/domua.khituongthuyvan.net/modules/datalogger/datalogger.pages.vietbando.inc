@@ -90,7 +90,7 @@ function _datalogger_vietbando() {
   $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=' .$url;
 
 	
-  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
+ drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
   $s = "  function loadMap() {";
 	$s .= "var station = [];\n";
@@ -227,7 +227,11 @@ MANG2;
 	}
 	
 	$s.=<<<MANG2
+<<<<<<< HEAD
       console.log("------------------------");
+=======
+
+>>>>>>> 6f0ce477af4fda5f88eb4b80a43d3a6411aa6d3a
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
