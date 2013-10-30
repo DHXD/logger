@@ -510,8 +510,14 @@ function _datalogger_report_rainfall_all_station_in_day_submit(&$form, &$form_st
 
 function _datalogger_chart_rainfall_form($form, &$form_state){
 	drupal_set_title(t('Rainfall data chart'));
+	
+	$tram_nid = intval(arg(3));
+	$tram = node_load($tram_nid);
+	$tentram = $tram->title;
+	$tinh = $tram->field_station_province_city['und'][0]['value'];
   
 	_datalogger_select_area_province_station($form, $form_state);
+	
 	$form['stations_fieldset']['year']['#access']=FALSE;
 	$form['stations_fieldset']['month']['#access']=FALSE;
   $form['stations_fieldset']['selectArea']['#access']=FALSE;

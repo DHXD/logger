@@ -71,19 +71,18 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     }
     if (!isset($in_array[$day])) $in_array[$day] = array();
     $in_array[$day][$record->entity_id] = $record;
-    
-      $in_array_1[$day][$hour] = $record;
-    
+    $in_array_1[$day][$hour] = $record;
   }
 
   
-  //dpm($in_array_1); return;
   $time_rainfall_last = $record;
+
   // $in_array_2 = array();
   //dpm(count($in_array)); return;
 
 	for($day = 1; $day <= $month_days_number; $day++){
     
+
     $dem_luong_mua_trong_dot[$day-1] = array();
 	
 		$day_time = ($day) < 10 ? '0'.($day) : $day;
@@ -92,6 +91,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 		$max_total_rainfall_in_day = 0;
 		$max_total_time_rainfall_in_day = 0;
 		$hours_in_day = array();
+    $hours_miss_sms = array();
     $month_day = $month.$day_time;
     
 		if(count($in_array) > 0){
@@ -99,7 +99,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
       
 			foreach($in_array[$day] as $rainfall){
      
-				$hour = (int)substr($rainfall->title, -8, 2); 
+				$hour = (int)substr($rainfall->title, -8, 2);
         $minute = (int)substr($rainfall->title, -5, 2);
         $second = (int)substr($rainfall->title, -2, 2);
         if($minute ==0 && $second == 0){
@@ -127,7 +127,9 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
       //dpm($hours_in_day); return;
 			for($i = 23; $i >= 0; $i--) {
 				$number = count($hours_in_day[$i]);
+
         //dpm($number);
+
 
      
         $total_rainfall_in_hour = 0;
@@ -135,11 +137,13 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				$time_rainfall_in_hour = 0;
 				$max_rainfall_in_hour = 0;
         
-        $in_array_2['day'] = $day;
-        $in_array_2['hour'] = $i;
+        $hours_miss_sms['day'] = $day;
+        $hours_miss_sms['hour'] = $i;
         if(!isset($in_array_1[$day][$i])) {
-          $total_rainfall_in_hour = -999;
-          dpm($in_array_2);
+          $hours_in_day[$i] = array(
+            'max_rainfall_in_hour' => 0, 
+						'total_rainfall_in_hour' => -999,
+						'time_rainfall_in_hour' => 0);
         }
         
 				if($number > 0){
@@ -203,7 +207,9 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
       'max_total_time_in_hours' => $max_time_in_hours
       );
 	}
-  // return;
+  
+  
+  //return;
   //dpm($day_of_month[]);
 	/*-----------------------------------------------------------------------------------------------------------*/
 	//dpm($dem_luong_mua_trong_dot[2]);
@@ -491,26 +497,27 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     // binhnt edited here
     $day = ($i - 15) * 2;
 
-    
 		for($j = 0; $j < 24 ; $j++){
 			$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 			$time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
         
-      if($i + 1 > intval($now["mday"]) && intval(substr($month,-2)) >= intval($now["mon"])) {
+      if($i + 1 > intval($now["mday"])){
          $total = '';
          $time = '';
          $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+6), '');
          $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+7), '');
       }
-      if(!$total) $total = '';
-      if(!$time) $time = '';
+      
+      if(!isset($total)) $total = '-';
+      if(!$time) $time = '-';
+      
       $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day +6),$total);
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day +7),$time);
+      
 			if($total > 0 && $time > 0){
 				$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->applyFromArray($font_bold);
 				$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+7))->applyFromArray($font_bold);
-         $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day + 6))->getNumberFormat()->setFormatCode('0.0');
-
+        $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day + 6))->getNumberFormat()->setFormatCode('0.0');
 			}
 
 		}
