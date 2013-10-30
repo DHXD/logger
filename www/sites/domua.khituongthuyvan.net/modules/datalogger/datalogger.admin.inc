@@ -614,7 +614,7 @@ function _datalogger_chart_rainfall_form_js() {
       $rows[$v->field_data_field_rainfall_send_time_field_rainfall_send_time] = '['.($v->field_data_field_rainfall_send_time_field_rainfall_send_time+7*3600)*1000 .','.$v->field_field_rainfall_total_hour[0]['raw']['value'] . ',' . $v->nid.','.'100'.','.'100'.  ']';
     }
   //$rows=array('[1318535940000,413.05,11.05, 100.00,100.00]', '[1318539990000,44.05,413.05, 100.00,100.00]');
-  echo "/* console.log(' start = $start, end = $end, startTime = $startTime, endTime = $endTime '); */";
+  echo "/* console.log(' start = $start, end = $end, startTime = $start_argument, endTime = $end_argument '); */";
   echo $callback ."([\n" . join(",\n", $rows) . "\n]);";
   //print json_encode($a);
   drupal_exit();
