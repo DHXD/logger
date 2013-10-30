@@ -35,7 +35,7 @@ var delta_timezone = 0;
 				var u = '/js/manage/chart/rainfalls';
 				//u = 'http://www.highcharts.com/samples/data/from-sql.php';
 				
-				$.getJSON(u + '?start='+ Math.round(e.min) + '&end='+ Math.round(e.max)+'&station='+ 2927  +'&callback=?', function(data) {
+				$.getJSON(u + '?start='+ Math.round(e.min) + '&end='+ Math.round(e.max)+'&station='+ station  +'&callback=?', function(data) {
 					//console.log(data);
 					// Add a null value for the end date 
 					//data = [].concat(data, [[Date.UTC(2011, 9, 14, 19, 59), null, null, null, null]]);
