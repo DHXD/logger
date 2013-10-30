@@ -227,11 +227,7 @@ MANG2;
 	}
 	
 	$s.=<<<MANG2
-<<<<<<< HEAD
-      console.log("------------------------");
-=======
 
->>>>>>> 6f0ce477af4fda5f88eb4b80a43d3a6411aa6d3a
 			var markers = [];  
 			var contentString = [];
 			for(var i =0;i<station.length;i++){
