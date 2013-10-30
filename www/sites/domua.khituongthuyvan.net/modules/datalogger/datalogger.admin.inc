@@ -746,16 +746,25 @@ function _datalogger_convert_number($number){
 function _datalogger_check_report_time($nid,$value){
 
 	$node = node_load($nid);
-	$node->field_station_report_time['und'][0]['value'] = $value;
+	$last_value = $node->field_station_report_time['und'][0]['value'];
+	if($last_value == ''){
+		$node->field_station_report_time['und'][0]['value'] = $value;
+	}else{
+		$difference = strtotime($value) - strtotime($last_value);
+		if($difference > 0){
+			$node->field_station_report_time['und'][0]['value'] = $value;
+		}
+	}
 	node_save($node);
+	
 }
 
 
 //Kiem tra trang thai sau 30 phut
 
 function _datalogger_check_status_30_minutes(){
-		//$content_type("viet_");
-		$content_type = "station";
+	//$content_type("viet_");
+	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
