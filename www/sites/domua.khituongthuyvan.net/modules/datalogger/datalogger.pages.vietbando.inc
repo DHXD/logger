@@ -47,7 +47,7 @@ function full_url()
 
 function _datalogger_vietbando() {
 	$tram = node_load(15150);
-	dpm($tram);
+	//dpm($tram);
 	$rows = views_get_view_result('viet_ban_do');
 	//dpm($rows);
 	$full_url = full_url();
