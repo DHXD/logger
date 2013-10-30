@@ -1435,6 +1435,10 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   };
   //dpm($value_select_province);
   
+  //dpm($value_select_area);
+  
+  //dpm(_datalogger_return_city2($value_select_area));
+  
 	$form['stations_fieldset']['selectProvince']['province'] = array(
 		'#type' => 'select',
 		'#title' => t('Chọn Tỉnh/ Thành phố: '),
@@ -1456,6 +1460,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 	
 	//$stations = views_get_view_result('view_station_filter_parameter', Null, 	$value_select_area, $value_select_province, 'all');
   $stations = views_get_view_result('view_station_filter_parameter', Null, 	$value_select_area, 'all', 'all');
+  //dpm($stations);
   $station_name = array();
 	foreach($stations as $station){
 		$station_name[$station->nid] = $station->node_title;   
@@ -1469,10 +1474,10 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   
   // add provinces to Drupal.settings
   $provinces = array();
-					$provinces['All'] = t('- Any -');
-					$provinces = array_merge($provinces, _datalogger_return_city2($khuvuc[0] /*$account->field_station_region['und'][0]['value']*/));
-					//$form['stations_fieldset']['field_station_province_city_value']['#options'] = $provinces;
-  
+	$provinces['All'] = t('- Any -');
+	$provinces = array_merge($provinces, _datalogger_return_city2($khuvuc[0] /*$account->field_station_region['und'][0]['value']*/));
+	//$form['stations_fieldset']['field_station_province_city_value']['#options'] = $provinces;
+  //dpm($provinces);
   _datalogger_alter_add_js_stations($provinces);
 	//dpm($default_station);
   
