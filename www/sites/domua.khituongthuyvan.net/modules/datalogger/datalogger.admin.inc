@@ -783,8 +783,8 @@ function _datalogger_check_status_30_minutes(){
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
 					$diff = ($now - $last_receive)/60;
 					
-          $node->field_station_status['und'][0]['value'] = ($diff > 90 ? 'station_deactive' : 'station_active');
-          node_save($node);
+				  $node->field_station_status['und'][0]['value'] = ($diff > 90 ? 'station_deactive' : 'station_active');
+				  node_save($node);
 					
 				}		
 
@@ -808,6 +808,7 @@ function _datalogger_check_inbox() {
   
   header('Content-Type: text/plain');
   
+  _datalogger_check_status_30_minutes();
   foreach ($result as $row) {
     // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
@@ -879,7 +880,7 @@ function _datalogger_check_inbox() {
 	
 
 	//Check status station in 30 minitues.
-	_datalogger_check_status_30_minutes();
+	
 	
 	
 
