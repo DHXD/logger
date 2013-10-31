@@ -106,7 +106,7 @@ function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_st
 					$time_rainfall_in_day =0;
 				}
 			}
-      //dpm($hours_in_day); return;
+      
 			for($i = 23; $i >= 0; $i--) {
 				$number = count($hours_in_day[$i]);
      
@@ -137,21 +137,9 @@ function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_st
 						'total_rainfall_in_hour' => $total_rainfall_in_hour, 
 						'time_rainfall_in_hour' => $time_rainfall_in_hour);
 				}
-				// else{
-					// $hours_in_day[$i] = array('max_rainfall_in_hour' => 0, 
-						// 'total_rainfall_in_hour' => -999,
-						// 'time_rainfall_in_hour' => 0);
-				// }
 			}
 		}
-		// else{
-			// for($i = 23; $i >=0; $i--){
-				// $hours_in_day[$i] = array('max_rainfall_in_hour' => 0, 
-						// 'total_rainfall_in_hour' => -999, 
-						// 'time_rainfall_in_hour' => 0);
-			// }
-		// }
-    //dpm($dem_luong_mua_trong_dot[$day -1]);
+    
     $max_rainfall_in_day = $hours_in_day[0]['total_rainfall_in_hour'];
     $max_time_in_hours = $hours_in_day[0]['time_rainfall_in_hour'];
     for($i=0; $i < 24; $i++){
@@ -169,18 +157,13 @@ function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_st
       'max_total_time_in_hours' => $max_time_in_hours
       );
 	}
-  
-  
-  //return;
-  //dpm($day_of_month[]);
+
 	/*-----------------------------------------------------------------------------------------------------------*/
-	//dpm($dem_luong_mua_trong_dot[2]);
+
   if (!$co_mua) {
     drupal_set_message(t('Rainfall stations in the no data to report'),'error');
     return;
   }
-  
-  //dpm($day_of_month[18]);  return;
   
   $objPHPExcel = new PHPExcel();
   $objPHPExcel->getProperties()->setCreator("Datalogger")
@@ -304,6 +287,8 @@ function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_st
 				$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 				$time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
 
+        if(!$total) $total = '-';
+        if(!$time) $time = '-';
         
         if($day/2+1 > intval($now["mday"]) && intval(substr($month,-2)) >= intval($now["mon"])) {
           $total = '';
@@ -311,9 +296,12 @@ function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_st
           $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+6), '');
           $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+7), '');
         }
-        if($total == 0) $total = '-';
-        if(!$time) $time = '-';
-
+        
+        if($day/2+1 == intval($now["mday"]) && $j > intval($now["hours"])) {
+          $total = '';
+          $time = '';
+        }
+      
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+6),$total);
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+7),$time);
 				if($total > 0 && $time > 0){
@@ -456,7 +444,10 @@ function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_st
 		for($j = 0; $j < 24 ; $j++){
 			$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 			$time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
-        
+      
+      if(!$total) $total = '-';
+      if(!$time) $time = '-';
+      
       if($i + 1 > intval($now["mday"])){
          $total = '';
          $time = '';
@@ -464,8 +455,10 @@ function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_st
          $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+7), '');
       }
       
-      if(!isset($total)) $total = '-';
-      if(!$time) $time = '-';
+      if($i+1 == intval($now["mday"]) && $j > intval($now["hours"])) {
+        $total = '';
+        $time = '';
+      } 
       
       $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day +6),$total);
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day +7),$time);
