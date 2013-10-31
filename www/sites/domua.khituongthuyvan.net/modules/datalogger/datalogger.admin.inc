@@ -553,6 +553,11 @@ function _datalogger_chart_rainfall_form($form, &$form_state){
       ),
   ); 
     
+  if($tram_nid != ''){
+     drupal_add_js('http://code.highcharts.com/stock/highstock.src.js','external');
+     drupal_add_js('sites/domua.khituongthuyvan.net/modules/datalogger/datalogger.chart.js');
+  }  
+    
   if (isset($form_state['input']['op'])) {
     //drupal_add_js('sites/domua.khituongthuyvan.net/modules/datalogger/highstock/js/highstock.js');
     drupal_add_js('http://code.highcharts.com/stock/highstock.src.js','external');

@@ -5,12 +5,14 @@ var delta_timezone = 0;
 		$(function () { 
 		
 				var e = {min:0, max:0};
-				var min = $('#edit-day').val();
-				//console.log(min);
-				var max = $('#edit-day-to').val();
-				//console.log(max);
-				var station = $('#edit-station').val();
-				
+				//var min = $('#edit-day').val();
+        var min = "28/10/2013 15:00";
+				console.log(min);
+				//var max = $('#edit-day-to').val();
+        var max = "31/10/2013 00:52";
+				console.log(max);
+				//var station = $('#edit-station').val();
+				var station = 87842;
 				//e.max   = Date.parse($('#edit-day-to').val()); // /1000
 				
 				var digitpattern = /\d+/g,				
