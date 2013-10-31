@@ -297,7 +297,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
           $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+7), '');
         }
         
-        if($day/2+1 == intval($now["mday"]) && $j > intval($now["hours"])) {
+        if($day/2+1 == intval($now["mday"]) && $j >= intval($now["hours"])) {
           $total = '';
           $time = '';
         }
@@ -455,7 +455,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
          $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+7), '');
       }
       
-      if($i+1 == intval($now["mday"]) && $j > intval($now["hours"])) {
+      if($i+1 == intval($now["mday"]) && $j >= intval($now["hours"])) {
         $total = '';
         $time = '';
       } 

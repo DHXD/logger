@@ -1530,9 +1530,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 		 '#required' => TRUE,	
 		 // '#weight' => 7,
   );
-	
-  
-  
+
 	$form['person'] = array(
     '#type' => 'fieldset',
     '#title' => t('Personal Information'),
