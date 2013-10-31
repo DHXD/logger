@@ -54,8 +54,8 @@ function _datalogger_vietbando() {
 	//echo $full_url;
 	
 	switch($full_url){
-		case "http://admin.domua.khituongthuyvan.net/" :
-			$url = "5lJdIlKaLKfA1UMwdmzgbRYOTt/AH+9wl6NQH/f0pue8AFCloQ7qJw==";
+		case "http://bactrungbo.admin.domua.khituongthuyvan.net/" :
+			$url = "Yz0YJVkIGXlSZCzH/Re1/DZTJ19y6Eu7bBrTrXLmhGZiXTy09/yqVASjbwFjK6Fy+qOTP7hMkzQ=";
 		break;	
 		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
 			$url = "E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=";
@@ -182,7 +182,7 @@ MANG;
 
 MANG2;
 	switch($full_url){
-		case "http://admin.domua.khituongthuyvan.net/" :
+		case "http://bactrungbo.admin.domua.khituongthuyvan.net/" :
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(18.8152328, 105.680505), 7);
 MANG2;
@@ -299,9 +299,10 @@ MANG2;
 				contentString[i] += '/views/statistics/search/';
 				contentString[i] += station[i].nid;
 				contentString[i] += '"><b>Thống kê số lương mưa theo bảng</b></a></li><li><a title="Thống kê số lượng mưa theo biểu đồ" href="';
-				contentString[i] += '/manage/chart/rainfalls';
+				contentString[i] += '/manage/chart/rainfalls/';
+				contentString[i] += station[i].nid;
 				contentString[i] += '"><b>Thống kê số lượng mưa theo biểu đồ</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li></ul></div></div></div></div>';
-				  contentString[i] += '';
+				contentString[i] += '';
 			
 				contentString[i] += '';		
 			}

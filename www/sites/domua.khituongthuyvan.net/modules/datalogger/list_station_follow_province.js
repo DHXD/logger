@@ -1,6 +1,12 @@
 //thay doi gia tri tram do mưa theo tinh thanh quan ly
 (function ($){
   $(document).ready(function(){
+	
+
+	
+	//$("#edit-day").attr("value", "New value");
+	//alert("ok");
+	
     var function_change = function () {
     
       //console.log('change....' + this.id);
