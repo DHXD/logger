@@ -633,15 +633,7 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
   $form['stations_fieldset']['selectProvince']['province']['#multiple']= TRUE;
   
   $form['stations_fieldset']['selectReport']['#access']=FALSE;
-	
-  /*$form['person']['txtNameQTV']['#access']=FALSE;
-	$form['person']['txtNameNLB']['#access']=FALSE;
-	$form['person']['txtNameKS']['#access']=FALSE;
-	$form['person']['txtNamePT']['#access']=FALSE;
-  */
-	
-  
-	//dpm($form);
+
   $form["submit"] = array(
       "#type" => "submit",
       "#value" => t("Report"),
@@ -653,11 +645,11 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
 }
 
 function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
-	//module_load_include('inc', 'datalogger', 'datalogger.admin.excel');
+
 	module_load_include('inc', 'datalogger', 'datalogger.admin.excel.stations.day');
-  //dpm($province);
+
   $region = $form['stations_fieldset']['selectArea']['#options'][$form_state['values']['selectArea']];
-  //$province = $form['stations_fieldset']['selectProvince']['province']['#options'][$form_state['values']['province']];
+  
   $province = array();
   if(count($form_state['values']['province'])) 
     foreach($form_state['values']['province'] as $tentinh){  
