@@ -1,6 +1,6 @@
 <?php
 
-function _datalogger_export_rainfall_month_excel_1($nid, $year, $month, $form_state){
+function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_state){
 
   //error_reporting(E_ALL ^ E_NOTICE);
   error_reporting(0);
