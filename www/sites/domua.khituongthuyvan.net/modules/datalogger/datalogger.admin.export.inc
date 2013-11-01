@@ -248,7 +248,7 @@ function tomorow_time($d, $m, $y) {
 // Ham tra ve cac nid cua tram
 function _datalogger_return_nid($number) {
   $content_type = "station";
-  $all_nodes = &node_load_multiple(array(), array('type' => $content_type));
+  $all_nodes = node_load_multiple(array(), array('type' => $content_type));
   
   foreach ($all_nodes as &$node) {
     if ($node->field_station_sim_number['und'][0]['value'] == $number) {
