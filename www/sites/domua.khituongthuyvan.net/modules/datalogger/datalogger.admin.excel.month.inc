@@ -435,7 +435,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   
 	//chen du lieu vao bao cao
 	$objPHPExcel->getActiveSheet()->setCellValue('E1', $name_station->title);
-	$objPHPExcel->getActiveSheet()->setCellValue('K1', substr($month,-1,2));
+	$objPHPExcel->getActiveSheet()->setCellValue('K1', substr($month,-2));
 	$objPHPExcel->getActiveSheet()->setCellValue('O1',$year);
 
 	$font_bold = array(
@@ -449,32 +449,34 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     $day = ($i - 15) * 2;
 
 		for($j = 0; $j < 24 ; $j++){
-			$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
-			$time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
       
+      $total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
+      $time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
+
       if(!$total) $total = '-';
       if(!$time) $time = '-';
       
-      if($i + 1 > intval($now["mday"])){
-         $total = '';
-         $time = '';
-         $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+6), '');
-         $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+7), '');
-      }
-      
-      if($i+1 == intval($now["mday"]) && $j >= intval($now["hours"])) {
+      if($i+1 > intval($now["mday"]) && intval(substr($month,-2)) >= intval($now["mon"])) {
         $total = '';
         $time = '';
-      } 
+        $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+6), '');
+        $objPHPExcel->getActiveSheet()->setCellValue('AA'.($day+7), '');
+      }
       
-      $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day +6),$total);
-			$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day +7),$time);
+      if($i+1 == intval($now["mday"]) && $j >= intval($now["hours"]) && intval(substr($month,-2)) >= intval($now["mon"])) {
+        $total = '';
+        $time = '';
+      }
+    
+      $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+6),$total);
+      $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+7),$time);
       
-			if($total > 0 && $time > 0){
-				$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->applyFromArray($font_bold);
-				$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+7))->applyFromArray($font_bold);
-        $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day + 6))->getNumberFormat()->setFormatCode('0.0');
-			}
+      if($total > 0 && $time > 0){
+        $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->applyFromArray($font_bold);
+        $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+7))->applyFromArray($font_bold);
+        $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->getNumberFormat()->setFormatCode('0.0');
+      }
+      
 		}
 		$day_in_month++;
 	}
@@ -673,7 +675,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	//tram do mua
 	$objPHPExcel->getActiveSheet()->setCellValue('C1', $name_station->title);
 	
-	$objPHPExcel->getActiveSheet()->setCellValue('G1',substr($month,-1,2));
+	$objPHPExcel->getActiveSheet()->setCellValue('G1',substr($month,-2));
 	$objPHPExcel->getActiveSheet()->setCellValue('I1', $year);
 	$objPHPExcel->getActiveSheet()->setCellValue('H8' , '=MAX(B8:B'.($month_days_number+7).')');
 	$objPHPExcel->getActiveSheet()->setCellValue('I8', '=MAX(C8:C'.($month_days_number+7).')');
@@ -739,7 +741,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   //return;
   
   header('Content-type: application/vnd.ms-excel');
-  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa theo tháng (BKT14) - Trạm ' . $name_station->title . ' - ' . substr($month,-2,2) . '-' . $year . '.xls"');
+  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa theo tháng (BKT14) - Trạm ' . $name_station->title . ' - ' . substr($month,-2) . '-' . $year . '.xls"');
   $objWriter->save('php://output');
   //$f = file_directory_temp() . '/Bao cao du lieu mua_' . time() . '.xls';
   //$objWriter->save($f);
@@ -973,7 +975,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
   $objPHPExcel->getActiveSheet()->mergeCells('L3:N3');
 	$objPHPExcel->getActiveSheet()->setCellValue('A4', 'Đơn vị:mm');
   $objPHPExcel->getActiveSheet()->mergeCells('A4:B4');
-	$objPHPExcel->getActiveSheet()->setCellValue('G4', 'Tháng:'.substr($month,-2,2));
+	$objPHPExcel->getActiveSheet()->setCellValue('G4', 'Tháng:'.substr($month,-2));
   $objPHPExcel->getActiveSheet()->mergeCells('G4:H4');
 	$objPHPExcel->getActiveSheet()->setCellValue('L4', 'Năm:'.$year);
 	$objPHPExcel->getActiveSheet()->mergeCells('L4:M4');
@@ -1037,7 +1039,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
   $objPHPExcel->getActiveSheet()->mergeCells('L3:M3');
 	$objPHPExcel->getActiveSheet()->setCellValue('A4', 'Đơn vị:mm');
   $objPHPExcel->getActiveSheet()->mergeCells('A4:B4');
-	$objPHPExcel->getActiveSheet()->setCellValue('G4', 'Tháng:'.substr($month,-2,2));
+	$objPHPExcel->getActiveSheet()->setCellValue('G4', 'Tháng:'.substr($month,-2));
   $objPHPExcel->getActiveSheet()->mergeCells('G4:H4');
 	$objPHPExcel->getActiveSheet()->setCellValue('L4', 'Năm:'.$year);
 
@@ -1150,7 +1152,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
   $objPHPExcel->getActiveSheet()->getStyle('E11')->getFont()->setSize(12);
   
   
-	$objPHPExcel->getActiveSheet()->setCellValue('F11', substr($month,-2,2));
+	$objPHPExcel->getActiveSheet()->setCellValue('F11', substr($month,-2));
   $objPHPExcel->getActiveSheet()->getStyle('F11')->applyFromArray($styleAlignments_left);
 	$objPHPExcel->getActiveSheet()->setCellValue('G11', 'NĂM');
    $objPHPExcel->getActiveSheet()->getStyle('G11')->getFont()->setName('Times New Roman');
@@ -1190,7 +1192,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
   //return;
   
   header('Content-type: application/vnd.ms-excel');
-  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa theo tháng (BKT14) - Trạm ' . $name_station->title . ' - ' . substr($month,-2,2) . '-' . $year . '.xls"');
+  header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa theo tháng (BKT14) - Trạm ' . $name_station->title . ' - ' . substr($month,-2) . '-' . $year . '.xls"');
   $objWriter->save('php://output');
   //$f = file_directory_temp() . '/Bao cao du lieu mua_' . time() . '.xls';
   //$objWriter->save($f);
