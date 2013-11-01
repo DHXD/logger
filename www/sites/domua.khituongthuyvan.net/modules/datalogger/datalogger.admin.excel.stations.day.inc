@@ -1,6 +1,6 @@
 <?php
 function _datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day){
-
+  
   error_reporting(0);
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel.php';
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel/IOFactory.php';
@@ -44,7 +44,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
     
       $in_array[$record->entity_id] = $record;
     }
-    
+    //dpm($hours_miss_sms);
     // End Binhnt Code Her
 		if(count(in_array) > 0){
 			foreach($in_array as $rainfall){
@@ -75,7 +75,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$time_rainfall_in_hour = 0;
 				$max_rainfall_in_hour = 0; 
         
-        $hours_miss_sms['hour'] = $i;
         if(!isset($hours_miss_sms[$i])) {
           $hours_in_day[$i] = array(
             'max_rainfall_in_hour' => 0, 
@@ -109,7 +108,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 		);
 	}
   
-  //dpm($last_day); return;
+  //return;
   
   //print($stations);
 	/*-----------------------------------------------------------------------------------------------------------*/
@@ -221,7 +220,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$time = $stations[$index/2]['hours_in_day'][$j]['time_rainfall_in_hour'];
         if($time == 0 ) $time = '-';
         
-        if(intval(substr($day, -2, 2)) == intval($now["mday"]) && $j >= intval($now["hours"])) {
+        if(intval(substr($month, -2)) == intval($now["mon"]) && intval(substr($day, -2, 2)) == intval($now["mday"]) && $j >= intval($now["hours"])) {
           $total = '';
           $time = '';
         }
