@@ -751,20 +751,23 @@ function _datalogger_convert_number($number){
 
 //Ham lay thoi gian truyen tin
 
-function _datalogger_check_report_time($nid,$value){
+function _datalogger_update_receive_time($nid, $value){
 
 
 	$node = node_load($nid);
 	$last_value = $node->field_station_report_time['und'][0]['value'];
 	if($last_value == ''){
 		$node->field_station_report_time['und'][0]['value'] = $value;
-	}else{
+    node_save($node);
+	} else{
 		$difference = strtotime($value) - strtotime($last_value);
-		if($difference > 0){
+		if($difference > 0) {
 			$node->field_station_report_time['und'][0]['value'] = $value;
+      node_save($node);
 		}
 	}
-	node_save($node);
+	
+  
 	
 }
 
@@ -779,19 +782,26 @@ function _datalogger_check_status_30_minutes(){
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
-		foreach ($all_nodes as $node) {
+		foreach ($all_nodes as &$node) {
 				//$last_receive = strtotime($row->UpdatedInDB);
 				
 				if($node->field_station_report_time['und'][0]['value'] ==''){
-						$node->field_station_status['und'][0]['value'] = 'station_deactive';
-						node_save($node);
-				}else{
+						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {
+              $node->field_station_status['und'][0]['value'] = 'station_deactive';
+              node_save($node);
+            }
+				} else{
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
 					$diff = ($now - $last_receive)/60;
-					
-				  $node->field_station_status['und'][0]['value'] = ($diff > 90 ? 'station_deactive' : 'station_active');
-				  node_save($node);
-					
+
+          
+				  $value = ($diff > 90 ? 'station_deactive' : 'station_active');
+          
+          if ($node->field_station_status['und'][0]['value'] != $value) {          
+            $node->field_station_status['und'][0]['value'] = $value;
+            node_save($node);
+          }
+
 				}		
 
 
@@ -815,6 +825,7 @@ function _datalogger_check_inbox() {
   header('Content-Type: text/plain');
   
   _datalogger_check_status_30_minutes();
+  
   foreach ($result as $row) {
     // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
@@ -833,7 +844,8 @@ function _datalogger_check_inbox() {
     module_load_include('inc', 'datalogger', 'datalogger.admin.export');
     $tram_nid = _datalogger_return_nid($number);
     $value = $row->UpdatedInDB;
-	_datalogger_check_report_time($tram_nid, $value);
+    
+    _datalogger_update_receive_time($tram_nid, $value);
     
 
 
@@ -881,12 +893,7 @@ function _datalogger_check_inbox() {
   }
 	// return 'Ok';
 
-	//_datalogger_check_status_30_minutes();
   print "Ok.";
-	
-
-	//Check status station in 30 minitues.
-	
 	
 	
 

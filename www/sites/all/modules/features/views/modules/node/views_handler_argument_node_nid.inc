@@ -14,7 +14,7 @@ class views_handler_argument_node_nid extends views_handler_argument_numeric {
    */
   function title_query() {
     $titles = array();
-
+  //dpm($this->value);
     $result = db_query("SELECT n.title FROM {node} n WHERE n.nid IN (:nids)", array(':nids' => $this->value));
     foreach ($result as $term) {
       $titles[] = check_plain($term->title);
