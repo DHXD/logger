@@ -1289,13 +1289,11 @@ function _datalogger_new_sms_form() {
   
   // Executing query
 
-<<<<<<< HEAD
-  $result = $query->execute(); 
-=======
+
   $result = $query->execute();
 
   //dpq($query);
->>>>>>> 2c6da577c885e7d5fcf800ecc5e95e1e35d99c43
+
 
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
@@ -1500,11 +1498,7 @@ function _datalogger_new_sentitems_form(){
     receiving_date_time => t('Sending Date Time'),
 
     //delivery_date_time =>t('Delivery Date Time'),
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> 2c6da577c885e7d5fcf800ecc5e95e1e35d99c43
     destination_number => t('Destination Number'),
     message_content => t('Message content'),
 		Modem => t('Modem'),
@@ -1522,13 +1516,12 @@ function _datalogger_new_sentitems_form(){
 	
   $result = db_query("SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT ". $offset.",".$num_per_page."");
 	
-<<<<<<< HEAD
-=======
+
 
   /*$query = "SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC";
   $result = pager_query(db_rewrite_sql($query));*/
   
->>>>>>> 2c6da577c885e7d5fcf800ecc5e95e1e35d99c43
+
   $rows = array();
   
   while($row = $result->fetchObject()) {
@@ -1538,24 +1531,18 @@ function _datalogger_new_sentitems_form(){
 		if(!empty($station)) {
 			$station_name = $station[0]->node_title;
 		}
-<<<<<<< HEAD
-=======
-		
->>>>>>> 2c6da577c885e7d5fcf800ecc5e95e1e35d99c43
+
 
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
 
     // highlight
     
-<<<<<<< HEAD
-    //Xử lý tin nhắn được yêu cầu :88byte
-    
-=======
+
 
     //Xử lý tin nhắn được yêu cầu :88byte
 
->>>>>>> 2c6da577c885e7d5fcf800ecc5e95e1e35d99c43
+
     if($len_sms == 88) {
       $sms = '<span style="color:blue;font-weight:bold">' . $sms . '</span>';
     }
