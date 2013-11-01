@@ -512,9 +512,6 @@ function _datalogger_chart_rainfall_form($form, &$form_state){
 	drupal_set_title(t('Rainfall data chart'));
 	
 	$tram_nid = intval(arg(3));
-	$tram = node_load($tram_nid);
-	$tentram = $tram->title;
-	$tinh = $tram->field_station_province_city['und'][0]['value'];
   
 	_datalogger_select_area_province_station($form, $form_state);
 	
@@ -534,14 +531,30 @@ function _datalogger_chart_rainfall_form($form, &$form_state){
 
 	
 	//dpm($form);
-  $form['stations_fieldset']['day']['#title'] = 'Date time Begin';
+	//$now = $date->format('Y-m-d H:i:s');
+	$end_day = new DateTime();
+	$begin_day = $end_day->getTimestamp() - 24*60*60;
+	$begin_day = new Datetime("@$begin_day");
+	$end_day = $end_day->format( 'd/m/Y H:i' );
+	$begin_day = $begin_day->format( 'd/m/Y H:i' );
+	$form['stations_fieldset']['day'] = array(
+	 '#type' => 'textfield',
+	'#title' => 'Date time Begin',
+	'#default_value'=>$begin_day,
+	'#date_format' => 'd/m/Y', 
+	'#required' => TRUE,	
+  );
+  
+ 
   $form['stations_fieldset']['day_to'] = array(     
      '#type' => 'textfield',
+	 '#default_value'=> $end_day,
      '#title' => 'Date time End',
      '#date_format' => 'd/m/Y', 
-		 '#required' => TRUE,	     
+	 '#required' => TRUE,	     
 		 // '#weight' => 7,
   );
+  
   
   
   
@@ -552,7 +565,15 @@ function _datalogger_chart_rainfall_form($form, &$form_state){
           "_datalogger_chart_rainfall_form_submit"
       ),
   ); 
-    
+  
+  if($tram_nid != ''){
+
+	$form_state['input']['op'] = 1;
+	
+	//_datalogger_chart_rainfall_form_js();
+	//drupal_add_js('http://code.highcharts.com/stock/highstock.src.js','external');
+    //drupal_add_js('sites/domua.khituongthuyvan.net/modules/datalogger/datalogger.chart.js');
+  }
   if (isset($form_state['input']['op'])) {
     //drupal_add_js('sites/domua.khituongthuyvan.net/modules/datalogger/highstock/js/highstock.js');
     drupal_add_js('http://code.highcharts.com/stock/highstock.src.js','external');
@@ -633,15 +654,7 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
   $form['stations_fieldset']['selectProvince']['province']['#multiple']= TRUE;
   
   $form['stations_fieldset']['selectReport']['#access']=FALSE;
-	
-  /*$form['person']['txtNameQTV']['#access']=FALSE;
-	$form['person']['txtNameNLB']['#access']=FALSE;
-	$form['person']['txtNameKS']['#access']=FALSE;
-	$form['person']['txtNamePT']['#access']=FALSE;
-  */
-	
-  
-	//dpm($form);
+
   $form["submit"] = array(
       "#type" => "submit",
       "#value" => t("Report"),
@@ -653,11 +666,11 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
 }
 
 function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
-	//module_load_include('inc', 'datalogger', 'datalogger.admin.excel');
+
 	module_load_include('inc', 'datalogger', 'datalogger.admin.excel.stations.day');
-  //dpm($province);
+
   $region = $form['stations_fieldset']['selectArea']['#options'][$form_state['values']['selectArea']];
-  //$province = $form['stations_fieldset']['selectProvince']['province']['#options'][$form_state['values']['province']];
+  
   $province = array();
   if(count($form_state['values']['province'])) 
     foreach($form_state['values']['province'] as $tentinh){  
