@@ -758,7 +758,7 @@ function _datalogger_update_receive_time($nid, $value){
 	$node = node_load($nid);
 	$last_value = $node->field_station_report_time['und'][0]['value'];
 	if($last_value == ''){		
-    _datalogger_node_save_field($node, 'field_station_report_time', $value)
+    _datalogger_node_save_field($node, 'field_station_report_time', $value);
 	} else{
 		$difference = strtotime($value) - strtotime($last_value);
 		if($difference > 0) {			
