@@ -753,9 +753,15 @@ function _datalogger_convert_number($number){
 
 function _datalogger_update_receive_time($nid, $value){
 
-
+  echo 'tram nid = '.$nid;
+  
 
 	$node = node_load($nid);
+  
+  dpm($node);
+  
+  return;
+  
 	$last_value = $node->field_station_report_time['und'][0]['value'];
 	if($last_value == ''){		
     _datalogger_node_save_field($node, 'field_station_report_time', $value);
@@ -765,6 +771,8 @@ function _datalogger_update_receive_time($nid, $value){
       _datalogger_node_save_field($node, 'field_station_report_time', $value);
 		}
 	}
+  
+  exit;
 	
 }
 
@@ -788,6 +796,7 @@ function _datalogger_check_status_30_minutes(){
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
+    return;   // trung
 		foreach ($all_nodes as &$node) {
 				//$last_receive = strtotime($row->UpdatedInDB);
 				
@@ -853,7 +862,7 @@ function _datalogger_check_inbox() {
     
     _datalogger_update_receive_time($tram_nid, $value);
     
-
+    
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
@@ -897,7 +906,9 @@ function _datalogger_check_inbox() {
 		}
     flush (); // flush the output buffer
   }
-	// return 'Ok';
+	
+  
+  return 'Ok';
 
   print "Ok.";
 	
