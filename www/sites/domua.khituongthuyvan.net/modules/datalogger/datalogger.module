@@ -1422,11 +1422,23 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   global $is_dev;
   $is_dev = TRUE;
   
-  $value_select_province = $is_dev ? 'thua_thien_hue' : $value_select_province;
+	$tram_nid = intval(arg(3));
+	if($tram_nid !=''){
+		$tram = node_load($tram_nid);
+		$tentram = $tram->title;
+		$tinh = $tram->field_station_province_city['und'][0]['value'];
+		 $value_select_province = $is_dev ? $tinh : $value_select_province;
+
+	}else{
+	
+	}
+	//dpm($tram);
+	
+ 
   $value_select_month = date('n'); //$is_dev ? '3' : 1;
   
   if (!$station_name || !is_array($station_name)) $station_name = array();
-  $default_station  = $is_dev ? 2976 : (isset($form_state['values']['station']) ? $form_state['values']['station']: key($station_name));
+  $default_station  = $is_dev ? $tram_nid : (isset($form_state['values']['station']) ? $form_state['values']['station']: key($station_name));
   if(arg(4)){
     $default_station = arg(4);
     $x= node_load($default_station);
