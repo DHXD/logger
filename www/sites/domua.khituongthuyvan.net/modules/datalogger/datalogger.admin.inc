@@ -758,11 +758,11 @@ function _datalogger_update_receive_time($nid, $value){
 	$node = node_load($nid);
 	$last_value = $node->field_station_report_time['und'][0]['value'];
 	if($last_value == ''){		
-    _datalogger_node_save_field($node, 'field_station_report_time', $value)
+    _datalogger_node_save_field($node, 'field_station_report_time', $value);
 	} else{
 		$difference = strtotime($value) - strtotime($last_value);
 		if($difference > 0) {			
-      _datalogger_node_save_field($node, 'field_station_report_time', $value)
+      _datalogger_node_save_field($node, 'field_station_report_time', $value);
 		}
 	}
 	
@@ -793,7 +793,7 @@ function _datalogger_check_status_30_minutes(){
 				
 				if($node->field_station_report_time['und'][0]['value'] ==''){
 						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {              
-              _datalogger_node_save_field($node, 'field_station_status', 'station_deactive')
+              _datalogger_node_save_field($node, 'field_station_status', 'station_deactive');
             }
 				} else{
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
@@ -931,7 +931,7 @@ function _datalogger_separate_sms_command($sms, $number){
 		$stations = views_get_view_result('view_station_find', Null, $number);
 		if(count($stations) >= 1){
 			$station = node_load($stations[0]->nid);			
-      _datalogger_node_save_field($station, 'field_station_alarm', 'alarm_true')
+      _datalogger_node_save_field($station, 'field_station_alarm', 'alarm_true');
 		}
 	}
 	
