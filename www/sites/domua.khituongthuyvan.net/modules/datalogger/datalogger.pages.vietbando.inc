@@ -82,7 +82,7 @@ function _datalogger_vietbando() {
 			$url = "6+ZvZ+bVk7nAf8Ske2bWNvDalMywr5HD5WT957Dk47EkXwf1b0S+dQ==";
 		break;
 		case "http://210.245.110.15:8181:8181/" : //Nam Bo ok
-			$url = "PxVLItwK6WpL/gxKoctolsN6g0viC8l/TmG1Ij+HgfTIT5uVqSFPgw==";
+			$url = "PxVLItwK6WpL/gxKoctolsN6g0viC8l/XlqTfK7KTG4=";
 		break;
 	}
 	
@@ -91,6 +91,7 @@ function _datalogger_vietbando() {
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
 
   $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=' .$url;
+
 	
  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   
@@ -102,7 +103,9 @@ function _datalogger_vietbando() {
 		
 		station[$k] = new Object();
 		station[$k].tentram = "{$row->node_title}";
+
 		station[$k].matram =" {$row->_field_data['nid']['entity']->field_station_code['und'][0]['value']}";
+
 		station[$k].status=0;
 		//Nid
 		station[$k].nid = {$row->nid};

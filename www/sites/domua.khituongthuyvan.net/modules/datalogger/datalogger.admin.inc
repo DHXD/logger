@@ -633,7 +633,15 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
   $form['stations_fieldset']['selectProvince']['province']['#multiple']= TRUE;
   
   $form['stations_fieldset']['selectReport']['#access']=FALSE;
-
+	
+  /*$form['person']['txtNameQTV']['#access']=FALSE;
+	$form['person']['txtNameNLB']['#access']=FALSE;
+	$form['person']['txtNameKS']['#access']=FALSE;
+	$form['person']['txtNamePT']['#access']=FALSE;
+  */
+	
+  
+	//dpm($form);
   $form["submit"] = array(
       "#type" => "submit",
       "#value" => t("Report"),
@@ -645,11 +653,11 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
 }
 
 function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
-
+	//module_load_include('inc', 'datalogger', 'datalogger.admin.excel');
 	module_load_include('inc', 'datalogger', 'datalogger.admin.excel.stations.day');
-
+  //dpm($province);
   $region = $form['stations_fieldset']['selectArea']['#options'][$form_state['values']['selectArea']];
-  
+  //$province = $form['stations_fieldset']['selectProvince']['province']['#options'][$form_state['values']['province']];
   $province = array();
   if(count($form_state['values']['province'])) 
     foreach($form_state['values']['province'] as $tentinh){  
@@ -730,6 +738,7 @@ function test_view(){
 	$number = '01634766847';
 	$result = _datalogger_get_station('view_command_send', $number);
 	$node_command = node_load($result[0]->nid);	
+  dpm($node_command);
 	return '';
 }
 
@@ -739,53 +748,59 @@ function _datalogger_convert_number($number){
 }
 
 
+
 //Ham lay thoi gian truyen tin
-
-function _datalogger_check_report_time($nid,$value){
-
+function _datalogger_update_receive_time($nid, $value){
 	$node = node_load($nid);
 	$last_value = $node->field_station_report_time['und'][0]['value'];
 	if($last_value == ''){
 		$node->field_station_report_time['und'][0]['value'] = $value;
-	}else{
+    node_save($node);
+	} else{
 		$difference = strtotime($value) - strtotime($last_value);
-		if($difference > 0){
+		if($difference > 0) {
 			$node->field_station_report_time['und'][0]['value'] = $value;
+      node_save($node);
 		}
 	}
-	node_save($node);
-	
 }
 
-
 //Kiem tra trang thai sau 30 phut
-
 function _datalogger_check_status_30_minutes(){
 	//$content_type("viet_");
 	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
-		foreach ($all_nodes as $node) {
+		foreach ($all_nodes as &$node) {
 				//$last_receive = strtotime($row->UpdatedInDB);
 				
 				if($node->field_station_report_time['und'][0]['value'] ==''){
-						$node->field_station_status['und'][0]['value'] = 'station_deactive';
-						node_save($node);
-				}else{
+						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {
+              $node->field_station_status['und'][0]['value'] = 'station_deactive';
+              node_save($node);
+            }
+				} else{
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
 					$diff = ($now - $last_receive)/60;
-					
-				  $node->field_station_status['und'][0]['value'] = ($diff > 90 ? 'station_deactive' : 'station_active');
-				  node_save($node);
-					
+
+          
+				  $value = ($diff > 90 ? 'station_deactive' : 'station_active');
+          
+          if ($node->field_station_status['und'][0]['value'] != $value) {          
+            $node->field_station_status['und'][0]['value'] = $value;
+            node_save($node);
+          }
+
 				}		
+
 
 		}
 		
 }
 
 function _datalogger_check_inbox() {
+
 
   $cron = (arg(3) == 'remote');
   
@@ -800,6 +815,7 @@ function _datalogger_check_inbox() {
   header('Content-Type: text/plain');
   
   _datalogger_check_status_30_minutes();
+  
   foreach ($result as $row) {
     // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
@@ -818,7 +834,8 @@ function _datalogger_check_inbox() {
     module_load_include('inc', 'datalogger', 'datalogger.admin.export');
     $tram_nid = _datalogger_return_nid($number);
     $value = $row->UpdatedInDB;
-	_datalogger_check_report_time($tram_nid, $value);
+    
+    _datalogger_update_receive_time($tram_nid, $value);
     
 
 
@@ -866,11 +883,7 @@ function _datalogger_check_inbox() {
   }
 	// return 'Ok';
 
-	//_datalogger_check_status_30_minutes();
   print "Ok.";
-	
-	//Check status station in 30 minitues.
-	
 	
 	
 
@@ -1205,7 +1218,7 @@ function _datalogger_new_sms_form() {
     else
       $sort = 'DESC';
 
-    $order = 'UpdatedInDB';    
+    $order = 'UpdatedInDB';
     // Which column will be sorted
     foreach ($header as $h) {
       if ($h['data'] == $_GET['order'] && isset($h['field'])) {
@@ -1250,7 +1263,10 @@ function _datalogger_new_sms_form() {
   $query = $query->extend('TableSort')->extend('PagerDefault')->orderByHeader($header)->limit(50);
   
   // Executing query
-  $result = $query->execute(); 
+
+  $result = $query->execute();
+
+  //dpq($query);
 
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
@@ -1396,7 +1412,7 @@ function _datalogger_new_outbox_form (){
 	
   // Executing query
   $result = $query->execute();
-  dpm("aaaaaaaaaaaaa");
+  
   db_set_active(); // without the paramater means set back to the default for the site
   
   // Looping for filling the table rows
@@ -1453,11 +1469,15 @@ function _datalogger_new_sentitems_form(){
     no => t('No.'),
 		station_name => t('Station Name'),
     receiving_date_time => t('Sending Date Time'),
+
+    //delivery_date_time =>t('Delivery Date Time'),
+
     destination_number => t('Destination Number'),
     message_content => t('Message content'),
 		Modem => t('Modem'),
     status => t('Status'),
   );
+
   $num_per_page = 500;
   $offset=$num_per_page*$page;
 	$total = db_query("SELECT COUNT(*) total FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT 0,500");
@@ -1469,6 +1489,7 @@ function _datalogger_new_sentitems_form(){
 	
   $result = db_query("SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC LIMIT ". $offset.",".$num_per_page."");
 	
+
   /*$query = "SELECT * FROM `sentitems` ORDER BY  `sentitems`.`ID` DESC";
   $result = pager_query(db_rewrite_sql($query));*/
   
@@ -1481,12 +1502,15 @@ function _datalogger_new_sentitems_form(){
 			$station_name = $station[0]->node_title;
 		}
 		
+
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
 
     // highlight
     
-    //X? lý tin nh?n du?c yêu c?u:88byte232323233
+
+    //Xử lý tin nhắn được yêu cầu :88byte
+
     if($len_sms == 88) {
       $sms = '<span style="color:blue;font-weight:bold">' . $sms . '</span>';
     }
@@ -1502,13 +1526,16 @@ function _datalogger_new_sentitems_form(){
       $status = "Lỗi";
     }
     
+
     $rows[] = array (
 			$offset+=1,
 			$station_name,
       $row -> SendingDateTime,
+
 			$number,
 			$sms,
 			$row -> SenderID,
+
       $status,
 			);
   }
@@ -1537,6 +1564,7 @@ function _datalogger_new_sentitems_form(){
 			$output = $output . l(t("last >>"),"gammu/sentitems/new/".($last - 1));
 		}
 	}
+  
   return $output;
 }
 

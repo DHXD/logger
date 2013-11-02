@@ -1637,6 +1637,11 @@ function _datalogger_ftp_txt($tram) {
   _datalogger_ftp_txt_export_inc($tram);
 }
 
-
+function datalogger_node_presave($node) {
+  if ($node->type == 'station') {   // log station changes
+    watchdog('save station', serialize (debug_backtrace()));
+    watchdog('save station', 'Presave... nid = ' . $node->nid);
+  }
+}
    
 
