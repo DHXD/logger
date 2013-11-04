@@ -510,12 +510,13 @@ function _datalogger_report_rainfall_all_station_in_day_submit(&$form, &$form_st
 
 function _datalogger_chart_rainfall_form($form, &$form_state){
 	drupal_set_title(t('Rainfall data chart'));
-	
+	$tram_nid = intval(arg(3));
+	/*
 	$tram_nid = intval(arg(3));
 	$tram = node_load($tram_nid);
 	$tentram = $tram->title;
 	$tinh = $tram->field_station_province_city['und'][0]['value'];
-  
+  */
 	_datalogger_select_area_province_station($form, $form_state);
 	
 	$form['stations_fieldset']['year']['#access']=FALSE;
@@ -534,16 +535,33 @@ function _datalogger_chart_rainfall_form($form, &$form_state){
 
 	
 	//dpm($form);
-  $form['stations_fieldset']['day']['#title'] = 'Date time Begin';
+
+	$end_time = time();
+	$begin_time = $end_time - 24*60*60;
+	$begin_time = date('d/m/Y H:i',$begin_time);
+	$end_time = date('d/m/Y H:i',$end_time);
+ // $form['stations_fieldset']['day']['#title'] = 'Date time Begin';
+	
+	 $form['stations_fieldset']['day'] = array(     
+     '#type' => 'textfield',
+     '#title' => 'Date time Begin',
+		 '#default_value' =>$begin_time, 
+     '#date_format' => 'd/m/Y', 
+		 '#required' => TRUE,	     
+		 // '#weight' => 7,
+  );
   $form['stations_fieldset']['day_to'] = array(     
      '#type' => 'textfield',
      '#title' => 'Date time End',
+		 '#default_value' =>$end_time, 
      '#date_format' => 'd/m/Y', 
 		 '#required' => TRUE,	     
 		 // '#weight' => 7,
   );
   
-  
+  if($tram_nid  != ''){
+		$form_state['input']['op'] = 1;
+	}
   
   $form['stations_fieldset']["submit"] = array(
       "#type" => "submit",
@@ -750,35 +768,59 @@ function _datalogger_convert_number($number){
 
 
 //Ham lay thoi gian truyen tin
+
 function _datalogger_update_receive_time($nid, $value){
+
+  echo 'tram nid = '.$nid;
+  
+
 	$node = node_load($nid);
+  
+  dpm($node);
+  
+  return;
+  
 	$last_value = $node->field_station_report_time['und'][0]['value'];
-	if($last_value == ''){
-		$node->field_station_report_time['und'][0]['value'] = $value;
-    node_save($node);
+	if($last_value == ''){		
+    _datalogger_node_save_field($node, 'field_station_report_time', $value);
 	} else{
 		$difference = strtotime($value) - strtotime($last_value);
-		if($difference > 0) {
-			$node->field_station_report_time['und'][0]['value'] = $value;
-      node_save($node);
+		if($difference > 0) {			
+      _datalogger_node_save_field($node, 'field_station_report_time', $value);
 		}
 	}
+  
+  exit;
+	
 }
 
+
+function _datalogger_node_save_field(&$node, $field, $value) {
+  $n = new stdClass();
+  $n->id = $node->nid;          // node id
+  $n->bundle = $node->type;  // aka content type
+  
+  $n->{$field}[LANGUAGE_NONE][0]['value'] = $value;
+  field_attach_update('node', $n);
+}
+
+
 //Kiem tra trang thai sau 30 phut
+
+
 function _datalogger_check_status_30_minutes(){
 	//$content_type("viet_");
 	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
+    return;   // trung
 		foreach ($all_nodes as &$node) {
 				//$last_receive = strtotime($row->UpdatedInDB);
 				
 				if($node->field_station_report_time['und'][0]['value'] ==''){
-						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {
-              $node->field_station_status['und'][0]['value'] = 'station_deactive';
-              node_save($node);
+						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {              
+              _datalogger_node_save_field($node, 'field_station_status', 'station_deactive');
             }
 				} else{
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
@@ -787,9 +829,8 @@ function _datalogger_check_status_30_minutes(){
           
 				  $value = ($diff > 90 ? 'station_deactive' : 'station_active');
           
-          if ($node->field_station_status['und'][0]['value'] != $value) {          
-            $node->field_station_status['und'][0]['value'] = $value;
-            node_save($node);
+          if ($node->field_station_status['und'][0]['value'] != $value) {                      
+            _datalogger_node_save_field($node, 'field_station_status', $value);
           }
 
 				}		
@@ -833,11 +874,13 @@ function _datalogger_check_inbox() {
     //Lay thoi gian nhan tin
     module_load_include('inc', 'datalogger', 'datalogger.admin.export');
     $tram_nid = _datalogger_return_nid($number);
+    if (!$tram_nid) continue;
+    
     $value = $row->UpdatedInDB;
     
     _datalogger_update_receive_time($tram_nid, $value);
     
-
+    
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
@@ -881,10 +924,13 @@ function _datalogger_check_inbox() {
 		}
     flush (); // flush the output buffer
   }
-	// return 'Ok';
+	
+  
+  return 'Ok';
 
   print "Ok.";
 	
+
 	
 
 
@@ -913,9 +959,8 @@ function _datalogger_separate_sms_command($sms, $number){
 	if($malenh == 'A:ALARM INTERVAL:'){
 		$stations = views_get_view_result('view_station_find', Null, $number);
 		if(count($stations) >= 1){
-			$station = node_load($stations[0]->nid);
-			$station->field_station_alarm[$station->language][0]['value'] =  'alarm_true';	
-			node_save($station);
+			$station = node_load($stations[0]->nid);			
+      _datalogger_node_save_field($station, 'field_station_alarm', 'alarm_true');
 		}
 	}
 	
@@ -1264,9 +1309,11 @@ function _datalogger_new_sms_form() {
   
   // Executing query
 
+
   $result = $query->execute();
 
   //dpq($query);
+
 
   //$num_rows = $query->countQuery()->execute()->fetchField();
   
@@ -1509,7 +1556,9 @@ function _datalogger_new_sentitems_form(){
     // highlight
     
 
+
     //Xử lý tin nhắn được yêu cầu :88byte
+
 
     if($len_sms == 88) {
       $sms = '<span style="color:blue;font-weight:bold">' . $sms . '</span>';
@@ -1518,14 +1567,13 @@ function _datalogger_new_sentitems_form(){
     elseif($len_sms == 140) {
       $sms = _datalogger_regex_rain($sms);      
     }			
-    
-    if($row->Status == "SendingOKNoReport") {
+
+    if($row -> Status == "SendingOKNoReport") {
       $status = "Thành công";
-    }    
+    }
     else {
       $status = "Lỗi";
     }
-    
 
     $rows[] = array (
 			$offset+=1,
