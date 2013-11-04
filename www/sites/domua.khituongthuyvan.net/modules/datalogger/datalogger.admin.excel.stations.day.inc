@@ -27,7 +27,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
       $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
     $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\'  AND n.type=\'rainfall\'';
     $query .= '  AND fs.field_rainfall_station_nid = '. $nid;
-
     
     $time_min = mktime(0,10,0,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
 
@@ -39,7 +38,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
     $query .= ' GROUP BY f.field_rainfall_send_time_value';
     // Result is returned as a iterable object that returns a stdClass object on each iteration
     $result = db_query($query);
-    
 
     $in_array = array();
     $hours_miss_sms = array();
@@ -56,9 +54,9 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
       $hours_miss_sms[$hour] = $record;
 
       $in_array[$record->entity_id] = $record;
+      //dpm($day);
     }
     // End Binhnt Code Her
-    
     //digi_debug(count($rainfalls), 0, 1);
     
 		if(count($in_array) > 0){
@@ -241,7 +239,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 		'bold' => true
 		)
 	);
- 
 
   $now = getdate();
 
