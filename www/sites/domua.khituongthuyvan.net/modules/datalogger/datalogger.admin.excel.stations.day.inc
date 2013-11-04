@@ -56,12 +56,8 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
       $hours_miss_sms[$hour] = $record;
 
       $in_array[$record->entity_id] = $record;
-      //dpm($day);
     }
-    //dpm($hours_miss_sms);
     // End Binhnt Code Her
-    
-		//$rainfalls = views_get_view_result('view_rainfall_admin','page', $nid, $day);
     
     //digi_debug(count($rainfalls), 0, 1);
     
@@ -98,7 +94,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
         $max_rainfall_in_hour = 0; 
         
         if(!isset($hours_miss_sms[$i])) {
-          $hours_in_day[$i] = array( //SAI
+          $hours_in_day[$i] = array(
             'max_rainfall_in_hour' => 0, 
             'total_rainfall_in_hour' => -999,
             'time_rainfall_in_hour' => 0);
@@ -134,7 +130,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 
         $max_rainfall_in_day = ($max_rainfall_in_day < $hours_in_day[$i]['max_rainfall_in_hour']) ? $hours_in_day[$i]['max_rainfall_in_hour'] : $max_rainfall_in_day; 
 			}
-		} // if
+		}
     else{   // khong lay duoc mua
 			for($i = 23; $i >=0; $i--){
 				$hours_in_day[$i] = array(
@@ -143,8 +139,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
           'time_rainfall_in_hour' => 0);
 			}
 		}
-    //dpm($station->title);
-    
     
 		$stations[]= array(
 			'station_name' => $station->title,
@@ -154,9 +148,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 			'hours_in_day' => $hours_in_day
 		);
 	}
-  
-  //dpm($hours_in_day);
-  //return 123;
   
 	/*-----------------------------------------------------------------------------------------------------------*/
 	

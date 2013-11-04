@@ -63,7 +63,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     $hours_miss_sms[$day][$hour] = $record;
   }
   //dpm($hours_miss_sms); return;
-  $time_rainfall_last = $record;
   
 	for($day = 1; $day <= $month_days_number; $day++){
     $dem_luong_mua_trong_dot[$day-1] = array();
@@ -669,8 +668,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   for($c = 'H'; $c <= 'J'; $c++)
     $objPHPExcel->getActiveSheet()->getColumnDimension($c)->setWidth(8);
 	
-	//$objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(8);
-	
 	//tram do mua
 	$objPHPExcel->getActiveSheet()->setCellValue('C1', $name_station->title);
 	
@@ -730,22 +727,15 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	$objPHPExcel->getActiveSheet()->setCellValue('I8', $max_time_in_hours);
 	$objPHPExcel->getActiveSheet()->setCellValue('H10' , $max_mm_in_phase);
 	$objPHPExcel->getActiveSheet()->setCellValue('I10', $max_time_in_phase);
-    //return 'aaaa';
 	
   $objPHPExcel->setActiveSheetIndex(0);   // back to first sheet
   
 	/** Include PHPExcel_IOFactory */  
   $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
   
-  //return;
-  
   header('Content-type: application/vnd.ms-excel');
   header('Content-Disposition: attachment; filename="Báo cáo dữ liệu mưa theo tháng (BKT14) - Trạm ' . $name_station->title . ' - ' . substr($month,-2) . '-' . $year . '.xls"');
   $objWriter->save('php://output');
-  //$f = file_directory_temp() . '/Bao cao du lieu mua_' . time() . '.xls';
-  //$objWriter->save($f);
-  //files($f);
-  //drupal_unlink($f);
   
   drupal_exit();
 }
