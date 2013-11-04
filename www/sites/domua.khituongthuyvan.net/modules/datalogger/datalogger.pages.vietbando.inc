@@ -90,6 +90,7 @@ function _datalogger_vietbando() {
 	//echo $rows[0]->field_field_station_alarm;
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
 
+
   $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=' .$url;
 
 	
