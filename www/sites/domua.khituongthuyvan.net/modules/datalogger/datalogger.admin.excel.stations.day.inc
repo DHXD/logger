@@ -125,9 +125,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
           }
           
         }
-        
-        //dpm($hours_in_day);
-
         $max_rainfall_in_day = ($max_rainfall_in_day < $hours_in_day[$i]['max_rainfall_in_hour']) ? $hours_in_day[$i]['max_rainfall_in_hour'] : $max_rainfall_in_day; 
 			}
 		}
@@ -187,13 +184,11 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '0');
 			}
 			$objPHPExcel->getActiveSheet()->mergeCells('A'.($i+7).':B'.($i+8));
-			//$objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUM(C'.($i+7).':Z'.($i+7).')');
 		}
 		else{
 			for($j =0; $j < 24; $j++){
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '0');
 			}
-			//$objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUM(C'.($i+7).':Z'.($i+7).')');
 		}
     $objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUMIF(C'.($i+7).':Z'.($i+7).',">0")');
 	}
