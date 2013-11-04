@@ -510,9 +510,10 @@ function _datalogger_report_rainfall_all_station_in_day_submit(&$form, &$form_st
 
 function _datalogger_chart_rainfall_form($form, &$form_state){
 	drupal_set_title(t('Rainfall data chart'));
-	
 	$tram_nid = intval(arg(3));
-  
+	/*
+	$tram_nid = intval(arg(3));
+
 	_datalogger_select_area_province_station($form, $form_state);
 	
 	$form['stations_fieldset']['year']['#access']=FALSE;
@@ -531,31 +532,36 @@ function _datalogger_chart_rainfall_form($form, &$form_state){
 
 	
 	//dpm($form);
-	//$now = $date->format('Y-m-d H:i:s');
-	$end_day = new DateTime();
-	$begin_day = $end_day->getTimestamp() - 24*60*60;
-	$begin_day = new Datetime("@$begin_day");
-	$end_day = $end_day->format( 'd/m/Y H:i' );
-	$begin_day = $begin_day->format( 'd/m/Y H:i' );
-	$form['stations_fieldset']['day'] = array(
-	 '#type' => 'textfield',
-	'#title' => 'Date time Begin',
-	'#default_value'=>$begin_day,
-	'#date_format' => 'd/m/Y', 
-	'#required' => TRUE,	
+
+
+	$end_time = time();
+	$begin_time = $end_time - 24*60*60;
+	$begin_time = date('d/m/Y H:i',$begin_time);
+	$end_time = date('d/m/Y H:i',$end_time);
+ // $form['stations_fieldset']['day']['#title'] = 'Date time Begin';
+	
+	 $form['stations_fieldset']['day'] = array(     
+     '#type' => 'textfield',
+     '#title' => 'Date time Begin',
+		 '#default_value' =>$begin_time, 
+     '#date_format' => 'd/m/Y', 
+		 '#required' => TRUE,	     
+		 // '#weight' => 7,
   );
-  
- 
+
   $form['stations_fieldset']['day_to'] = array(     
      '#type' => 'textfield',
 	 '#default_value'=> $end_day,
      '#title' => 'Date time End',
+		 '#default_value' =>$end_time, 
      '#date_format' => 'd/m/Y', 
 	 '#required' => TRUE,	     
 		 // '#weight' => 7,
   );
   
-  
+  if($tram_nid  != ''){
+		$form_state['input']['op'] = 1;
+	}
   
   
   $form['stations_fieldset']["submit"] = array(
@@ -770,7 +776,9 @@ function _datalogger_update_receive_time($nid, $value){
 
 	$node = node_load($nid);
 	$last_value = $node->field_station_report_time['und'][0]['value'];
-	if($last_value == ''){
+
+	if($last_value == ''){		
+
     _datalogger_node_save_field($node, 'field_station_report_time', $value);
 	} else{
 		$difference = strtotime($value) - strtotime($last_value);

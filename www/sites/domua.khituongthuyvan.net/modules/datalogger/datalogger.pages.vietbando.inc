@@ -250,7 +250,7 @@ MANG2;
 		
 		 		map.addOverlay(markers[i]);
 				
-				contentString[i] = '<div style =" width: 200px; height: 100px"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 751;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 1; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
+				contentString[i] = '<div style =" width: 200px; height: 100px;z-index: 110;"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 110;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 110; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
 				contentString[i] += '/station/Quảng-Hợp';
 				contentString[i] += '"><b>Trạm ';
 				contentString[i] += station[i].tentram;

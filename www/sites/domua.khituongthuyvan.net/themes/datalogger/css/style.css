@@ -1987,3 +1987,11 @@ form#-datalogger-chart-rainfall-form  .form-type-textfield  input#edit-day {
 div.AnyTime-win {
 	z-index: 100;
 }
+.olLayerGooglePoweredBy {
+	display: none;
+}
+
+/* inbox table */
+table.sms-table th a {
+	color: #d2cdff;
+}
