@@ -766,34 +766,6 @@ function _datalogger_convert_number($number){
 }
 
 
-
-//Ham lay thoi gian truyen tin
-
-function _datalogger_update_receive_time($nid, $value){
-
-	$node = node_load($nid);
-  
-  dpm($node);
-  
-  _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
-  
-  //return;
-  
-	$last_value = $node->field_station_report_time['und'][0]['value'];
-	if($last_value == ''){		
-    _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
-	} else{
-		$difference = strtotime($value) - strtotime($last_value);
-		if($difference > 0) {			
-      _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
-		}
-	}
-  
-  exit;
-	
-}
-
-
 function _datalogger_node_save_field($nid, $type, $field, $value) {
 
   $n = new stdClass();
@@ -803,6 +775,34 @@ function _datalogger_node_save_field($nid, $type, $field, $value) {
   field_attach_presave('node', $n);
   field_attach_update('node', $n);
 }
+//Ham lay thoi gian truyen tin
+
+function _datalogger_update_receive_time($nid, $value){
+
+	$node_tram = node_load($nid);
+  
+  dpm($node);
+
+	$last_value = $node_tram->field_station_report_time['und'][0]['value'];
+	if($last_value == ''){		
+    _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
+	}else{
+    
+		$khac = strtotime($value) - strtotime($last_value);
+    
+      //return;
+		if($khac > 0) {	
+      //return;
+      _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
+		}
+	}
+  
+  //exit;
+	
+}
+
+
+
 
 
 //Kiem tra trang thai sau 30 phut
