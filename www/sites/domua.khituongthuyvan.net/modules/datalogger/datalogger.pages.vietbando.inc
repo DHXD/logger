@@ -46,7 +46,7 @@ function full_url()
 }
 
 function _datalogger_vietbando() {
-	$tram = node_load(15150);
+	//$tram = node_load(3126181);
 	//dpm($tram);
 	$rows = views_get_view_result('viet_ban_do');
 	//dpm($rows);
@@ -303,7 +303,8 @@ MANG2;
 				contentString[i] += '/views/statistics/search/';
 				contentString[i] += station[i].nid;
 				contentString[i] += '"><b>Thống kê số lương mưa theo bảng</b></a></li><li><a title="Thống kê số lượng mưa theo biểu đồ" href="';
-				contentString[i] += '/manage/chart/rainfalls';
+				contentString[i] += '/manage/chart/rainfalls/';
+        contentString[i] += station[i].nid;
 				contentString[i] += '"><b>Thống kê số lượng mưa theo biểu đồ</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li></ul></div></div></div></div>';
 				  contentString[i] += '';
 			
