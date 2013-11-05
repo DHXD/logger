@@ -136,10 +136,8 @@ DirectoryIndex index.php index.html index.htm
   </IfModule>
 </IfModule>
 
-<<<<<<< HEAD
+
 php_value memory_limit 3072M
-=======
-php_value memory_limit 2048M
->>>>>>> 2c6da577c885e7d5fcf800ecc5e95e1e35d99c43
+
 php_value max_execution_time 360
 
