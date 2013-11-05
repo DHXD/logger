@@ -1,7 +1,9 @@
 <?php
-
-
-/* BKT14*/
+/*
+*
+*** BKT14***
+*
+*/
 function _datalogger_report_rainfall_month_form($form, &$form_state) {
 	drupal_set_title(t('Report monthly rainfall data (BKT14 form)'));
  
@@ -9,61 +11,50 @@ function _datalogger_report_rainfall_month_form($form, &$form_state) {
   
 	$form['stations_fieldset']['day']['#access']=FALSE;
   
-  $active = array(0 => 'Báo cáo BKT14', 1 => 'BKT14 Tự động');
-  $form['settings']['active'] = array(
+  $report_BKT = array(
+    0 => 'Báo cáo BKT14', 
+    1 => 'BKT14 Tự động',
+  );
+  
+  $form['report_BKT14'] = array(
     '#type' => 'radios',
     '#title' => 'Chọn loại báo cáo',
-    '#default_value' => isset($node->active) ? $node->active : 0,
-    '#options' => $active,
-    //'#description' => t('When a poll is closed, visitors can no longer vote for it.'),
-    //'#access' => $admin,
+    '#options' => $report_BKT,
+    '#default_value' => 0,
   );
-	
-	$form["submit1"] = array(
-      "#type" => "submit",
-      "#value" => t("Report"),
-      "#submit" => array(
-          "_datalogger_report_rainfall_month2_submit"
-      ),
-  );
-	/*
-	$form["submit2"] = array(
-      "#type" => "submit",
-      "#value" => t("Report"),
-      "#submit" => array(
-          "_datalogger_report_rainfall_month2_submit"
-      ),
-  );
-
-	*/
-
   
+	$form['submit'] = array(
+      "#type" => "submit",
+      "#value" => t("Report"),
+      "#submit" => array("_datalogger_report_rainfall_month_submit_BKT14"),
+  );
   
   return $form;
 }
 
-function _datalogger_report_rainfall_month2_submit(&$form, &$form_state) {
+function _datalogger_report_rainfall_month_submit_BKT14(&$form, &$form_state) {
 	module_load_include('inc', 'datalogger', 'datalogger.admin.excel');
-	module_load_include('inc', 'datalogger', 'datalogger.admin.excel.month');
+	
 	$nid = $form_state['values']['station'];
 	$year = $form_state['values']['year'];	
   $month = $form_state['values']['month'];
-	if($month < 10){
+  
+  $report_BKT = $form_state['values']['report_BKT14'];
+  
+  if($month < 10){
 		$month = '0'.$month;
 	}
 	$year_month = $year.$month;
-	
-	//dpm($month);
-	// kiem tra trong ham _datalogger_export_rainfall_month_excel().
-	///$rainfalls = views_get_view_result('view_export_excel','default', $nid, $year, $year_month, 'all');
-	
-	/*if(count($rainfalls) <= 0){
-		drupal_set_message(t('Rainfall stations in the no data to report'),'error');
-	}
-	else{*/
-		_datalogger_export_rainfall_month_excel($nid, $year, $year_month, $form_state);
-	//}
-	// */
+  
+  if($report_BKT == 0) {
+    module_load_include('inc', 'datalogger', 'datalogger.admin.excel.month');
+    _datalogger_export_rainfall_month_excel($nid, $year, $year_month, $form_state);
+  }
+  else {
+    module_load_include('inc', 'datalogger', 'datalogger.admin.auto.excel.month');
+    _datalogger_auto_export_rainfall_month_excel($nid, $year, $year_month, $form_state);
+  }
+  
 }
 
 function _datalogger_calculate_total_rain_hour_inc(&$nodes) {

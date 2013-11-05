@@ -1360,14 +1360,10 @@ function _datalogger_views_get_view_result($viewname, $display_id = NULL, $args 
 
 function _datalogger_select_area_province_station(&$form, &$form_state) {
 
-
   // default lock region
   global $khuvuc;
   $form_state['lock-region'] = true;
   $form_state['values']['selectArea'] = $khuvuc[0];
-  
-
-	//module_load_include('module', 'datalogger','datalogger');
   
   $module_path = drupal_get_path('module', 'datalogger');
   
@@ -1379,11 +1375,9 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
     '#title' => t('Select station'),
   );
   
-	
 	$form['stations_fieldset']['selectReport'] = array(
     '#type' => 'select',
     '#title' => t('Select the type of report: '),
-		// '#weight' => 1,
     '#options' => array(
       'bk1' => t('Reported rainfall data in report form BKT-14'),
      ),
@@ -1402,14 +1396,6 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
     '#title' => t('Chọn khu vực: '),
     '#options' => $regions,
 		'#default_value' => $value_select_area,
-		// '#weight' => 2,
-		/*'#ajax' => array(
-      'event'=>'change',
-      'callback' =>'_datalogger_ajax_dropdown_area',
-      'wrapper' => 'area-wrapper',
-			'method' => 'replace',
-      'effect' => 'fade',
-    ),*/
   );
 	
 	$form['stations_fieldset']['selectProvince'] = array(
@@ -1442,28 +1428,14 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   if(arg(4)){
     $default_station = arg(4);
     $x= node_load($default_station);
-    //dpm($x);
     $value_select_province = $x->field_station_province_city['und'][0]['value'];
   };
-  //dpm($value_select_province);
-  
-  //dpm($value_select_area);
-  
-  //dpm(_datalogger_return_city2($value_select_area));
   
 	$form['stations_fieldset']['selectProvince']['province'] = array(
 		'#type' => 'select',
 		'#title' => t('Chọn Tỉnh/ Thành phố: '),
 		'#options' => _datalogger_return_city2($value_select_area),
 		'#default_value' => $value_select_province,
-		// '#weight' => 3,
-		/*'#ajax' => array(
-      'event'=>'change',
-      'callback' =>'_datalogger_ajax_dropdown_province',
-      'wrapper' => 'province-wrapper',
-			'method' => 'replace',
-      'effect' => 'fade',
-    ),*/
 	); 
 	$form['stations_fieldset']['selectStation'] = array(
 	 '#prefix' => '<div id="province-wrapper">',
@@ -1475,11 +1447,8 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   //dpm($stations);
   $station_name = array();
 	foreach($stations as $station){
-		$station_name[$station->nid] = $station->node_title;   
-    //dpm($station);
+		$station_name[$station->nid] = $station->node_title;
 	}
-  
-  //sort($station_name );
     
   global $khuvuc;
   
@@ -1487,18 +1456,13 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   // add provinces to Drupal.settings
   $provinces = array();
 	$provinces['All'] = t('- Any -');
-	$provinces = array_merge($provinces, _datalogger_return_city2($khuvuc[0] /*$account->field_station_region['und'][0]['value']*/));
-	//$form['stations_fieldset']['field_station_province_city_value']['#options'] = $provinces;
-  //dpm($provinces);
+	$provinces = array_merge($provinces, _datalogger_return_city2($khuvuc[0]));
   _datalogger_alter_add_js_stations($provinces);
-	//dpm($default_station);
-  
   
 	$form['stations_fieldset']['selectStation']['station'] = array(
 		 '#type' => 'select',
 		 '#title' => t('Select station: '),
 		 '#options' => $station_name,
-		 // '#weight' => 4,
 		 '#default_value' => $default_station,
 	);
 	
@@ -1518,7 +1482,6 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 		 '#title' => t('Year'),
 		 '#options' => $years,
 		 '#default_value' => date("Y"),
-		 // '#weight' => 5,
 	);
 	
 	$form['stations_fieldset']['month'] = array(
@@ -1526,7 +1489,6 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
      '#title' => t('Month'),
      '#options' => $months,
      '#default_value' => $value_select_month ? $value_select_month : $form_state['input']['month'],
-		 // '#weight' => 6,
   );
   
   drupal_add_js('sites/domua.khituongthuyvan.net/modules/datalogger/anytime.compressed.js');
@@ -1535,16 +1497,12 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   
 	
 	$form['stations_fieldset']['day'] = array(
-     //'#type' => 'date_popup',
      '#type' => 'textfield',
      '#title' => 'Date time',
      '#date_format' => 'd/m/Y', 
-		 '#required' => TRUE,	
-		 // '#weight' => 7,
+		 '#required' => TRUE,
   );
-	
-  
-  
+
 	$form['person'] = array(
     '#type' => 'fieldset',
     '#title' => t('Personal Information'),
@@ -1553,38 +1511,23 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   $form['person']['txtNameQTV'] = array(
      '#type' => 'textfield',
      '#title' => t('Full name of the person observation: '),
-		 // '#weight' => 8,
   );  
   
   $form['person']['txtNameNLB'] = array(
      '#type' => 'textfield',
      '#title' => t('Full name of the person creating the table: '),
-		 // '#weight' => 9,
   );    
   
   $form['person']['txtNameKS'] = array(
      '#type' => 'textfield',
      '#title' => t('Full name of the person control: '),
-		 // '#weight' => 10,
-		 // '#weight' => 10,
   );    
   
   $form['person']['txtNamePT'] = array(
      '#type' => 'textfield',
      '#title' => t('Full name of person Appeal: '),
-		 // '#weight' => 11,
-		 // '#weight' => 11,
   );
   
-  /*
-  $form["notice_excel_2007"] = array(
-    '#prefix' => '<div class="" style="margin-bottom: 15px; clear: both">',
-	  '#suffix' => '</div>', 
-    "#markup" => '',
-	  // "#markup" => t("For better rendering, downloaded file format will be Excel 2007. If you cannot read XLSX file format, please download and install Microsoft compability pack at: <a href='http://www.microsoft.com/en-us/download/details.aspx?id=3'>http://www.microsoft.com/en-us/download/details.aspx?id=3</a>."),    
-		// '#weight' => 12,
-  );
-  */
 	return $form;
 }
 
@@ -1657,3 +1600,4 @@ function datalogger_node_presave($node) {
     watchdog('save station', 'Presave... nid = ' . $node->nid);
   }
 }
+
