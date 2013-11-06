@@ -170,7 +170,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 
             //if ($total_rainfall_in_hour < 0) $total_rainfall_in_hour = 0;   // truong hop -999
 
-            
+
 
 						$total_rainfall_in_hour += $rainfall_measuring;
 						$time_rainfall_in_hour += 10;
@@ -223,7 +223,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 	}
   
 
-  
+
   //return;
   //dpm($day_of_month[]);
 
@@ -519,6 +519,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 
 		for($j = 0; $j < 24 ; $j++){
 
+
       
       $total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
       $time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
@@ -540,6 +541,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     
       $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+6),$total);
       $objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($day+7),$time);
+
 
       
       if($total > 0 && $time > 0){
