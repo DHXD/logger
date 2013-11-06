@@ -107,7 +107,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 					$time_rainfall_in_day =0;
 				}
 			}
-      
       for($i = 0; $i <=23; $i++) {
 				$number = count($hours_in_day[$i]);
      
@@ -136,7 +135,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				if($number > 0){
 					for($j = 0; $j < $number; $j++){
 						$rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value ;
-            
 						$total_rainfall_in_hour += $rainfall_measuring;
 						$time_rainfall_in_hour += 10;
 						$max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
@@ -449,7 +447,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
     $day = ($i - 15) * 2;
 
 		for($j = 0; $j < 24 ; $j++){
-      
       $total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
       $time = $day_of_month[$day_in_month]['hours_in_day'][$j]['time_rainfall_in_hour'];
 
@@ -478,7 +475,6 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
         $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+7))->applyFromArray($font_bold);
         $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($day+6))->getNumberFormat()->setFormatCode('0.0');
       }
-      
 		}
 		$day_in_month++;
 	}
