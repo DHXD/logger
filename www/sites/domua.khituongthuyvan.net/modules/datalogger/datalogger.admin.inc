@@ -767,27 +767,26 @@ function _datalogger_convert_number($number){
 
 
 function _datalogger_node_save_field($nid, $type, $field, $value) {
-
+ watchdog('giatri',$value);
   $n = new stdClass();
   $n->nid = $nid;
   $n->type = $type;
   $n->{$field}[LANGUAGE_NONE][0]['value'] = $value;
   field_attach_presave('node', $n);
   field_attach_update('node', $n);
+  watchdog('Luu','daluu');
 }
 //Ham lay thoi gian truyen tin
 
 function _datalogger_update_receive_time($nid, $value){
-
+  //watchdog('1-----',$value);
 	$node_tram = node_load($nid);
-  
-  dpm($node);
-
 	$last_value = $node_tram->field_station_report_time['und'][0]['value'];
+  
 	if($last_value == ''){		
     _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
 	}else{
-    
+    watchdog('2-----',$value);
 		$khac = strtotime($value) - strtotime($last_value);
     
       //return;
@@ -796,8 +795,6 @@ function _datalogger_update_receive_time($nid, $value){
       _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
 		}
 	}
-  
-  //exit;
 	
 }
 
@@ -840,52 +837,68 @@ function _datalogger_check_status_30_minutes(){
 
 function _datalogger_check_inbox() {
 
-
+  
   $cron = (arg(3) == 'remote');
+  
+  $test_tram = (arg(3) == 'test');
   
   $processed = 0;
   
-  $result = db_query("SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10");	
-  //dpm($rerult[0]->ID);
-  //$result = db_query("SELECT * FROM inbox WHERE Processed={$processed}  LIMIT 0,10");
-	//_check_report_time();
-  //dpm($result[0]->ID);
+  $sql = "SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10";
   
-  header('Content-Type: text/plain');
+  if ($test_tram) $sql = "SELECT * FROM inbox WHERE ID = 262283";   // cho LASI
   
-  _datalogger_check_status_30_minutes();
+  $result = db_query($sql);	
   
+  
+  if (!$test_tram) header('Content-Type: text/plain');
+  
+  //_datalogger_check_status_30_minutes();
+  
+  $output = '';
+  
+  $rows = array();
   foreach ($result as $row) {
+    $rows[] = $row;
+  }
+  
+  unset($result);
+  
+  module_load_include('inc', 'datalogger', 'datalogger.admin.export');  // xuat txt
+  
+  foreach ($rows as $row) {
+    
     // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
 
-    print "Inbox ID: {$row->ID}\n";
+    //print "Inbox ID: {$row->ID}\n";
+    $receiveTime = $row->UpdatedInDB;
     
 		$number = _datalogger_convert_number($row->SenderNumber);
-
-
-    
-
 		$sms = $row->TextDecoded;
     $smsID = $row->ID;
-    
+  
     //Lay thoi gian nhan tin
-    module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+    
     $tram_nid = _datalogger_return_nid($number);
-    if (!$tram_nid) continue;
     
-    $value = $row->UpdatedInDB;
+    watchdog('Thong tin tram',$receiveTime.'-smsID-'.$row->ID.'-Nid-'.$tram_nid);
     
-    _datalogger_update_receive_time($tram_nid, $value);
+    if (!$tram_nid) {
+      _datalogger_update_process_inbox(3, $id_inbox);
+      continue;
+    }
+    $node_tram = node_load($tram_nid);
     
-    
+
+    _datalogger_update_receive_time($tram_nid, $receiveTime);
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
       //Xử lý tin nhắn được yêu cầu:88byte
       
       if($len_sms == 88){
-        print "Command.\n";
+        $output .= "Command.\n";
         
 				//Thực hiện chèn bản tin vào bảng command
 				_datalogger_separate_sms_command($sms, $number);
@@ -895,25 +908,28 @@ function _datalogger_check_inbox() {
       }
       //Xử lý bản tin đo mưa tự động:140byte
       elseif($len_sms == 140) {
-        print "Rain.\n";
+        
+        $output .= "Rain.\n";
       
         switch ($number) {
 	
           default:
             // Chèn bản tin vào bảng đo mưa
             // dsm('into 140');
-            _datalogger_separate_sms($sms,$number, $id_inbox);
+            if (!$test_tram)
+              _datalogger_separate_sms($sms,$number, $id_inbox);
+            
             // Cập nhật các bản tin đã xử lý
             _datalogger_update_process_inbox(1, $id_inbox);
+            
+            
             //Xuat file txt tu dong
-            module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-           
 						//_datalogger_
             _datalogger_ftp_txt_export_inc($tram_nid);
           }
       }			
 			else {
-        print "Other.\n";
+        $output .= "Other.\n";
         _datalogger_update_process_inbox(2, $id_inbox);
       }
     }
@@ -924,9 +940,9 @@ function _datalogger_check_inbox() {
   }
 	
   
-  return 'Ok';
+  return $output;
 
-  print "Ok.";
+  print $output;
 	
 
 	
@@ -1024,7 +1040,6 @@ function _datalogger_separate_sms($sms,$number, $smsID) {
 	$nid = $station[0]->nid;
 	$title = $station[0]->node_title;
 	$arg = array($timestart, $nid, $is_valid, $measuaring, $accumulate, $battery, $smsID, $total_rain_hour);
-
 	_datalogger_insert_node_rainfall($arg);
   
 }
@@ -1051,16 +1066,14 @@ function _datalogger_insert_node_rainfall(&$arg){
   $smsID = $arg[6];
   $total_rain_hour = $arg[7];
   
-  
-  
+
 	if( $nid != null || !empty($nid ) && (!empty($station) || $station != null)) {
 		$time_unix = _datalogger_string_to_unix_date($timestam);
 		$is_data_valids = $arg[2];
 		$measuring_interval = $arg[3];//3
 		$accumulate;//4
 		$battery = $arg[5];//5
-		
-    
+	
     for($i = 5; $i >= 0; $i--) {
     
 			$is_data_valid = $is_data_valids[$i];
@@ -1074,17 +1087,20 @@ function _datalogger_insert_node_rainfall(&$arg){
 			if($is_data_valid == 0){
 				$power = $battery[$i];
         
+        // Tam thoi bo chuc nang
+        /*
         // trung temp
-        
+       
 				$rainfalls = views_get_view_result('view_find_rainfall_station', NULL, $nid, $send_time);
-        
         //print('$send_time='.$send_time);
+        
+        */
         
         $rainfalls = array();
         
 				
 				if(count($rainfalls) > 0 ){         // trung du lieu thi cap nhat lai cai cu theo gia tri moi
-        
+          
 					foreach($rainfalls as $rainfall_old){
 						$rainfall_old = node_load($rainfall_old->nid);
 						//lượng mưa đo được trong 10p
@@ -1108,6 +1124,7 @@ function _datalogger_insert_node_rainfall(&$arg){
 				}
 
 				else{
+          
 					//tao node moi
 					$rainfall = new stdClass();
 					$rainfall->title = date('d/m/Y H:i:s',$time);
@@ -1120,7 +1137,7 @@ function _datalogger_insert_node_rainfall(&$arg){
 					$rainfall->format = 1; // Filtered HTML?
 					$rainfall->uid = 1; // Content owner uid (author)?
 					$rainfall->language = 'und';
-
+         
 					node_object_prepare($rainfall); 
 					$rainfall->field_rainfall_station[$rainfall->language][0]['nid'] = $nid;
 					//lượng mưa đo được trong 10p
@@ -1149,10 +1166,12 @@ function _datalogger_insert_node_rainfall(&$arg){
 					$rainfall = node_submit($rainfall);
           
 					node_save($rainfall);
+          
 					// dsm($rainfall);
 				}
 			}
 		}
+    
 		$station->field_station_power['und'][0]['value'] = $power/10;
 		$station->field_station_rain_nearest['und'][0]['value'] = $measuring_interval[0]/10;
 		$station->field_station_rain_24['und'][0]['value'] = $arg[4][0]/10;
@@ -1169,6 +1188,7 @@ function _datalogger_insert_node_rainfall(&$arg){
 			//khong co mua - kho han
 			$station->field_station_alarm['und'][0]['value'] = 'alarm_false';	
 		}		
+    
 		node_save($station);
 	}
 	
