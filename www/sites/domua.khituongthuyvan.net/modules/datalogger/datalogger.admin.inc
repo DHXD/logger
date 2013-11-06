@@ -766,34 +766,6 @@ function _datalogger_convert_number($number){
 }
 
 
-
-//Ham lay thoi gian truyen tin
-
-function _datalogger_update_receive_time($nid, $value){
-
-
-
-	$node = node_load($nid);
-  
-  dpm($node);
-  
-
-  
-	$last_value = $node->field_station_report_time['und'][0]['value'];
-	if($last_value == ''){		
-    _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
-	} else{
-		$difference = strtotime($value) - strtotime($last_value);
-		if($difference > 0) {			
-      _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
-		}
-	}
-  
-  exit;
-	
-}
-
-
 function _datalogger_node_save_field($nid, $type, $field, $value) {
 
   $n = new stdClass();
@@ -803,6 +775,37 @@ function _datalogger_node_save_field($nid, $type, $field, $value) {
   field_attach_presave('node', $n);
   field_attach_update('node', $n);
 }
+//Ham lay thoi gian truyen tin
+
+function _datalogger_update_receive_time($nid, $value){
+
+
+	$node_tram = node_load($nid);
+  
+  _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
+  
+  return;
+	$last_value = $node_tram->field_station_report_time['und'][0]['value'];
+
+	if($last_value == ''){		
+    _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
+	}else{
+    
+		$khac = strtotime($value) - strtotime($last_value);
+    
+      //return;
+		if($khac > 0) {	
+      //return;
+      _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
+		}
+	}
+  
+  //exit;
+	
+}
+
+
+
 
 
 //Kiem tra trang thai sau 30 phut
@@ -855,9 +858,15 @@ function _datalogger_check_inbox() {
   
   header('Content-Type: text/plain');
   
-  _datalogger_check_status_30_minutes();
+  //_datalogger_check_status_30_minutes();
+  $rows = array();
+  foreach ($result as $row){
+    $rows[] = $row;
+  }
   
-  foreach ($result as $row) {
+  unset($result);
+  
+  foreach ($rows as $row) {
     // //tin nhắn từ datalogger
 		$id_inbox = $row->ID;
 
@@ -875,9 +884,11 @@ function _datalogger_check_inbox() {
     module_load_include('inc', 'datalogger', 'datalogger.admin.export');
     $tram_nid = _datalogger_return_nid($number);
     if (!$tram_nid) continue;
-    
+    $node_tram = node_load($tram_nid);
+    watchdog('Tentram',$node_tram->title . ' SMS ID = ' . $row->ID);
+    watchdog('ReceivingTime ...',$row->UpdatedInDB);
     $value = $row->UpdatedInDB;
-    
+    //$value = '2013-11-06 13:16:56';
     _datalogger_update_receive_time($tram_nid, $value);
     
     
@@ -1078,7 +1089,7 @@ function _datalogger_insert_node_rainfall(&$arg){
         
         // trung temp
         
-				$rainfalls = views_get_view_result('view_find_rainfall_station', NULL, $nid, $send_time);
+				//$rainfalls = views_get_view_result('view_find_rainfall_station', NULL, $nid, $send_time);
         
         //print('$send_time='.$send_time);
         

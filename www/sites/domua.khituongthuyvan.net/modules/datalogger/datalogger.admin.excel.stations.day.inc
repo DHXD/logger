@@ -10,6 +10,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 	$number = count($station_nids);
 	//lay du lieu cua tram
 	foreach($station_nids as $nid){
+    //print($nid);
 		$station = node_load($nid);
 		$max_rainfall_in_day = 0;
 		$max_total_rainfall_in_day = 0;
@@ -21,35 +22,28 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
                             fm.field_rainfall_measuring_value, n.title
                       FROM {field_data_field_rainfall_send_time} f ';
     $query .= ' LEFT JOIN {field_data_field_rainfall_station} fs ON fs.entity_id=f.entity_id';
-    $query .= ' LEFT JOIN {field_data_field_rainfall_measuring} fm ON fm.entity_id=f.entity_id';
-    $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
+    //field_data_field_rainfall_measuring
+     $query .= ' LEFT JOIN {field_data_field_rainfall_measuring} fm ON fm.entity_id=f.entity_id';
+      $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
     $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\'  AND n.type=\'rainfall\'';
     $query .= '  AND fs.field_rainfall_station_nid = '. $nid;
     
-
     $time_min = mktime(0,10,0,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
-
 
     $time_max = mktime(24,00,00,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
     
     // Set station
-    
+    //if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
     if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.$time_min .' AND  f.field_rainfall_send_time_value <= '.$time_max;
     $query .= ' GROUP BY f.field_rainfall_send_time_value';
     // Result is returned as a iterable object that returns a stdClass object on each iteration
     $result = db_query($query);
 
-
     $in_array = array();
     $hours_miss_sms = array();
 
-
     $in_array = array();
-    $in_array_1 = array();
-    $hours_miss_sms = array();
-    
     foreach ($result as $record) {
-
 
       $hour = (int)substr($record->title, -8, 2);
       $minute = (int)substr($record->title, -5, 2);
@@ -59,17 +53,17 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
       
       $hours_miss_sms[$hour] = $record;
 
-
       $in_array[$record->entity_id] = $record;
+      //dpm($day);
     }
     // End Binhnt Code Her
-
     //digi_debug(count($rainfalls), 0, 1);
     
 		if(count($in_array) > 0){
-
 			foreach($in_array as $rainfall){
+        //dpm($rainfall);
 				$hour = (int)substr($rainfall->title, -8, 2);
+        
         $minute = (int)substr($rainfall->title, -5, 2);
         $second = (int)substr($rainfall->title, -2, 2);
         if($minute =='00' && $second == '00'){
@@ -90,7 +84,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 					$time_rainfall_in_day =0;
 				}
 			}
-
       
 			for($i = 23; $i >= 0; $i--) {
         
@@ -142,7 +135,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 			}
 		}
     
-
 		$stations[]= array(
 			'station_name' => $station->title,
 			'max_total_rainfall_in_day' => $max_total_rainfall_in_day,
@@ -152,7 +144,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 		);
 	}
   
-
 	/*-----------------------------------------------------------------------------------------------------------*/
 	
   $objPHPExcel = new PHPExcel();
@@ -191,17 +182,11 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '0');
 			}
 			$objPHPExcel->getActiveSheet()->mergeCells('A'.($i+7).':B'.($i+8));
-
-			$objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUMIF(C'.($i+7).':Z'.($i+7).',"<>-999",C'.($i+7).':Z'.($i+7).')');
-
 		}
 		else{
 			for($j =0; $j < 24; $j++){
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '0');
 			}
-
-			$objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUMIF(C'.($i+7).':Z'.($i+7).',"<>-999",C'.($i+7).':Z'.($i+7).')');
-
 		}
     $objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUMIF(C'.($i+7).':Z'.($i+7).',">0")');
 	}
@@ -255,9 +240,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 		)
 	);
 
-
   $now = getdate();
-
 
 	for($index = 0; $index < $number*2; $index++){
 		if($index%2 == 0){
@@ -269,12 +252,10 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$time = $stations[$index/2]['hours_in_day'][$j]['time_rainfall_in_hour'];
         if($time == 0 ) $time = '-';
         
-
-        if($j > intval($now["hours"])) {
+        if(intval(substr($month, -2)) == intval($now["mon"]) && intval(substr($day, -2, 2)) == intval($now["mday"]) && $j >= intval($now["hours"])) {
           $total = '';
           $time = '';
         }
-        
 
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($index+7),$total);
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($index+8),$time);
