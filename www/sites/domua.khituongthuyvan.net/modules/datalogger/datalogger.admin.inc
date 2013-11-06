@@ -766,15 +766,7 @@ function _datalogger_convert_number($number){
 }
 
 
-function _datalogger_node_save_field($nid, $type, $field, $value) {
 
-  $n = new stdClass();
-  $n->nid = $nid;
-  $n->type = $type;
-  $n->{$field}[LANGUAGE_NONE][0]['value'] = $value;
-  field_attach_presave('node', $n);
-  field_attach_update('node', $n);
-}
 //Ham lay thoi gian truyen tin
 
 function _datalogger_update_receive_time($nid, $value){
@@ -801,32 +793,40 @@ function _datalogger_update_receive_time($nid, $value){
 		}
 	}
   
-  //exit;
+  exit;
 	
 }
 
 
-
+function _datalogger_node_save_field(&$node, $field, $value) {
+  $n = new stdClass();
+  $n->id = $node->nid;          // node id
+  $n->bundle = $node->type;  // aka content type
+  
+  $n->{$field}[LANGUAGE_NONE][0]['value'] = $value;
+  field_attach_update('node', $n);
+}
 
 
 //Kiem tra trang thai sau 30 phut
 
 
 function _datalogger_check_status_30_minutes(){
-  
-    $content_type = "station";
+	//$content_type("viet_");
+	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 
     $now = time();
     //return;   // trung
     
-
 		foreach ($all_nodes as &$node) {
+				//$last_receive = strtotime($row->UpdatedInDB);
+				
 				if($node->field_station_report_time['und'][0]['value'] ==''){
 						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {              
 
               _datalogger_node_save_field($node->nid, 'station', 'field_station_status', 'station_deactive');
-
+             // _datalogger_node_save_field($node, 'field_station_status', 'station_deactive');
             }
 				} else{
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
@@ -836,9 +836,9 @@ function _datalogger_check_status_30_minutes(){
 				  $value = ($diff > 90 ? 'station_deactive' : 'station_active');
           
           if ($node->field_station_status['und'][0]['value'] != $value) {                      
-
             _datalogger_node_save_field($node->nid, 'station', 'field_station_status', $value);
 
+            //_datalogger_node_save_field($node, 'field_station_status', $value);
           }
 
 				}		
@@ -933,15 +933,10 @@ function _datalogger_check_inbox() {
     flush (); // flush the output buffer
   }
 	
-  
   return 'Ok';
-
+  
   print "Ok.";
-	
-
-	
-
-
+  
   drupal_exit();
 }
 
@@ -967,10 +962,11 @@ function _datalogger_separate_sms_command($sms, $number){
 	if($malenh == 'A:ALARM INTERVAL:'){
 		$stations = views_get_view_result('view_station_find', Null, $number);
 		if(count($stations) >= 1){
-
 			//$station = node_load($stations[0]->nid);			
       _datalogger_node_save_field($stations[0]->nid, 'station', 'field_station_alarm', 'alarm_true');
 
+			//$station = node_load($stations[0]->nid);			
+      //_datalogger_node_save_field($station, 'field_station_alarm', 'alarm_true');
 		}
 	}
 	
