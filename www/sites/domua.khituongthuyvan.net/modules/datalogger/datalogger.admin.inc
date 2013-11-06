@@ -925,15 +925,10 @@ function _datalogger_check_inbox() {
     flush (); // flush the output buffer
   }
 	
-  
   return 'Ok';
-
+  
   print "Ok.";
-	
-
-	
-
-
+  
   drupal_exit();
 }
 

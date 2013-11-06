@@ -54,8 +54,8 @@ function _datalogger_vietbando() {
 	//echo $full_url;
 	
 	switch($full_url){
-		case "http://admin.domua.khituongthuyvan.net/" :
-			$url = "5lJdIlKaLKfA1UMwdmzgbRYOTt/AH+9wl6NQH/f0pue8AFCloQ7qJw==";
+		case "http://bactrungbo.admin.domua.khituongthuyvan.net/" :
+			$url = "Yz0YJVkIGXlSZCzH/Re1/DZTJ19y6Eu7bBrTrXLmhGZiXTy09/yqVASjbwFjK6Fy+qOTP7hMkzQ=";
 		break;	
 		case "http://117.6.129.235:8181:8181/" ://Bac Trung Bo ok
 			$url = "E43pcmZHdUhoao9ejBKG/CwvXxcHv+NwVcvW0H3Rg+o=";
@@ -89,6 +89,7 @@ function _datalogger_vietbando() {
 	//dpm($rows);
 	//echo $rows[0]->field_field_station_alarm;
 	//drupal_add_js("var view = " . drupal_to_js($view) . ";", 'inline');
+
 
   $external_js = 'http://www.vietbando.com/maps/API/VBDMapAPI.js?key=' .$url;
 
@@ -185,7 +186,7 @@ MANG;
 
 MANG2;
 	switch($full_url){
-		case "http://admin.domua.khituongthuyvan.net/" :
+		case "http://bactrungbo.admin.domua.khituongthuyvan.net/" :
 			$s.=<<<MANG2
 			map.setCenter(new VLatLng(18.8152328, 105.680505), 7);
 MANG2;
@@ -249,7 +250,7 @@ MANG2;
 		
 		 		map.addOverlay(markers[i]);
 				
-				contentString[i] = '<div style =" width: 200px; height: 100px"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 751;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 1; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
+				contentString[i] = '<div style =" width: 200px; height: 100px;z-index: 110;"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 110;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 110; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
 				contentString[i] += '/station/Quảng-Hợp';
 				contentString[i] += '"><b>Trạm ';
 				contentString[i] += station[i].tentram;
