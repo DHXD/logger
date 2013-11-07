@@ -262,7 +262,7 @@ function _datalogger_station_name_list(){
 
 /**
 	*Begin: 16/11. 
- *author:Nguyễn Mạnh Hùng
+ *author:Nguy?n M?nh Hùng
  */
  /*
 function _datalogger_return_area($areas){
@@ -366,8 +366,8 @@ function _datalogger_return_city($citys){
 		
 /**
  *Begin: 19/11. 
- *author:Nguyễn Mạnh Hùng
- *description:danh sach cac tram do mưa theo khu vực/tinh/tram
+ *author:Nguy?n M?nh Hùng
+ *description:danh sach cac tram do mua theo khu v?c/tinh/tram
  */
 function _datalogger_station_ajax($area, $province,$nid){
 	$stations = views_get_view_result('view_station_filter_parameter',Null, $area, $province, $nid);
@@ -377,8 +377,8 @@ function _datalogger_station_ajax($area, $province,$nid){
 		
 /**
  *Begin: 17/11. 
- *author:Phan Văn Tuấn
- *description:tạo form xuất báo cáo theo năm
+ *author:Phan Van Tu?n
+ *description:t?o form xu?t báo cáo theo nam
  */
 //
 function _datalogger_set_station_callback($form, &$form_state){
@@ -465,8 +465,8 @@ function _datalogger_report_rainfall_year_form_submit(&$form, &$form_state) {
 }
 
 /**
- *author:Phan Văn Tuấn
- *description:tạo form xuất báo cáo theo ngày
+ *author:Phan Van Tu?n
+ *description:t?o form xu?t báo cáo theo ngày
  */
 function _datalogger_report_rainfall_all_station_in_day_form($form, &$form_state){
 	drupal_set_title(t('Statistics of rainfall during the day'));
@@ -765,41 +765,38 @@ function _datalogger_convert_number($number){
 	return $sim_number;
 }
 
-
-
+function _datalogger_node_save_field($nid, $type, $field, $value) {
+ watchdog('giatri',$value);
+  $n = new stdClass();
+  $n->nid = $nid;
+  $n->type = $type;
+  $n->{$field}[LANGUAGE_NONE][0]['value'] = $value;
+  field_attach_presave('node', $n);
+  field_attach_update('node', $n);
+  watchdog('Luu','daluu');
+}
 //Ham lay thoi gian truyen tin
 
 function _datalogger_update_receive_time($nid, $value){
-
+  //watchdog('1-----',$value);
 	$node_tram = node_load($nid);
-  
-  _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
-  
-  return;
 	$last_value = $node_tram->field_station_report_time['und'][0]['value'];
   
 	if($last_value == ''){		
-    _datalogger_node_save_field($node, 'field_station_report_time', $value);
-	} else{
-		$difference = strtotime($value) - strtotime($last_value);
-		if($difference > 0) {			
-      _datalogger_node_save_field($node, 'field_station_report_time', $value);
+    _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
+	}else{
+    watchdog('2-----',$value);
+		$khac = strtotime($value) - strtotime($last_value);
+    
+      //return;
+		if($khac > 0) {	
+      //return;
+      _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
 		}
 	}
-  
-  exit;
 	
 }
 
-
-function _datalogger_node_save_field(&$node, $field, $value) {
-  $n = new stdClass();
-  $n->id = $node->nid;          // node id
-  $n->bundle = $node->type;  // aka content type
-  
-  $n->{$field}[LANGUAGE_NONE][0]['value'] = $value;
-  field_attach_update('node', $n);
-}
 
 
 //Kiem tra trang thai sau 30 phut
@@ -809,11 +806,9 @@ function _datalogger_check_status_30_minutes(){
 	//$content_type("viet_");
 	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
-    
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
     return;   // trung
-
 		foreach ($all_nodes as &$node) {
 				//$last_receive = strtotime($row->UpdatedInDB);
 				
@@ -841,88 +836,99 @@ function _datalogger_check_status_30_minutes(){
 
 function _datalogger_check_inbox() {
 
-
+  
   $cron = (arg(3) == 'remote');
+  
+  $test_tram = (arg(3) == 'test');
   
   $processed = 0;
   
-  $result = db_query("SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10");	
-  //dpm($rerult[0]->ID);
-  //$result = db_query("SELECT * FROM inbox WHERE Processed={$processed}  LIMIT 0,10");
-	//_check_report_time();
-  //dpm($result[0]->ID);
+  $sql = "SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10";
   
-  header('Content-Type: text/plain');
+  if ($test_tram) $sql = "SELECT * FROM inbox WHERE ID = 262283";   // cho LASI
+  
+  $result = db_query($sql);	
+  
+  
+  if (!$test_tram) header('Content-Type: text/plain');
   
   //_datalogger_check_status_30_minutes();
+  
+  $output = '';
+  
   $rows = array();
-  foreach ($result as $row){
+  foreach ($result as $row) {
     $rows[] = $row;
   }
   
   unset($result);
   
+  module_load_include('inc', 'datalogger', 'datalogger.admin.export');  // xuat txt
+  
   foreach ($rows as $row) {
-    // //tin nhắn từ datalogger
+    
+    // //tin nh?n t? datalogger
 		$id_inbox = $row->ID;
 
-    print "Inbox ID: {$row->ID}\n";
+    //print "Inbox ID: {$row->ID}\n";
+    $receiveTime = $row->UpdatedInDB;
     
 		$number = _datalogger_convert_number($row->SenderNumber);
-
-
-    
-
 		$sms = $row->TextDecoded;
     $smsID = $row->ID;
-    
+  
     //Lay thoi gian nhan tin
-    module_load_include('inc', 'datalogger', 'datalogger.admin.export');
+    
     $tram_nid = _datalogger_return_nid($number);
-    if (!$tram_nid) continue;
+    
+    watchdog('Thong tin tram',$receiveTime.'-smsID-'.$row->ID.'-Nid-'.$tram_nid);
+    
+    if (!$tram_nid) {
+      _datalogger_update_process_inbox(3, $id_inbox);
+      continue;
+    }
     $node_tram = node_load($tram_nid);
-    watchdog('Tentram',$node_tram->title . ' SMS ID = ' . $row->ID);
-    watchdog('ReceivingTime ...',$row->UpdatedInDB);
-    $value = $row->UpdatedInDB;
-    //$value = '2013-11-06 13:16:56';
-    _datalogger_update_receive_time($tram_nid, $value);
     
-    
+
+    _datalogger_update_receive_time($tram_nid, $receiveTime);
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
       $len_sms = strlen($row->TextDecoded);
-      //Xử lý tin nhắn được yêu cầu:88byte
+      //X? lý tin nh?n du?c yêu c?u:88byte
       
       if($len_sms == 88){
-        print "Command.\n";
+        $output .= "Command.\n";
         
-				//Thực hiện chèn bản tin vào bảng command
+				//Th?c hi?n chèn b?n tin vào b?ng command
 				_datalogger_separate_sms_command($sms, $number);
-				//Cập nhật các bản tin đã xử lý
+				//C?p nh?t các b?n tin dã x? lý
 				_datalogger_update_process_inbox(1,$id_inbox);
         
       }
-      //Xử lý bản tin đo mưa tự động:140byte
+      //X? lý b?n tin do mua t? d?ng:140byte
       elseif($len_sms == 140) {
-        print "Rain.\n";
+        
+        $output .= "Rain.\n";
       
         switch ($number) {
 	
           default:
-            // Chèn bản tin vào bảng đo mưa
+            // Chèn b?n tin vào b?ng do mua
             // dsm('into 140');
-            _datalogger_separate_sms($sms,$number, $id_inbox);
-            // Cập nhật các bản tin đã xử lý
+            if (!$test_tram)
+              _datalogger_separate_sms($sms,$number, $id_inbox);
+            
+            // C?p nh?t các b?n tin dã x? lý
             _datalogger_update_process_inbox(1, $id_inbox);
+            
+            
             //Xuat file txt tu dong
-            module_load_include('inc', 'datalogger', 'datalogger.admin.export');
-           
 						//_datalogger_
             _datalogger_ftp_txt_export_inc($tram_nid);
           }
       }			
 			else {
-        print "Other.\n";
+        $output .= "Other.\n";
         _datalogger_update_process_inbox(2, $id_inbox);
       }
     }
@@ -945,7 +951,7 @@ function _datalogger_update_process_inbox($process, $id_inbox){
 }
 
 /**
- *Cập nhật giá trị trả từ Datalogger cho node command.
+ *C?p nh?t giá tr? tr? t? Datalogger cho node command.
  **/
 function _datalogger_separate_sms_command($sms, $number){
 
@@ -980,7 +986,7 @@ function _datalogger_separate_sms_command($sms, $number){
 }
 
 /**
- *Phân tách bản tin đưa mưa tự động từ Datalogger gửi về
+ *Phân tách b?n tin dua mua t? d?ng t? Datalogger g?i v?
 */
 
 function _datalogger_string_to_date($str){
@@ -1028,7 +1034,6 @@ function _datalogger_separate_sms($sms,$number, $smsID) {
 	$nid = $station[0]->nid;
 	$title = $station[0]->node_title;
 	$arg = array($timestart, $nid, $is_valid, $measuaring, $accumulate, $battery, $smsID, $total_rain_hour);
-
 	_datalogger_insert_node_rainfall($arg);
   
 }
@@ -1055,16 +1060,14 @@ function _datalogger_insert_node_rainfall(&$arg){
   $smsID = $arg[6];
   $total_rain_hour = $arg[7];
   
-  
-  
+
 	if( $nid != null || !empty($nid ) && (!empty($station) || $station != null)) {
 		$time_unix = _datalogger_string_to_unix_date($timestam);
 		$is_data_valids = $arg[2];
 		$measuring_interval = $arg[3];//3
 		$accumulate;//4
 		$battery = $arg[5];//5
-		
-    
+	
     for($i = 5; $i >= 0; $i--) {
     
 			$is_data_valid = $is_data_valids[$i];
@@ -1078,24 +1081,27 @@ function _datalogger_insert_node_rainfall(&$arg){
 			if($is_data_valid == 0){
 				$power = $battery[$i];
         
+        // Tam thoi bo chuc nang
+        /*
         // trung temp
-        
-				//$rainfalls = views_get_view_result('view_find_rainfall_station', NULL, $nid, $send_time);
-        
+       
+				$rainfalls = views_get_view_result('view_find_rainfall_station', NULL, $nid, $send_time);
         //print('$send_time='.$send_time);
+        
+        */
         
         $rainfalls = array();
         
 				
 				if(count($rainfalls) > 0 ){         // trung du lieu thi cap nhat lai cai cu theo gia tri moi
-        
+          
 					foreach($rainfalls as $rainfall_old){
 						$rainfall_old = node_load($rainfall_old->nid);
-						//lượng mưa đo được trong 10p
+						//lu?ng mua do du?c trong 10p
 						$rainfall_old->field_rainfall_measuring['und'][0]['value'] = $measuring_interval[$i]/10;
 						// luong mua tich luy
 						$rainfall_old->field_rainfall_total['und'][0]['value'] = $arg[4][$i]/10;
-            //lượng mưa đo được trong 60p            
+            //lu?ng mua do du?c trong 60p            
             $rainfall_old->field_rainfall_total_hour['und'][0]['value'] = $total_rain_hour / 10;
             
 						
@@ -1112,6 +1118,7 @@ function _datalogger_insert_node_rainfall(&$arg){
 				}
 
 				else{
+          
 					//tao node moi
 					$rainfall = new stdClass();
 					$rainfall->title = date('d/m/Y H:i:s',$time);
@@ -1124,12 +1131,12 @@ function _datalogger_insert_node_rainfall(&$arg){
 					$rainfall->format = 1; // Filtered HTML?
 					$rainfall->uid = 1; // Content owner uid (author)?
 					$rainfall->language = 'und';
-
+         
 					node_object_prepare($rainfall); 
 					$rainfall->field_rainfall_station[$rainfall->language][0]['nid'] = $nid;
-					//lượng mưa đo được trong 10p
+					//lu?ng mua do du?c trong 10p
 					$rainfall->field_rainfall_measuring[$rainfall->language][0]['value'] = $measuring_interval[$i]/10;
-					//lượng mưa tich luy
+					//lu?ng mua tich luy
 					$rainfall->field_rainfall_total[$rainfall->language][0]['value'] = $arg[4][$i]/10;
           // luong mua tong trong 1 gio
           $rainfall->field_rainfall_total_hour['und'][0]['value'] = $total_rain_hour / 10;
@@ -1143,7 +1150,7 @@ function _datalogger_insert_node_rainfall(&$arg){
           $rainfall->field_rainfall_sms_id[$rainfall->language][0]['value'] = $smsID;
           $rainfall->field_rainfall_op_idx[$rainfall->language][0]['value'] = ($i + 1);
 					
-					//chỉ trèn giá trị vào trường này khi thời gian là: 01:00:00, 02:00:00,...23:00:00h
+					//ch? trèn giá tr? vào tru?ng này khi th?i gian là: 01:00:00, 02:00:00,...23:00:00h
 					for($j = 0; $j < 24; $j++){
 						if($clearTime3['h'.$j] == $hour_time){
 							$rainfall->field_rainfall_hour_time[$rainfall->language][0]['value'] = $hour_time;
@@ -1153,10 +1160,12 @@ function _datalogger_insert_node_rainfall(&$arg){
 					$rainfall = node_submit($rainfall);
           
 					node_save($rainfall);
+          
 					// dsm($rainfall);
 				}
 			}
 		}
+    
 		$station->field_station_power['und'][0]['value'] = $power/10;
 		$station->field_station_rain_nearest['und'][0]['value'] = $measuring_interval[0]/10;
 		$station->field_station_rain_24['und'][0]['value'] = $arg[4][0]/10;
@@ -1173,6 +1182,7 @@ function _datalogger_insert_node_rainfall(&$arg){
 			//khong co mua - kho han
 			$station->field_station_alarm['und'][0]['value'] = 'alarm_false';	
 		}		
+    
 		node_save($station);
 	}
 	
@@ -1181,12 +1191,12 @@ function _datalogger_insert_node_rainfall(&$arg){
 function _datalogger_generate_rainfalls_form($form, &$form_state) {
   $form['station'] = array(
     '#type' => 'textfield',
-    '#title' => 'Trạm Nid',
+    '#title' => 'Tr?m Nid',
   );
   
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => 'Sinh mưa',
+    '#value' => 'Sinh mua',
   );
   return $form;
 }
@@ -1212,12 +1222,12 @@ function _datalogger_generate_rainfalls_form_submit($form, &$form_state) {
       $battery[$i] = floatval(rand(124, 138)) / 10.0;
     }
     
-    $arg = array('Lượng mưa ', $station_nid, $is_valid, $measuaring, $accumulated, $battery, $smsID);
+    $arg = array('Lu?ng mua ', $station_nid, $is_valid, $measuaring, $accumulated, $battery, $smsID);
     
     _datalogger_insert_node_rainfall($arg);
     
   }
-  drupal_set_message('Tạo node thành công.');
+  drupal_set_message('T?o node thành công.');
   
 }
 
@@ -1237,7 +1247,7 @@ function _datalogger_endsWith($sms, $needle)
 	return substr($sms, -strlen($needle)) == $needle;
 }
 
-/*Ham xu ly cac tin nhắn gửi tới*/
+/*Ham xu ly cac tin nh?n g?i t?i*/
 function _datalogger_new_sms_form() {
   // Initialising output
   $output = '';
@@ -1331,11 +1341,11 @@ function _datalogger_new_sms_form() {
     $sms = $row -> TextDecoded;
     $len_sms = strlen($row->TextDecoded);
     // highlight
-    //Xử lý tin nhắn được yêu cầu:88byte
+    //X? lý tin nh?n du?c yêu c?u:88byte
     if($len_sms == 88) {
       $sms = '<span style="background:blue;color:white;font-weight:bold">' . $sms . '</span>';
     }
-    //Xử lý bản tin đo mưa tự động:140byte
+    //X? lý b?n tin do mua t? d?ng:140byte
     elseif($len_sms == 140) {
       $sms = _datalogger_regex_rain($sms); 
     }
@@ -1471,11 +1481,11 @@ function _datalogger_new_outbox_form (){
     $len_sms = strlen($row->TextDecoded);
 
     // highlight    
-    //Xử lý tin nhắn được yêu cầu:88byte
+    //X? lý tin nh?n du?c yêu c?u:88byte
     if($len_sms == 88) {
       $sms = '<span style="background:blue;color:white;font-weight:bold">' . $sms . '</span>';
     }
-    //Xử lý bản tin đo mưa tự động:140byte
+    //X? lý b?n tin do mua t? d?ng:140byte
     elseif($len_sms == 140) {
       $sms = _datalogger_regex_rain($sms);      
     }
@@ -1559,7 +1569,7 @@ function _datalogger_new_sentitems_form(){
     
 
 
-    //Xử lý tin nhắn được yêu cầu :88byte
+    //X? lý tin nh?n du?c yêu c?u :88byte
 
 
     if($len_sms == 88) {
@@ -1574,7 +1584,7 @@ function _datalogger_new_sentitems_form(){
       $status = "Thành công";
     }
     else {
-      $status = "Lỗi";
+      $status = "L?i";
     }
 
     $rows[] = array (
@@ -1670,12 +1680,12 @@ function _datalogger_regex_rain($sms) {
 function _user_form(){
   $form['u_nameLogin'] = array(
     '#type' => 'textfield',
-    '#title' => t('Tên đăng nhập: '),
+    '#title' => t('Tên dang nh?p: '),
   );
   
   $form['u_lastName'] = array(
     '#type' => 'textfield',
-    '#title' => t('Họ: '),
+    '#title' => t('H?: '),
   );
   
   $form['u_firstname'] = array(
@@ -1685,67 +1695,67 @@ function _user_form(){
   
    $form['u_nameDisplay'] = array(
     '#type' => 'textfield',
-    '#title' => t('Tên hiển thị: '),
+    '#title' => t('Tên hi?n th?: '),
   );
   
   $form['u_email'] = array(
     '#type' => 'textfield',
-    '#title' => t('Địa chỉ Email: '),
+    '#title' => t('Ð?a ch? Email: '),
   );
   
   $form['u_createDate'] = array(
     '#type' => 'item',
-    '#title' => t('Ngày được tạo: '.date('d/m/Y h:m:s')),
+    '#title' => t('Ngày du?c t?o: '.date('d/m/Y h:m:s')),
   );
   
   $form['u_loginDate'] = array(
     '#type' => 'item',
-    '#title' => t('Ngày đăng nhập gần nhất: '.date('d/m/Y h:m:s')),
+    '#title' => t('Ngày dang nh?p g?n nh?t: '.date('d/m/Y h:m:s')),
   );
   
   $form['u_actionDate'] = array(
     '#type' => 'item',
-    '#title' => t('Ngày hoạt động gần nhất: '.date('d/m/Y h:m:s')),
+    '#title' => t('Ngày ho?t d?ng g?n nh?t: '.date('d/m/Y h:m:s')),
   );
   
   $form['u_changePassDate'] = array(
     '#type' => 'item',
-    '#title' => t('Thời điểm thay đổi password: '.date('d/m/Y h:m:s')),
+    '#title' => t('Th?i di?m thay d?i password: '.date('d/m/Y h:m:s')),
   );
   
   $form['u_lockDate'] = array(
     '#type' => 'item',
-    '#title' => t('Ngày bị khóa gần nhất:never'),
+    '#title' => t('Ngày b? khóa g?n nh?t:never'),
   );
   
   $form['u_isOnl'] = array(
     '#type' => 'item',
-    '#title' => t('Người dùng đang online: true'),
+    '#title' => t('Ngu?i dùng dang online: true'),
   );
   
   $form['u_isLock'] = array(
     '#type' => 'item',
-    '#title' => t('Bị khóa:false'),
+    '#title' => t('B? khóa:false'),
   );
   
   $form['u_isAccept'] = array(
     '#type' => 'item',
-    '#title' => t('Chấp nhận:false'),
+    '#title' => t('Ch?p nh?n:false'),
   );
   
   $form['u_updatePass'] = array(
     '#type' => 'item',
-    '#title' => t('Cập nhật password:false'),
+    '#title' => t('C?p nh?t password:false'),
   );
   
   $form['u_delete'] = array(
     '#type' => 'item',
-    '#title' => t('Xóa bỏ:false'),
+    '#title' => t('Xóa b?:false'),
   );
   
   $form['sub_add'] = array(
      '#type' => 'submit',
-     '#value' => t('Cập nhật'),    
+     '#value' => t('C?p nh?t'),    
   );
   
   $form['sub_cancel'] = array(
@@ -1760,12 +1770,12 @@ function _user_form(){
 function _user_pass_form(){
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Quản lý password'),
+    '#title' => t('Qu?n lý password'),
   );
   
   $form['submitExportData'] = array(
      '#type' => 'submit',
-     '#value' => t('Cập nhật'),    
+     '#value' => t('C?p nh?t'),    
   );
   
   return $form;  
@@ -1774,12 +1784,12 @@ function _user_pass_form(){
 function _user_profile_form(){
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Quản lý profile'),
+    '#title' => t('Qu?n lý profile'),
   );
   
   $form['submitExportData'] = array(
      '#type' => 'submit',
-     '#value' => t('Cập nhật'),    
+     '#value' => t('C?p nh?t'),    
   );
   
   return $form;  
@@ -1788,42 +1798,42 @@ function _user_profile_form(){
 function _user_group_form(){
   $form['u_gr_power'] = array(
     '#type' => 'select',
-    '#title' => t('Quyền hạn: '),
+    '#title' => t('Quy?n h?n: '),
     '#options' => array(
       1 => 'Admin',
       2 => 'Register user',
-      3 => 'Quản lý', 
+      3 => 'Qu?n lý', 
     ),
   );
   
   $form['u_pr_eff'] = array(
     '#type' => 'date_popup',
-    '#title' => t('Ngày áp dụng: '),
+    '#title' => t('Ngày áp d?ng: '),
   );
   
   $form['u_pr_exp'] = array(
     '#type' => 'date_popup',
-    '#title' => t('Ngày hết hiệu lực: '),
+    '#title' => t('Ngày h?t hi?u l?c: '),
   );
   
   $form['u_gr_add'] = array(
     '#type' => 'submit',
-    '#value' => t('Thêm quyền hạn: '),
+    '#value' => t('Thêm quy?n h?n: '),
   );
   
   return $form;  
 }
 
 function _user_add_form(){
-  drupal_set_title('Quản lý thông tin người dùng');
+  drupal_set_title('Qu?n lý thông tin ngu?i dùng');
   $form['u_nameLogin'] = array(
     '#type' => 'textfield',
-    '#title' => t('Tên đăng nhập: '),
+    '#title' => t('Tên dang nh?p: '),
   );
   
   $form['u_lastName'] = array(
     '#type' => 'textfield',
-    '#title' => t('Họ: '),
+    '#title' => t('H?: '),
   );
   
   $form['u_firstname'] = array(
@@ -1833,17 +1843,17 @@ function _user_add_form(){
   
   $form['u_nameDisplay'] = array(
     '#type' => 'textfield',
-    '#title' => t('Tên hiển thị: '),
+    '#title' => t('Tên hi?n th?: '),
   );
   
   $form['u_email'] = array(
     '#type' => 'textfield',
-    '#title' => t('Địa chỉ Email: '),
+    '#title' => t('Ð?a ch? Email: '),
   );
   
   $form['u_accept'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Chấp nhận: '),
+    '#title' => t('Ch?p nh?n: '),
   );   
   
   $form['u_notice'] = array(
@@ -1853,12 +1863,12 @@ function _user_add_form(){
   
   $form['u_item'] = array(
     '#type' => 'item',
-    '#title' => t('Tùy chọn nhập một password cho thành viên này, hoặc cho phép hệ thống tạo ra một password ngẫu nhiên: '),
+    '#title' => t('Tùy ch?n nh?p m?t password cho thành viên này, ho?c cho phép h? th?ng t?o ra m?t password ng?u nhiên: '),
   );
   
   $form['u_rand_pass'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Password ngẫu nhiên: '),
+    '#title' => t('Password ng?u nhiên: '),
   );    
   
   $form['u_pass_confirm'] = array(
@@ -1867,12 +1877,12 @@ function _user_add_form(){
   
   $form['sub_add'] = array(
      '#type' => 'submit',
-     '#value' => t('Tạo người dùng'),    
+     '#value' => t('T?o ngu?i dùng'),    
   );
   
   $form['sub_cancel'] = array(
      '#type' => 'submit',
-     '#value' => t('Hủy bỏ'),    
+     '#value' => t('H?y b?'),    
   );
   return $form;  
 }
@@ -1939,7 +1949,7 @@ function _init_rainfall_node($title, $time, $rainfall, $stationCode) {
 
 // function _datalogger_station_title_callback($node) {
   // if ($node->type == 'station') {
-    // return 'Thông tin trạm';
+    // return 'Thông tin tr?m';
   // }
   // else {
     // return 'View';
@@ -1951,29 +1961,29 @@ function _init_rainfall_node($title, $time, $rainfall, $stationCode) {
 */
 
 function _manage_data(){
-    return 'Quản lý dữ liệu';
+    return 'Qu?n lý d? li?u';
 }
 
 function _manage_statistics_form() {
   $nid = intval(arg(1));
   $node = node_load($nid);
-  drupal_set_title('Trạm đo mưa: '.$node->title);
+  drupal_set_title('Tr?m do mua: '.$node->title);
   $form['tieude'] = array(
     '#type' => 'item',
-    '#title' => t('Thống kê khối lượng mưa ngày: ').date('d:m:Y'),
+    '#title' => t('Th?ng kê kh?i lu?ng mua ngày: ').date('d:m:Y'),
   );
   $form['ao'] = array(
     '#type' => 'item',
-    '#title' => t('Tổng lượng mưa quan trắc gần nhất:0.4mm'),
+    '#title' => t('T?ng lu?ng mua quan tr?c g?n nh?t:0.4mm'),
   );$form['bo'] = array(
     '#type' => 'item',
-    '#title' => t('Tổng lượng mưa từ 19h đến thời điểm hiện tại:1.7mm'),
+    '#title' => t('T?ng lu?ng mua t? 19h d?n th?i di?m hi?n t?i:1.7mm'),
   );
   $nid = intval(arg(1));
   $node = node_load($nid);
-  drupal_set_title('Trạm đo mưa: '.$node->title);
+  drupal_set_title('Tr?m do mua: '.$node->title);
   $headers = array(
-    1 => 'Thời điểm',
+    1 => 'Th?i di?m',
     2 => 'ObsRp (phút)',
     3 => 'Rp (mm)',
   );
@@ -1991,33 +2001,33 @@ function _manage_statistics_form() {
     '#theme' => 'table',
     '#header' => $headers,
     '#rows' => $rows,
-    '#empty' => t('Hiện tại không có thông tin trong ngay'),
+    '#empty' => t('Hi?n t?i không có thông tin trong ngay'),
   );
   
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Tổng lượng mưa: 1,7mm'),
+    '#title' => t('T?ng lu?ng mua: 1,7mm'),
   );
   
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Xuất dữ liệu'),
+    '#value' => t('Xu?t d? li?u'),
   );
   return $form;
 }
 function _manage_chart_form() {
   $nid = intval(arg(1));
   $node = node_load($nid);
-  drupal_set_title('Trạm đo mưa: '.$node->title);
+  drupal_set_title('Tr?m do mua: '.$node->title);
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Biểu đồ lượng mưa theo giờ'),
+    '#title' => t('Bi?u d? lu?ng mua theo gi?'),
   );
   $nid = intval(arg(1));
   $node = node_load($nid);
-  drupal_set_title('Trạm đo mưa: '.$node->title);
+  drupal_set_title('Tr?m do mua: '.$node->title);
   $headers = array(
-    1 => 'Thời điểm',
+    1 => 'Th?i di?m',
     2 => 'ObsRp (phút)',
     3 => 'Rp (mm)',
   );
@@ -2039,17 +2049,17 @@ function _manage_chart_form() {
     '#theme' => 'table',
     '#header' => $headers,
     '#rows' => $rows,
-    '#empty' => t('Hiện tại không có thông tin trong ngay'),
+    '#empty' => t('Hi?n t?i không có thông tin trong ngay'),
   );
   
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Tổng lượng mưa: 1,7mm'),
+    '#title' => t('T?ng lu?ng mua: 1,7mm'),
   );
   
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Xuất dữ liệu'),
+    '#value' => t('Xu?t d? li?u'),
   );
   return $form;
 }
@@ -2057,9 +2067,9 @@ function _manage_rainfall_form($form, &$form_state) {
   // $node = node_load($nid);
   $nid = intval(arg(1));
   $node = node_load($nid);
-  drupal_set_title('Trạm đo mưa: '.$node->title);
+  drupal_set_title('Tr?m do mua: '.$node->title);
   $headers = array(
-    1 => 'Thời điểm',
+    1 => 'Th?i di?m',
     2 => 'ObsRp (phút)',
     3 => 'Rp (mm)',
   );
@@ -2075,17 +2085,17 @@ function _manage_rainfall_form($form, &$form_state) {
     '#theme' => 'table',
     '#header' => $headers,
     '#rows' => $rows,
-    '#empty' => t('Hiện tại không có thông tin trong ngay'),
+    '#empty' => t('Hi?n t?i không có thông tin trong ngay'),
   );
   
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Tổng lượng mưa: 1,7mm'),
+    '#title' => t('T?ng lu?ng mua: 1,7mm'),
   );
   
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Xuất dữ liệu'),
+    '#value' => t('Xu?t d? li?u'),
   );
   return $form;
 }
@@ -2094,7 +2104,7 @@ function _manage_info_form() {
   // $node = node_load($nid);
   $nid = intval(arg(1));
   $node = node_load($nid);
-  drupal_set_title('Trạm đo mưa: '.$node->title);
+  drupal_set_title('Tr?m do mua: '.$node->title);
   $form['description'] = array(
     '#type' => 'item',
     '#title' => t('Thông tin tram'),
