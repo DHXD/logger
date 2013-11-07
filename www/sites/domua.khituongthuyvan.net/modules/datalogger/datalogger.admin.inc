@@ -766,31 +766,31 @@ function _datalogger_convert_number($number){
 }
 
 function _datalogger_node_save_field($nid, $type, $field, $value) {
- watchdog('giatri',$value);
+
   $n = new stdClass();
   $n->nid = $nid;
   $n->type = $type;
   $n->{$field}[LANGUAGE_NONE][0]['value'] = $value;
   field_attach_presave('node', $n);
   field_attach_update('node', $n);
-  watchdog('Luu','daluu');
+  node_load($nid, NULL, TRUE);      // reset
+
 }
 //Ham lay thoi gian truyen tin
 
 function _datalogger_update_receive_time($nid, $value){
-  //watchdog('1-----',$value);
+  
 	$node_tram = node_load($nid);
 	$last_value = $node_tram->field_station_report_time['und'][0]['value'];
   
 	if($last_value == ''){		
     _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
 	}else{
-    watchdog('2-----',$value);
+
 		$khac = strtotime($value) - strtotime($last_value);
     
-      //return;
-		if($khac > 0) {	
-      //return;
+		if($khac > 0 || (arg(3) == 'test')) {	
+      
       _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
 		}
 	}
@@ -799,32 +799,34 @@ function _datalogger_update_receive_time($nid, $value){
 
 
 
+
+
 //Kiem tra trang thai sau 30 phut
 
 
 function _datalogger_check_status_30_minutes(){
-	//$content_type("viet_");
+	
 	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
-    return;   // trung
-		foreach ($all_nodes as &$node) {
+    
+		foreach ($all_nodes as $node) {
 				//$last_receive = strtotime($row->UpdatedInDB);
 				
 				if($node->field_station_report_time['und'][0]['value'] ==''){
-						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {              
-              _datalogger_node_save_field($node, 'field_station_status', 'station_deactive');
+          
+						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {  
+              _datalogger_node_save_field($node->nid, 'station', 'field_station_status', 'station_deactive');
             }
 				} else{
+        
 					$last_receive = strtotime($node->field_station_report_time['und'][0]['value']);
-					$diff = ($now - $last_receive)/60;
-
-          
+					$diff = ($now - $last_receive)/60; 
 				  $value = ($diff > 90 ? 'station_deactive' : 'station_active');
           
           if ($node->field_station_status['und'][0]['value'] != $value) {                      
-            _datalogger_node_save_field($node, 'field_station_status', $value);
+            _datalogger_node_save_field($node->nid, 'station', 'field_station_status', $value);
           }
 
 				}		
@@ -843,16 +845,24 @@ function _datalogger_check_inbox() {
   
   $processed = 0;
   
-  $sql = "SELECT * FROM inbox WHERE Processed={$processed} ORDER BY `ID` DESC LIMIT 0,10";
+  $sql = "SELECT * FROM inbox WHERE (Processed=0) AND (ID > 263053) ORDER BY `ID` DESC LIMIT 0,10";
   
-  if ($test_tram) $sql = "SELECT * FROM inbox WHERE ID = 262283";   // cho LASI
+  
+  
+  if ($test_tram) {
+    //$sql = "SELECT * FROM inbox WHERE ID = 262967";   // cho LASI
+    
+    // Set Processed to 0
+    db_query("UPDATE inbox SET Processed=0 WHERE (ID>=263044 AND ID<=263053)");
+    
+    $sql = "SELECT * FROM inbox WHERE (ID>=263044 AND ID<=263053) ORDER BY `ID` DESC LIMIT 0,10";
+  }
   
   $result = db_query($sql);	
   
-  
   if (!$test_tram) header('Content-Type: text/plain');
   
-  //_datalogger_check_status_30_minutes();
+  _datalogger_check_status_30_minutes();
   
   $output = '';
   
@@ -887,7 +897,7 @@ function _datalogger_check_inbox() {
       _datalogger_update_process_inbox(3, $id_inbox);
       continue;
     }
-    $node_tram = node_load($tram_nid);
+    //$node_tram = node_load($tram_nid);
     
 
     _datalogger_update_receive_time($tram_nid, $receiveTime);
