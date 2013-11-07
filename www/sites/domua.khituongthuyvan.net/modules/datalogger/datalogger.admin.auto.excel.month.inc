@@ -46,6 +46,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
   
   $in_array = array();
   $hours_miss_sms = array();
+  $day_miss_sms = array();
   
   $rainfall_in_ten_minutes = array();
   
@@ -64,6 +65,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
     if (!isset($in_array[$day])) $in_array[$day] = array();
     $in_array[$day][$record->entity_id] = $record;
     $hours_miss_sms[$day][$hour] = $record;
+    $day_miss_sms[$day] = $record;
     $rainfall_in_ten_minutes[$day]["$hour-$minute"] = $record->field_rainfall_measuring_value ;
   }
   //dpm($in_array); return;
@@ -145,6 +147,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
 						'time_rainfall_in_hour' => $time_rainfall_in_hour);
 				}
 			}
+      
 		}
 		
     $max_rainfall_in_day = $hours_in_day[0]['total_rainfall_in_hour'];
@@ -161,7 +164,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
 			'max_rainfall_in_day' => $max_rainfall_in_day,
 			'hours_in_day' => $hours_in_day,
       'max_total_time_in_hours' => $max_time_in_hours
-      );   
+      );
 	}
   
 	/*-----------------------------------------------------------------------------------------------------------*/
@@ -369,8 +372,8 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
 	$objPHPExcel->getActiveSheet()->setCellValue('L4', 'Năm:'.$year);
   
   //font
-  $objPHPExcel->getActiveSheet()->getStyle('A1:O37')->getFont()->setName('Times New Roman');
-	$objPHPExcel->getActiveSheet()->getStyle('A1:O37')->getFont()->setSize(10);
+  $objPHPExcel->getActiveSheet()->getStyle('A1:M40')->getFont()->setName('Times New Roman');
+	$objPHPExcel->getActiveSheet()->getStyle('A1:M40')->getFont()->setSize(10);
   
   //Thiet lap border
   for($day = 0; $day <= $month_days_number; $day++) {
@@ -403,7 +406,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
   $day_in_month = 1;
 	for($day = 0; $day < $month_days_number; $day++){
    
-    for($j=14; $j<24; $j++){
+    for($j=14; $j<24; $j++) {
 			$total = $day_of_month[$day_in_month]['hours_in_day'][$j]['total_rainfall_in_hour'];
 			if(!$total) $total = '-';
       
@@ -416,14 +419,11 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
       }
       
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(65+$j-14).($day+8),$total);
-		}
-    
-    for($j = 0; $j <= 12; $j++) {
+      
       if($total > 0) {
         $objPHPExcel->getActiveSheet()->getStyle(chr(65+$j).($day+8))->getNumberFormat()->setFormatCode('0.0');
       }
-    }
-    
+		}
 		$day_in_month++;
 	}
   
@@ -480,15 +480,26 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
     '=SUM(SUMIF(\'Trang 1\'!B'.($day+7).':O'.($day+7).',"<>-999"),SUMIF(A'.($day+7).':J'.($day+7).',"<>-999"))');
     
     $sum = $objPHPExcel->getActiveSheet()->getCell('K'.($day+7))->getCalculatedValue();
-    if($sum == '0') {$objPHPExcel->getActiveSheet()->setCellValue('K'.($day+7),'-');}
     
+    
+    
+    if($sum == '0') {$objPHPExcel->getActiveSheet()->setCellValue('K'.($day+7),'-');}
+    if($sum > 0) {$objPHPExcel->getActiveSheet()->getStyle('K'.($day+7))->getNumberFormat()->setFormatCode('0.0');}
     //Max 60 phut
-    if(!$max60[$day]) {$max60[$day] = '-' ;}
+    if($max60[$day] == 0) {$max60[$day] = '-' ;}
+    if($max60[$day] > 0) {$objPHPExcel->getActiveSheet()->getStyle('L'.($day+7))->getNumberFormat()->setFormatCode('0.0');}
     $objPHPExcel->getActiveSheet()->setCellValue('L'.($day+7), $max60[$day]);
     
     //Max 30 phut
-    if(!$max30[$day]) {$max30[$day] = '-' ;}
+    if($max30[$day] == 0) {$max30[$day] = '-' ;}
+    if($max30[$day] > 0) {$objPHPExcel->getActiveSheet()->getStyle('M'.($day+7))->getNumberFormat()->setFormatCode('0.0');}
     $objPHPExcel->getActiveSheet()->setCellValue('M'.($day+7), $max30[$day]);
+    
+    if(!isset($day_miss_sms[$day])) {
+      $objPHPExcel->getActiveSheet()->setCellValue('K'.($day+7),'-999');
+      $objPHPExcel->getActiveSheet()->setCellValue('L'.($day+7), '-999');
+      $objPHPExcel->getActiveSheet()->setCellValue('M'.($day+7), '-999');
+    }
     
     if($day + 1 > intval($now["mday"]) && intval(substr($month,-2)) >= intval($now["mon"])) {
       $objPHPExcel->getActiveSheet()->setCellValue('K'.($day+7), '');
