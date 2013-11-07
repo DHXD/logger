@@ -35,7 +35,13 @@ function _datalogger_ftp_export() {
 function _datalogger_ftp_txt_export_inc($tram) {
 
   $query_station = $tram;
+  
+  dpm('3.1----------'.date('m/d/Y h:i:s a', time())); 
+  
   $node_station = node_load($query_station);
+  
+  dpm('3.2----------'.date('m/d/Y h:i:s a', time())); 
+  
   $ten = $node_station->title;
   $matram = $node_station->field_station_code['und'][0]['value'];
   $ten_tinh = $node_station->field_station_province_city['und'][0]['value'];
@@ -82,9 +88,12 @@ function _datalogger_ftp_txt_export_inc($tram) {
     $in_array[] = $record->entity_id;
   }
 
+  dpm('3.3----------'.date('m/d/Y h:i:s a', time())); 
   
   $nodes = node_load_multiple($in_array);
   
+  dpm('3.4----------'.date('m/d/Y h:i:s a', time())); 
+  /////return;
   //dpm($nodes);
   
   $a = array();
@@ -188,7 +197,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
   $file_name = creat_folder($matinh, $matram, $y, $m, $d);
   write_to_text($out, $matram, $y, $m, $d, $h, $file_name);
   
-  // return '123';
+  return '123';
   drupal_set_message('Xuat du lieu xong tram ' . $ten);
   }
 

@@ -269,16 +269,7 @@ function datalogger_views_pre_render(&$view) {
 	}	  
 } 
 
-/*
- *Implements hook_views_pre_render().
- *Author:hungnm0302
- *Description: thay đổi query hiển thị trạm theo từng khu vực trên user
- */
- function datalogger_views_post_execute(&$view){
- if($view->current_display=='page'&&$view->name=='search_rainfall'){
-    //dpm($view);
-   }
- }
+
  
  function datalogger_views_query_alter(&$view, &$query) {
  
@@ -286,6 +277,7 @@ function datalogger_views_pre_render(&$view) {
     return ;
   }
  if($view->current_display=='page'&&$view->name=='search_rainfall'){
+  $query_stations = array();
   //dpm($view);
   foreach ($query->where[1]['conditions'] as $k=>$v){      
     if(isset($v['value'][':field_data_field_rainfall_send_time_field_rainfall_send_time_value'])){
@@ -302,12 +294,13 @@ function datalogger_views_pre_render(&$view) {
      // Need code to get station
       if(isset($v['field'])&&$v['field']=='field_data_field_rainfall_station.field_rainfall_station_nid')
       {
-        $query_station = $v['value'][0];
+        //$query_station = $v['value'][0];
+        $query_stations = $v['value'];
       }
     } 
     // Use query here
     //field_rainfall_measuring
-   // dpm($view);
+   //dpm($view);
    if(count($_REQUEST['field_rainfall_station_nid'])){
       $query = 'SELECT DISTINCT f.field_rainfall_send_time_value, f.entity_id
                     FROM {field_data_field_rainfall_send_time} f ';
@@ -315,10 +308,13 @@ function datalogger_views_pre_render(&$view) {
       $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\' ';
      
       // Set station
-      if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
+      //if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
+      if(count($query_stations)) $query .= '  AND fs.field_rainfall_station_nid IN ('. implode(',', $query_stations) . ')';
       if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.strtotime($time_min) .' AND  f.field_rainfall_send_time_value <= '.strtotime($time_max);
-      $query .= ' GROUP BY f.field_rainfall_send_time_value';
-     // $query .= ' GROUP BY f.field_rainfall_send_time_value';
+      ////$query .= ' GROUP BY f.field_rainfall_send_time_value';     
+      
+      $query .= ' ORDER BY f.field_rainfall_send_time_value ASC, fs.field_rainfall_station_nid ASC';
+      
       //$query .= ' LIMIT  0, 50';
       // Result is returned as a iterable object that returns a stdClass object on each iteration
       $result = db_query($query);
@@ -326,7 +322,7 @@ function datalogger_views_pre_render(&$view) {
       $in_array = array();
       foreach ($result as $record) {
         $in_array[] = $record->entity_id;
-       // dpm($record);
+       //dpm($record);
       }
     }
     else $in_array = array(-1);
@@ -371,7 +367,7 @@ function datalogger_views_pre_render(&$view) {
       $in_array = array();
       foreach ($result as $record) {
         $in_array[] = $record->entity_id;
-       // dpm($record);
+       //pm($record);
       }
     }
     else $in_array = array(-1);
@@ -431,7 +427,7 @@ function datalogger_views_pre_render(&$view) {
     $view->build_info['count_query'] = str_replace($search, 
                                                    $replace, 
                                                $view->build_info['count_query']); */
-                                              // dpm($query);
+                                              //dpm($query);
                 //$query->groupby = array('field_data_field_rainfall_send_time_field_rainfall_send_time');
     global $user;
 		$account = user_load($user->uid);
@@ -526,6 +522,33 @@ function datalogger_views_pre_render(&$view) {
 	
   }
 	
+}
+
+function datalogger_views_post_execute(&$view) {
+  // If there are more than 100 results, show a message that encourages the user
+  // to change the filter settings.
+  // (This action could be performed later in the execution process, but not
+  // earlier.)
+  $data = array();
+  
+  
+  if($view->current_display=='page' && $view->name=='search_rainfall'){
+    //dpm($view->result);
+    $tt = 1;
+    foreach ($view->result as $k => &$result) {
+      $key = $result->field_field_rainfall_station[0]['raw']['nid'] . '-' . $result->field_data_field_rainfall_send_time_field_rainfall_send_time;
+      if (isset($data[$key])) {
+        //unset($view->result[$k]);
+        $view->result[$k]->node_title .= ' trung nhau roi: ' . $key;
+      }
+      else $data[$key] = &$result;
+    }
+    
+    $view->result = array(); // reset $view->result
+    foreach ($data as &$result) {
+      $view->result[] = &$result;
+    }
+  }
 }
 
 /**
