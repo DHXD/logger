@@ -652,14 +652,6 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
   
   $form['stations_fieldset']['selectReport']['#access']=FALSE;
 	
-  /*$form['person']['txtNameQTV']['#access']=FALSE;
-	$form['person']['txtNameNLB']['#access']=FALSE;
-	$form['person']['txtNameKS']['#access']=FALSE;
-	$form['person']['txtNamePT']['#access']=FALSE;
-  */
-	
-  
-	//dpm($form);
   $form["submit"] = array(
       "#type" => "submit",
       "#value" => t("Report"),
@@ -671,21 +663,18 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
 }
 
 function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
-	//module_load_include('inc', 'datalogger', 'datalogger.admin.excel');
+	
 	module_load_include('inc', 'datalogger', 'datalogger.admin.excel.stations.day');
-  //dpm($province);
   $region = $form['stations_fieldset']['selectArea']['#options'][$form_state['values']['selectArea']];
-  //$province = $form['stations_fieldset']['selectProvince']['province']['#options'][$form_state['values']['province']];
+  
   $province = array();
+  
   if(count($form_state['values']['province'])) 
-    foreach($form_state['values']['province'] as $tentinh){  
-    //dpm($tentinh);
+    foreach($form_state['values']['province'] as $tentinh){
     array_push($province, $form['stations_fieldset']['selectProvince']['province']['#options'][$tentinh]);
   }  
-  //dpm($form);
-  //dpm($form_state);
+  
   $station_nids = array();
-  //$station_names = array();
   $sotram = count($form_state['values']['station']);
   
   $nids = array_keys($form['stations_fieldset']['selectStation']['station']['#value']);
@@ -694,14 +683,12 @@ function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
     $station_nids[$i] = $nids[$i];
     
   }
-  //dpm($station_nids);
+  
   $day = new DateTime($form_state['values']['day']);
   $year = $day->format('Y');
   $month = $day->format('m');
   $day = $day->format('Ymd');
   
-  //dpm($form);
-  //dpm($form_state);
   $khang = array(
     'region' => $region,
     'province' => $province,
@@ -712,21 +699,17 @@ function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
   );
   
   $tramdomua = implode(",", $station_nids);
-  //dpm($tramdomua);
   
 	$rainfalls = views_get_view_result('view_rainfall_admin','page', $tramdomua, $day);
-  //dpm($rainfalls);
   
-  //_datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day);
 	if(count($rainfalls) <= 0){
 		drupal_set_message(t('Rainfall stations in the no data to report'),'error');
 	}
 	else{
-		// $args = array($nid, $rainfalls, $name_qtv, $name_nlb, $name_ks, $name_pt);
-		//$args = array($nid, $rainfalls);
-		//_export_excel($args);
     _datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day);
 	}
+  
+  return;
 }
 
 
@@ -850,7 +833,7 @@ function _datalogger_check_inbox() {
   
   $processed = 0;
   
-  $sql = "SELECT * FROM inbox WHERE (Processed=0) AND (ID > 263053) ORDER BY `ID` DESC LIMIT 0,10";
+  $sql = "SELECT * FROM inbox WHERE Processed=0 ORDER BY `ID` DESC LIMIT 0,10";
   
   
   

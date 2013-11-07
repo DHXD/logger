@@ -251,7 +251,11 @@ MANG2;
 		
 		 		map.addOverlay(markers[i]);
 				
-				contentString[i] = '<div style =" width: 200px; height: 100px;z-index: 110;"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 110;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 110; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
+
+
+				contentString[i] = '<div style =" width: 200px; height: 100px"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 751;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 1; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
+
+
 				contentString[i] += '/station/Quảng-Hợp';
 				contentString[i] += '"><b>Trạm ';
 				contentString[i] += station[i].tentram;
@@ -305,7 +309,9 @@ MANG2;
 				contentString[i] += station[i].nid;
 				contentString[i] += '"><b>Thống kê số lương mưa theo bảng</b></a></li><li><a title="Thống kê số lượng mưa theo biểu đồ" href="';
 				contentString[i] += '/manage/chart/rainfalls/';
-        contentString[i] += station[i].nid;
+
+				contentString[i] += station[i].nid;
+
 				contentString[i] += '"><b>Thống kê số lượng mưa theo biểu đồ</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li></ul></div></div></div></div>';
 				  contentString[i] += '';
 			
@@ -316,10 +322,16 @@ MANG2;
 				VEvent.addListener(
 					marker,
 					'mouseover',
-					function(obj){
+					function(obj, latlng){
+						//var position = marker.position();
+						//alert('ad');
 						//console.log('over');
 						//alert('ok');
-						var content = obj.openInfoWindow(contentString[currentIndex]);
+						
+						//obj.openInfoWindow('HELLO');
+						obj.openInfoWindow(contentString[currentIndex]);
+						//infowindow.setContent('<h3>abc</h3>');
+            //infowindow.open(map, marker);
 					}
 				);	
 			}
