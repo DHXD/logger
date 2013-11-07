@@ -1,6 +1,7 @@
 <?php
+/*************************************/
 function _datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day){
-
+  
   error_reporting(0);
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel.php';
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel/IOFactory.php';
@@ -26,13 +27,9 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
       $query .= ' LEFT JOIN {node} n ON n.nid=f.entity_id';
     $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\'  AND n.type=\'rainfall\'';
     $query .= '  AND fs.field_rainfall_station_nid = '. $nid;
-    // month day year
-    /* dpm($day);
-  dpm(substr($day, -2, 2));
-  dpm(substr($day,-4, 2));
-  dpm(substr($day, 0, 4));
-  return; */
-    $time_min = mktime(0,10,0,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));   
+    
+    $time_min = mktime(0,10,0,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
+
     $time_max = mktime(24,00,00,substr($day,-4, 2), substr($day, -2, 2), substr($day, 0, 4));
     
     // Set station
@@ -41,22 +38,28 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
     $query .= ' GROUP BY f.field_rainfall_send_time_value';
     // Result is returned as a iterable object that returns a stdClass object on each iteration
     $result = db_query($query);
-    
-    //dpm($query);return;
-    
+
+    $in_array = array();
+    $hours_miss_sms = array();
+
     $in_array = array();
     foreach ($result as $record) {
+
+      $hour = (int)substr($record->title, -8, 2);
+      $minute = (int)substr($record->title, -5, 2);
+      $second = (int)substr($record->title, -2, 2);
+      if ($hour == 0 && $minute == 0 && $second == 0) continue;     // 00:00:00 ngay hom truoc bo di
+      if ($minute == 0 && $second == 0) $hour--;
+      
+      $hours_miss_sms[$hour] = $record;
+
       $in_array[$record->entity_id] = $record;
       //dpm($day);
     }
-   
     // End Binhnt Code Her
-    
-		//$rainfalls = views_get_view_result('view_rainfall_admin','page', $nid, $day);
-    
     //digi_debug(count($rainfalls), 0, 1);
     
-		if(count(in_array) > 0){
+		if(count($in_array) > 0){
 			foreach($in_array as $rainfall){
         //dpm($rainfall);
 				$hour = (int)substr($rainfall->title, -8, 2);
@@ -81,38 +84,57 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 					$time_rainfall_in_day =0;
 				}
 			}
-			for($i = 23; $i >= 0; $i--){
-				$number_for = count($hours_in_day[$i]);
-				$total_rainfall_in_hour = 0;
-				$time_rainfall_in_hour = 0;
-				$max_rainfall_in_hour = 0; 
-				if($number_for > 0){
-					for($j = 0; $j < $number_for; $j++){
-						$rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value;
-						$total_rainfall_in_hour += $rainfall_measuring;
-						$time_rainfall_in_hour +=10;
-						$max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
-					}
-					$hours_in_day[$i] = array('max_rainfall_in_hour' => $max_rainfall_in_hour, 
-						'total_rainfall_in_hour' => $total_rainfall_in_hour, 
-						'time_rainfall_in_hour' => $time_rainfall_in_hour);
-				}
-				else{
-					$hours_in_day[$i] = array('max_rainfall_in_hour' => 0, 
-						'total_rainfall_in_hour' => 0, 
-						'time_rainfall_in_hour' => 0);
-				}
-				$max_rainfall_in_day = ($max_rainfall_in_day < $hours_in_day[$i]['max_rainfall_in_hour']) ? $hours_in_day[$i]['max_rainfall_in_hour'] : $max_rainfall_in_day; 
+      
+			for($i = 23; $i >= 0; $i--) {
+        
+        $total_rainfall_in_hour = 0;
+        $time_rainfall_in_hour = 0;
+        $max_rainfall_in_hour = 0; 
+        
+        if(!isset($hours_miss_sms[$i])) {
+          $hours_in_day[$i] = array(
+            'max_rainfall_in_hour' => 0, 
+            'total_rainfall_in_hour' => -999,
+            'time_rainfall_in_hour' => 0);
+            
+          //dpm($hours_in_day);
+        }
+        else {    // chuyen class sang so
+          $number_for = count($hours_in_day[$i]);
+          
+          if($number_for > 0){          
+            for($j = 0; $j < $number_for; $j++){
+              
+              $rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value;
+              $total_rainfall_in_hour += $rainfall_measuring;
+              $time_rainfall_in_hour +=10;
+              $max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
+            }
+            $hours_in_day[$i] = array( 
+              'max_rainfall_in_hour' => $max_rainfall_in_hour, 
+              'total_rainfall_in_hour' => $total_rainfall_in_hour, 
+              'time_rainfall_in_hour' => $time_rainfall_in_hour);
+          }
+          else{
+            $hours_in_day[$i] = array( 
+              'max_rainfall_in_hour' => 0, 
+              'total_rainfall_in_hour' => 0, 
+              'time_rainfall_in_hour' => 0);
+          }
+          
+        }
+        $max_rainfall_in_day = ($max_rainfall_in_day < $hours_in_day[$i]['max_rainfall_in_hour']) ? $hours_in_day[$i]['max_rainfall_in_hour'] : $max_rainfall_in_day; 
 			}
 		}
-		else{
+    else{   // khong lay duoc mua
 			for($i = 23; $i >=0; $i--){
-				$hours_in_day[$i] = array('max_rainfall_in_hour' => 0, 
-						'total_rainfall_in_hour' => 0, 
-						'time_rainfall_in_hour' => 0);
+				$hours_in_day[$i] = array(
+          'max_rainfall_in_hour' => 0, 
+          'total_rainfall_in_hour' => -999, 
+          'time_rainfall_in_hour' => 0);
 			}
 		}
-    //dpm($station->title);
+    
 		$stations[]= array(
 			'station_name' => $station->title,
 			'max_total_rainfall_in_day' => $max_total_rainfall_in_day,
@@ -121,7 +143,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 			'hours_in_day' => $hours_in_day
 		);
 	}
-  //print($stations);
+  
 	/*-----------------------------------------------------------------------------------------------------------*/
 	
   $objPHPExcel = new PHPExcel();
@@ -160,14 +182,13 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '0');
 			}
 			$objPHPExcel->getActiveSheet()->mergeCells('A'.($i+7).':B'.($i+8));
-			$objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUM(C'.($i+7).':Z'.($i+7).')');
 		}
 		else{
 			for($j =0; $j < 24; $j++){
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($i+7), '0');
 			}
-			$objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUM(C'.($i+7).':Z'.($i+7).')');
 		}
+    $objPHPExcel->getActiveSheet()->setCellValue('AA'.($i+7), '=SUMIF(C'.($i+7).':Z'.($i+7).',">0")');
 	}
 	
 	
@@ -218,7 +239,9 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 		'bold' => true
 		)
 	);
- 
+
+  $now = getdate();
+
 	for($index = 0; $index < $number*2; $index++){
 		if($index%2 == 0){
 			$objPHPExcel->getActiveSheet()->setCellValue('A'.($index+7), $stations[$index/2]['station_name']);
@@ -229,11 +252,17 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 				$time = $stations[$index/2]['hours_in_day'][$j]['time_rainfall_in_hour'];
         if($time == 0 ) $time = '-';
         
+        if(intval(substr($month, -2)) == intval($now["mon"]) && intval(substr($day, -2, 2)) == intval($now["mday"]) && $j >= intval($now["hours"])) {
+          $total = '';
+          $time = '';
+        }
+
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($index+7),$total);
 				$objPHPExcel->getActiveSheet()->setCellValue(chr(67+$j).($index+8),$time);
 				if($total > 0 && $time > 0){
 					$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($index+7))->applyFromArray($font_bold);
 					$objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($index+8))->applyFromArray($font_bold);
+          $objPHPExcel->getActiveSheet()->getStyle(chr(67+$j).($index+7))->getNumberFormat()->setFormatCode('0.0');
 				}
 			}
 		}
