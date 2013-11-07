@@ -845,7 +845,7 @@ function _datalogger_check_inbox() {
   
   $processed = 0;
   
-  $sql = "SELECT * FROM inbox WHERE (Processed=0) AND ORDER BY `ID` DESC LIMIT 0,10";
+  $sql = "SELECT * FROM inbox WHERE Processed=0 ORDER BY `ID` DESC LIMIT 0,10";
   
   
   
