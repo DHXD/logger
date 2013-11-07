@@ -1411,15 +1411,14 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 
 	$tram_nid = intval(arg(3));
 	if($tram_nid !=''){
-		$tram = node_load($tram_nid);
-		$tentram = $tram->title;
-		$tinh = $tram->field_station_province_city['und'][0]['value'];
-		 $value_select_province = $is_dev ? $tinh : $value_select_province;
+    $tram = node_load($tram_nid);
+    $tentram = $tram->title;
+    $tinh = $tram->field_station_province_city['und'][0]['value'];
+    $value_select_province = $is_dev ? $tinh : $value_select_province;
 
 	}else{
 	
 	}
-	//dpm($tram);
 	
  
   $value_select_month = date('n'); //$is_dev ? '3' : 1;
@@ -1446,7 +1445,6 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 	
 	//$stations = views_get_view_result('view_station_filter_parameter', Null, 	$value_select_area, $value_select_province, 'all');
   $stations = views_get_view_result('view_station_filter_parameter', Null, 	$value_select_area, 'all', 'all');
-  //dpm($stations);
   $station_name = array();
 	foreach($stations as $station){
 		$station_name[$station->nid] = $station->node_title;
