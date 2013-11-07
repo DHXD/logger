@@ -6,6 +6,8 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel.php';
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel/IOFactory.php';
 	module_load_include('inc', 'datalogger', 'datalogger.admin');
+  
+  $co_mua = false;
 
 	$number = count($station_nids);
 	//lay du lieu cua tram
@@ -114,6 +116,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
               'max_rainfall_in_hour' => $max_rainfall_in_hour, 
               'total_rainfall_in_hour' => $total_rainfall_in_hour, 
               'time_rainfall_in_hour' => $time_rainfall_in_hour);
+            $co_mua = true;
           }
           else{
             $hours_in_day[$i] = array( 
@@ -143,6 +146,11 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 			'hours_in_day' => $hours_in_day
 		);
 	}
+  
+  if (!$co_mua) {
+    drupal_set_message(t('Rainfall stations in the no data to report'),'error');
+    return;
+  }
   
 	/*-----------------------------------------------------------------------------------------------------------*/
 	

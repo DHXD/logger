@@ -1,4 +1,5 @@
 <?php
+/*******************/
 $stations = views_get_view_result('list_all_datalogger');
 GLOBAL $station_name;
 $station_name = array();
@@ -698,16 +699,16 @@ function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
     'year' => $year
   );
   
-  $tramdomua = implode(",", $station_nids);
+  /*$tramdomua = implode(",", $station_nids);
   
-	$rainfalls = views_get_view_result('view_rainfall_admin','page', $tramdomua, $day);
+	/*$rainfalls = views_get_view_result('view_rainfall_admin','page', $tramdomua, $day);
   
-	if(count($rainfalls) <= 0){
+	/*if(count($rainfalls) <= 0){
 		drupal_set_message(t('Rainfall stations in the no data to report'),'error');
 	}
-	else{
+	else{*/
     _datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day);
-	}
+	/*}*/
   
   return;
 }

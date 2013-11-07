@@ -1431,6 +1431,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   global $is_dev;
   $is_dev = TRUE;
   
+
 	$tram_nid = intval(arg(3));
 	if($tram_nid !=''){
     $tram = node_load($tram_nid);
@@ -1439,7 +1440,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
     $value_select_province = $is_dev ? $tinh : $value_select_province;
 
 	}else{
-	
+    
 	}
 	
  
@@ -1448,6 +1449,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   if (!$station_name || !is_array($station_name)) $station_name = array();
   $default_station  = $is_dev ? $tram_nid : (isset($form_state['values']['station']) ? $form_state['values']['station']: key($station_name));
   if(arg(4)){
+
     $default_station = arg(4);
     $x= node_load($default_station);
     $value_select_province = $x->field_station_province_city['und'][0]['value'];
@@ -1466,11 +1468,13 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
 	
 	//$stations = views_get_view_result('view_station_filter_parameter', Null, 	$value_select_area, $value_select_province, 'all');
   $stations = views_get_view_result('view_station_filter_parameter', Null, 	$value_select_area, 'all', 'all');
+  
   $station_name = array();
 	foreach($stations as $station){
 		$station_name[$station->nid] = $station->node_title;
 	}
-    
+  asort($station_name);
+  
   global $khuvuc;
   
   
