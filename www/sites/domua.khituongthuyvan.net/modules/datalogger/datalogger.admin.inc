@@ -779,7 +779,6 @@ function _datalogger_node_save_field($nid, $type, $field, $value) {
 //Ham lay thoi gian truyen tin
 
 function _datalogger_update_receive_time($nid, $value){
-
   
 	$node_tram = node_load($nid);
 	$last_value = $node_tram->field_station_report_time['und'][0]['value'];
@@ -793,7 +792,6 @@ function _datalogger_update_receive_time($nid, $value){
 		if($khac > 0 || (arg(3) == 'test')) {	
       
       _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
-
 		}
 	}
 	
@@ -810,7 +808,6 @@ function _datalogger_check_status_30_minutes(){
 	
 	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
-
 		//$rows = views_get_view_result('viet_ban_do');
 		$now = time();
     
@@ -821,7 +818,6 @@ function _datalogger_check_status_30_minutes(){
           
 						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {  
               _datalogger_node_save_field($node->nid, 'station', 'field_station_status', 'station_deactive');
-
             }
 				} else{
         
@@ -831,7 +827,6 @@ function _datalogger_check_status_30_minutes(){
           
           if ($node->field_station_status['und'][0]['value'] != $value) {                      
             _datalogger_node_save_field($node->nid, 'station', 'field_station_status', $value);
-
           }
 
 				}		
@@ -867,7 +862,7 @@ function _datalogger_check_inbox() {
   
   if (!$test_tram) header('Content-Type: text/plain');
   
-  //_datalogger_check_status_30_minutes();
+  _datalogger_check_status_30_minutes();
   
   $output = '';
   
@@ -894,12 +889,9 @@ function _datalogger_check_inbox() {
   
     //Lay thoi gian nhan tin
     
-
-
     $tram_nid = _datalogger_return_nid($number);
     
     watchdog('Thong tin tram',$receiveTime.'-smsID-'.$row->ID.'-Nid-'.$tram_nid);
-
     
     if (!$tram_nid) {
       _datalogger_update_process_inbox(3, $id_inbox);
@@ -985,11 +977,8 @@ function _datalogger_separate_sms_command($sms, $number){
 	if($malenh == 'A:ALARM INTERVAL:'){
 		$stations = views_get_view_result('view_station_find', Null, $number);
 		if(count($stations) >= 1){
-			//$station = node_load($stations[0]->nid);			
-      _datalogger_node_save_field($stations[0]->nid, 'station', 'field_station_alarm', 'alarm_true');
-
-			//$station = node_load($stations[0]->nid);			
-      //_datalogger_node_save_field($station, 'field_station_alarm', 'alarm_true');
+			$station = node_load($stations[0]->nid);			
+      _datalogger_node_save_field($station, 'field_station_alarm', 'alarm_true');
 		}
 	}
 	
