@@ -866,7 +866,7 @@ function _datalogger_check_inbox() {
   
   foreach ($rows as $row) {
     
-    // //tin nh?n t? datalogger
+    // //tin nhan tu datalogger
 		$id_inbox = $row->ID;
 
     //print "Inbox ID: {$row->ID}\n";
@@ -877,9 +877,7 @@ function _datalogger_check_inbox() {
     $smsID = $row->ID;
   
     //Lay thoi gian nhan tin
-    
     $tram_nid = _datalogger_return_nid($number);
-    
     watchdog('Thong tin tram',$receiveTime.'-smsID-'.$row->ID.'-Nid-'.$tram_nid);
     
     if (!$tram_nid) {
@@ -888,41 +886,49 @@ function _datalogger_check_inbox() {
     }
     //$node_tram = node_load($tram_nid);
     
-
+    dpm('1----------'.date('m/d/Y h:i:s a', time()));
     _datalogger_update_receive_time($tram_nid, $receiveTime);
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
+     
       $len_sms = strlen($row->TextDecoded);
-      //X? lý tin nh?n du?c yêu c?u:88byte
+      //Xu ly tin nhan duoc yeu cau:88byte
       
       if($len_sms == 88){
         $output .= "Command.\n";
         
-				//Th?c hi?n chèn b?n tin vào b?ng command
-				_datalogger_separate_sms_command($sms, $number);
-				//C?p nh?t các b?n tin dã x? lý
-				_datalogger_update_process_inbox(1,$id_inbox);
+        //return $output;
         
+				//Thuc hien chen ban tin vao bang command
+				_datalogger_separate_sms_command($sms, $number);
+        
+				//Cap nhat cac ban tin da xu ly
+				_datalogger_update_process_inbox(1,$id_inbox);
+        //return $output;
       }
-      //X? lý b?n tin do mua t? d?ng:140byte
+      //Xu ly ban tin do mua tu dong:140byte
       elseif($len_sms == 140) {
         
         $output .= "Rain.\n";
-      
+        //return $output;
+        
         switch ($number) {
 	
           default:
-            // Chèn b?n tin vào b?ng do mua
+            // Chèn ban tin vào bang do mua
             // dsm('into 140');
             if (!$test_tram)
               _datalogger_separate_sms($sms,$number, $id_inbox);
+            dpm('2----------'.date('m/d/Y h:i:s a', time()));  
             
-            // C?p nh?t các b?n tin dã x? lý
+            // Cap nhat cac ban tin da xu ly
             _datalogger_update_process_inbox(1, $id_inbox);
-            
+            dpm('3----------'.date('m/d/Y h:i:s a', time())); 
             
             //Xuat file txt tu dong
 						//_datalogger_
+            
+            //Tam thoi bo qua
             _datalogger_ftp_txt_export_inc($tram_nid);
           }
       }			
@@ -934,10 +940,13 @@ function _datalogger_check_inbox() {
 		else{
 			_datalogger_update_process_inbox(2, $id_inbox);
 		}
-    flush (); // flush the output buffer
+    
+   dpm('4----------'.date('m/d/Y h:i:s a', time()));
+   //return  $output;
+    //flush (); // flush the output buffer
   }
-	
-  return 'Ok';
+	dpm('5----------'.date('m/d/Y h:i:s a', time()));
+  return  $output;
   
   print "Ok.";
   
