@@ -107,6 +107,7 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 					$time_rainfall_in_day =0;
 				}
 			}
+      
       for($i = 0; $i <=23; $i++) {
 				$number = count($hours_in_day[$i]);
      
@@ -742,5 +743,3 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   
   drupal_exit();
 }
-////////////////////////
-
