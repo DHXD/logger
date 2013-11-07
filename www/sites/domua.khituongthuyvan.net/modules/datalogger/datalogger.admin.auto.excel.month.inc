@@ -316,9 +316,9 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
       
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(66+$j).($day+8),$total);
       
-      // if($total > 0) {
-        // $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j).($day+8))->getNumberFormat()->setFormatCode('0.0');
-      // }
+      if($total > 0) {
+        $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j).($day+8))->getNumberFormat()->setFormatCode('0.0');
+      }
 		}
 		$day_in_month++;
 	}
@@ -416,12 +416,14 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
       }
       
 			$objPHPExcel->getActiveSheet()->setCellValue(chr(65+$j-14).($day+8),$total);
-      
-      // if($total > 0) {
-        // $objPHPExcel->getActiveSheet()->getStyle(chr(66+$j-11).($day+8))->getNumberFormat()->setFormatCode('0.0');
-      // }
-      
 		}
+    
+    for($j = 0; $j <= 12; $j++) {
+      if($total > 0) {
+        $objPHPExcel->getActiveSheet()->getStyle(chr(65+$j).($day+8))->getNumberFormat()->setFormatCode('0.0');
+      }
+    }
+    
 		$day_in_month++;
 	}
   
