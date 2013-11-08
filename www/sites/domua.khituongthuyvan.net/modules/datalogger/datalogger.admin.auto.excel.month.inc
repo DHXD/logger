@@ -60,7 +60,9 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
       $day--;
       if ($day <1 ) continue;
       $record->title = sprintf("%02d/%02d/%04d 23:60:00", $day, $month, $year);
-    }     
+    }
+    
+    if ($minute == 0 && $second == 0) $hour--;
     
     if (!isset($in_array[$day])) $in_array[$day] = array();
     $in_array[$day][$record->entity_id] = $record;
@@ -68,16 +70,10 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
     $day_miss_sms[$day] = $record;
     $rainfall_in_ten_minutes[$day]["$hour-$minute"] = $record->field_rainfall_measuring_value ;
   }
-  //dpm($in_array); return;
+  
 	for($day = 1; $day <= $month_days_number; $day++){
-    
-    $dem_luong_mua_trong_dot[$day-1] = array();
 	
 		$day_time = ($day) < 10 ? '0'.($day) : $day;
-		
-		$max_rainfall_in_day = 0;
-		$max_total_rainfall_in_day = 0;
-		$max_total_time_rainfall_in_day = 0;
 		$hours_in_day = array();
     $month_day = $month.$day_time;
     
@@ -93,77 +89,52 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
           if($hour == 0) $hour = '23';
           else $hour -=1;
         }
-        array_push($dem_luong_mua_trong_dot[$day-1],0);
 				$rainfall_measuring = (float)$rainfall->field_rainfall_measuring_value;
         
 				if($rainfall_measuring > 0){
-          $vitri = count($dem_luong_mua_trong_dot[$day-1]);
-          $dem_luong_mua_trong_dot[$day-1][$vitri] = $rainfall_measuring;
 					$hours_in_day[$hour][] = $rainfall;
 					$total_rainfall_in_day += $rainfall_measuring;
-					$time_rainfall_in_day +=10;
-					$max_total_time_rainfall_in_day = ($max_total_time_rainfall_in_day < $time_rainfall_in_day) ? $time_rainfall_in_day:$max_total_time_rainfall_in_day;
-					$max_total_rainfall_in_day = ($max_total_rainfall_in_day < $total_rainfall_in_day) ? $total_rainfall_in_day :$max_total_rainfall_in_day;
 				}
 				else{
 					$total_rainfall_in_day = 0;
-					$time_rainfall_in_day =0;
 				}
 			}
       
 			for($i = 0; $i <= 23; $i++) {
-				$number = count($hours_in_day[$i]);
 				$total_rainfall_in_hour = 0;
-				$time_rainfall_in_hour = 0;
-				$max_rainfall_in_hour = 0; 
         
         if(!isset($hours_miss_sms[$day][$i])) {
           $hours_in_day[$i] = array(
-            'max_rainfall_in_hour' => 0, 
 						'total_rainfall_in_hour' => -999,
-						'time_rainfall_in_hour' => 0);
         }
-        
-        foreach($in_array[$day] as $miss_sms) {
-          $minute = (int)substr($miss_sms->title, -5, 2);
-          $second = (int)substr($miss_sms->title, -2, 2);
-          if($minute == 0 && $second == 0 && !isset($hours_miss_sms[$day][$i])){
-            $hours_in_day[$i - 1] = array(
-              'max_rainfall_in_hour' => 0, 
-              'total_rainfall_in_hour' => -999,
-              'time_rainfall_in_hour' => 0);
+        else {
+          $number = count($hours_in_day[$i]);
+          if($number > 0){
+            for($j = 0; $j < $number; $j++){
+              $rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value ;
+              $total_rainfall_in_hour += $rainfall_measuring;
+            }
+            $hours_in_day[$i] = array(
+              'total_rainfall_in_hour' => $total_rainfall_in_hour, 
+          
           }
-        }
-        
-				if($number > 0){
-					for($j = 0; $j < $number; $j++){
-						$rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value ;
-						$total_rainfall_in_hour += $rainfall_measuring;
-						$time_rainfall_in_hour +=10;
-						$max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
-					}
-					$hours_in_day[$i] = array('max_rainfall_in_hour' => $max_rainfall_in_hour, 
-						'total_rainfall_in_hour' => $total_rainfall_in_hour, 
-						'time_rainfall_in_hour' => $time_rainfall_in_hour);
+          else {
+            $hours_in_day[$i] = array( 
+              'total_rainfall_in_hour' => 0,
+          }          
 				}
 			}
       
 		}
-		
-    $max_rainfall_in_day = $hours_in_day[0]['total_rainfall_in_hour'];
-    $max_time_in_hours = $hours_in_day[0]['time_rainfall_in_hour'];
-    for($i=0; $i < 24; $i++){
-      if($hours_in_day[$i]['total_rainfall_in_hour'] >= $max_rainfall_in_day){
-        $max_rainfall_in_day = $hours_in_day[$i]['total_rainfall_in_hour'];
-        $max_time_in_hours = $hours_in_day[$i]['time_rainfall_in_hour'];
-      }
+    else { // Khong lay duoc mua
+      for($i = 23; $i >=0; $i--){
+				$hours_in_day[$i] = array(
+          'total_rainfall_in_hour' => -999, 
+			}
     }
-    
-		$day_of_month[$day]= array('max_total_rainfall_in_day' => $max_total_rainfall_in_day,
-			'max_total_time_rainfall_in_day' => $max_total_time_rainfall_in_day, 
-			'max_rainfall_in_day' => $max_rainfall_in_day,
+		
+		$day_of_month[$day]= array(
 			'hours_in_day' => $hours_in_day,
-      'max_total_time_in_hours' => $max_time_in_hours
       );
 	}
   
