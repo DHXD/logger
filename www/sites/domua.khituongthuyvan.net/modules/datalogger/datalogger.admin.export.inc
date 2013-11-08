@@ -9,7 +9,6 @@ function _datalogger_ftp_export() {
   
   $content_type = "station";
   $all_nodes = node_load_multiple(array(), array('type' => $content_type));
-  //dpm($all_nodes);
   
   foreach($all_nodes as $station)  {
     $operations[] = array("_datalogger_ftp_txt", array( $station->nid));
@@ -33,30 +32,28 @@ function _datalogger_ftp_export() {
 }
 
 function _datalogger_ftp_txt_export_inc($tram) {
-
+//function _datalogger_ftp_txt_export_inc() {
+  //$tram = 2961; // Hoa thanh.
   $query_station = $tram;
   
-  dpm('3.1----------'.date('m/d/Y h:i:s a', time())); 
-  
   $node_station = node_load($query_station);
-  
-  dpm('3.2----------'.date('m/d/Y h:i:s a', time())); 
   
   $ten = $node_station->title;
   $matram = $node_station->field_station_code['und'][0]['value'];
   $ten_tinh = $node_station->field_station_province_city['und'][0]['value'];
   
   $tinh = array(
-    "kom_tum" =>36,
-    "giai_lai" => 38,
-    "dak_lak" => 40,
-    "lam_dong" => 42,
-    "dak_nong" =>63,
+    "quang_binh" =>31,
+    "quang_tri" => 32,
+    "thua_thien_hue" => 33,
+    "da_nang" => 04,
+    "quang_nam" =>34,
+    "quang_ngai" =>35, 
     );
   
   $matinh = $tinh[$ten_tinh];
   
-  // $d = 13; $m = 10; $y = 2013;
+  //$d = 6; $m = 11; $y = 2013;
   $now = getdate();
   $h = $now["hours"];
   $d = $now["mday"]; $m = $now["mon"]; $y = $now["year"];
@@ -66,9 +63,6 @@ function _datalogger_ftp_txt_export_inc($tram) {
   $time_min = yesterday_time($d_min, $m_min, $y_min)->format('Y-m-d') . "  19:00";
   $time_max = tomorow_time($d, $m, $y)->format('Y-m-d') . "  00:00";
   
-  //$time_min = "2013-08-{$d_1} 19:00";
-  //$time_max = sprintf("2013-%02d-%02d  00:00", $m, $d_2);
-  
   $query = 'SELECT DISTINCT f.field_rainfall_send_time_value, f.entity_id
                 FROM {field_data_field_rainfall_send_time} f ';
   $query .= ' LEFT JOIN {field_data_field_rainfall_station} fs ON fs.entity_id=f.entity_id';
@@ -77,7 +71,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
   // Set station
   if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
   if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.strtotime($time_min) .
-                                                      ' AND  f.field_rainfall_send_time_value <= '.strtotime($time_max);
+                                                   ' AND  f.field_rainfall_send_time_value <= '.strtotime($time_max);
   $query .= ' GROUP BY f.field_rainfall_send_time_value';
  
   // Result is returned as a iterable object that returns a stdClass object on each iteration
@@ -87,21 +81,15 @@ function _datalogger_ftp_txt_export_inc($tram) {
   foreach ($result as $record) {
     $in_array[] = $record->entity_id;
   }
-
-  dpm('3.3----------'.date('m/d/Y h:i:s a', time())); 
   
   $nodes = node_load_multiple($in_array);
   
-  dpm('3.4----------'.date('m/d/Y h:i:s a', time())); 
-  /////return;
-  //dpm($nodes);
-  
   $a = array();
-  $nodes_query_title = array();
+  //$nodes_query_title = array();
   $sms_id = array();
   foreach ($nodes as &$node) {
     $a[$node->title] = &$node;
-    $nodes_query_title[$node->title] = 1;
+    //$nodes_query_title[$node->title] = 1;
     if(isset($node->field_rainfall_sms_id['und'][0]['value'])) {
       $sms_id[]  = $node->field_rainfall_sms_id['und'][0]['value'];
     }
@@ -120,13 +108,12 @@ function _datalogger_ftp_txt_export_inc($tram) {
     $sms[$r->ID] = $r->TextDecoded;
   }
   
-  $dpm = array();
+  // $dpm = array();
   
   $ten = convert_vi_to_en($ten);
   
-  $out = "\n\n\n";
-  $out .= "$matram    $ten\r\n\n";
-  $out .= " Time   Obs   R24h   R19h   RnOb      Batt         R10p..\r\n";
+  $out .= sprintf("%06d %s\r\n", $matram, $ten);
+  //$out .= " Time   Obs   R24h   R19h   RnOb      Batt         R10p..\r\n";
   
   $rain = array();
   $RnOb = 0;
@@ -138,7 +125,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
   
   for($i = 1 - 5; $i <=24; $i++) {
   
-    if ($i == 0)  $out .= "\r\n";   // begin
+    //if ($i == 0)  $out .= "\r\n";   // begin
   
     //$d_ = $i < 0 ? $d_1 : $d;    // ngay hom truoc, xem lai...
     if($i < 0) {
@@ -180,10 +167,16 @@ function _datalogger_ftp_txt_export_inc($tram) {
     {
       $R19h = $R19h + $RnOb;
     }
-    else {$R19h = 0;}
+    if($i == 20) {
+      $R19h = 0;
+      $R19h = $R19h + $RnOb;
+    }
+    if($i > 20) {
+      $R19h = $R19h + $RnOb;
+    }
     
-    if( $i >0) {
-      $out .= sprintf("%02d:00%5d", $hour, "60");
+    if( $i == $h) {
+      $out .= sprintf("%04d%02d%02d%02d0000%5d", $y, $m, $d, $h, "60");
       $out .= sprintf("%7d", $R24h);
       $out .= sprintf("%7d", $R19h);
       $out .= sprintf("%7d", $RnOb);
@@ -191,13 +184,12 @@ function _datalogger_ftp_txt_export_inc($tram) {
       $out .= sprintf("%10d%10d%10d%10d%10d%10d\r\n", $rain[0], $rain[1], $rain[2], $rain[3], $rain[4], $rain[5]);
     }
     
-    $dpm[$time]  = $node ? $node->title : '(null)';
+    // $dpm[$time]  = $node ? $node->title : '(null)';
   }
   dpm($out);
-  $file_name = creat_folder($matinh, $matram, $y, $m, $d);
-  write_to_text($out, $matram, $y, $m, $d, $h, $file_name);
+  $file_path = creat_folder($matinh, $matram, $y, $m, $d);
+  write_to_text($out, $matram, $y, $m, $d, $h, $file_path);
   
-  return '123';
   drupal_set_message('Xuat du lieu xong tram ' . $ten);
   }
 
@@ -220,22 +212,22 @@ function convert_vi_to_en($str) {
   return $str;
 }
 
-function write_to_text($str,$matram, $year, $month, $day, $hour, $path)  {
+function write_to_text($str,$matram, $year, $month, $day, $hour, $file_path)  {
   
   $file_name = sprintf("%06d_%4d-%02d-%02d-%02d.00.00", $matram, $year, $month, $day, $hour +1);
-  $file = fopen($path . "\\" . $file_name .".txt", 'w');
+  $file = fopen($file_path . "\\" . $file_name .".txt", 'w');
   //dpm($file_name);
   fwrite($file, $str);
   fclose($file);
 }
 
 function creat_folder($matinh, $matram, $year, $month, $day) {
-  $file_name = sprintf("F:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
+  $file_path = sprintf("E:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
   
-  if(!file_exists($file_name)) {
-    mkdir($file_name, 0700, TRUE);
+  if(!file_exists($file_path)) {
+    mkdir($file_path, 0700, true);
   }
-  return $file_name;
+  return $file_path;
 }
 
 function yesterday_time($d, $m, $y) {
