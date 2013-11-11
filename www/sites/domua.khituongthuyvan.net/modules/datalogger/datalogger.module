@@ -83,6 +83,18 @@ function _datalogger_views_exposed_form_bieu_do_luong_mua_validate(&$form, &$for
 function datalogger_form_alter(&$form, &$form_state, &$form_id){
 	global $user,$admin_khuvuc;
 	$path = current_path();
+  // ------------ cadic
+  //dpm($form);
+	if(!in_array('administrator', array_values($user->roles)) || TRUE){
+		if($form_id = 'views_exposed_form'){
+			if($form['#id'] == 'views-exposed-form-search-rainfall-page'){
+        dpm($form);
+        $form['field_station_province_city_value']['#default_value'] = 'Thừa Thiên - Huế';
+        dpm($form['field_station_province_city_value']['#default_value']);
+      }
+     }
+   }  
+  //<--- end cadic
 	//$path_alias = drupal_lookup_path('alias',$path);
 	//drupal_set_message('_form_alter: '.$user->uid.'-'.$user->name.'-'.$form_id.'-'.$path.'</br>');
 	//back page: header( 'Location: '.$_SERVER['HTTP_REFERER']); 
@@ -178,7 +190,7 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
 							$form['#id'] == 'views-exposed-form-view-rainfall-chart-hour-page' ||//bieu do theo gio
 							$form['#id'] == 'views-exposed-form-rainfall-chart-page'){//bieu do theo op
               */              
-								drupal_add_js(drupal_get_path('module', 'datalogger').'/list_station_follow_province.js');
+							//	drupal_add_js(drupal_get_path('module', 'datalogger').'/list_station_follow_province.js');
 								//$form['field_rainfall_station_nid']['#options'] = $stations_view;
 					//}
 					
@@ -1122,6 +1134,9 @@ function _datalogger_menu_access_callback_command() {
 function _datalogger_menu_access_callback_manage_data() {
   return user_access('manage data')|| user_access('khuvucbactrungbo')|| user_access('khuvuctrungtrungbo')|| user_access('khuvucnamtrungbo')|| user_access('khuvucnambo')|| user_access('khuvuctaynguyen');
 }
+/**
+ * alter form (). cadic <----------
+ */
 
 /**
  * Implements hook_permission().
@@ -1390,7 +1405,7 @@ function _datalogger_select_area_province_station(&$form, &$form_state) {
   
   $module_path = drupal_get_path('module', 'datalogger');
   
-  drupal_add_js($module_path . '/list_station_follow_province.js');
+  //drupal_add_js($module_path . '/list_station_follow_province.js');
   
   
   $form['stations_fieldset'] = array(
