@@ -466,8 +466,12 @@ MANG2;
 			map.setCenter(new VLatLng(lat,lon),8);
 			markers[feature.contentString].openInfoWindow(contentString[feature.contentString]);				
 		}
+		
+		
+		
 MANG2;
-
+		
+		
 	$s.="}";
 	
 	drupal_add_js( <<< EEE
@@ -489,9 +493,17 @@ EEE
 		<input type="button" id="olvm-search-btn" name="olvm-search-btn" value="Tìm kiếm" class="form-submit">
 	</div>
   <div id="container" style="height:500px; width:930px;position:relative; margin:10px; border:1px #b1c4d5 solid;"></div>
-  <div id"test"></div>
+  <style type="text/css">
+		.dragmarker {
+			display:none;
+		}
+		#container_InfoWindow >.dragmap {
+			display:none;
+		}
+	</style>
   <script>
     loadMap();
+		
   </script>
   
 ABC;
