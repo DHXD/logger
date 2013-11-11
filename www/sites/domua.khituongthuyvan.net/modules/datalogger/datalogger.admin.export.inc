@@ -46,12 +46,6 @@ function _datalogger_ftp_txt_export_inc($tram) {
     "thanh_hoa" =>28,
     "nghe_an" => 29,
     "ha_tinh" => 30,
-    "quang_binh" =>31,
-    "quang_tri" => 32,
-    "thua_thien_hue" => 33,
-    "da_nang" => 04,
-    "quang_nam" =>34,
-    "quang_ngai" =>35,
     );
   
   $matinh = $tinh[$ten_tinh];
