@@ -6,6 +6,8 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel.php';
   require_once 'sites/all/libraries/PHPExcel/Classes/PHPExcel/IOFactory.php';
 	module_load_include('inc', 'datalogger', 'datalogger.admin');
+  
+  $co_mua = false;
 
 	$number = count($station_nids);
 	//lay du lieu cua tram
@@ -57,7 +59,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
       //dpm($day);
     }
     // End Binhnt Code Her
-    //digi_debug(count($rainfalls), 0, 1);
     
 		if(count($in_array) > 0){
 			foreach($in_array as $rainfall){
@@ -114,6 +115,7 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
               'max_rainfall_in_hour' => $max_rainfall_in_hour, 
               'total_rainfall_in_hour' => $total_rainfall_in_hour, 
               'time_rainfall_in_hour' => $time_rainfall_in_hour);
+            $co_mua = true;
           }
           else{
             $hours_in_day[$i] = array( 
@@ -121,7 +123,6 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
               'total_rainfall_in_hour' => 0, 
               'time_rainfall_in_hour' => 0);
           }
-          
         }
         $max_rainfall_in_day = ($max_rainfall_in_day < $hours_in_day[$i]['max_rainfall_in_hour']) ? $hours_in_day[$i]['max_rainfall_in_hour'] : $max_rainfall_in_day; 
 			}
@@ -140,9 +141,14 @@ function _datalogger_export_rainfall_station_day_excel($region, $province, $stat
 			'max_total_rainfall_in_day' => $max_total_rainfall_in_day,
 			'max_total_time_rainfall_in_day' => $max_total_time_rainfall_in_day, 
 			'max_rainfall_in_day' => $max_rainfall_in_day,
-			'hours_in_day' => $hours_in_day
-		);
+			'hours_in_day' => $hours_in_day);
 	}
+  
+  /*
+  if (!$co_mua) {
+    drupal_set_message(t('Rainfall stations in the no data to report'),'error');
+    return;
+  }*/
   
 	/*-----------------------------------------------------------------------------------------------------------*/
 	

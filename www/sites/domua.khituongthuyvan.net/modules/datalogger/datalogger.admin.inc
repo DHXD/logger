@@ -1,4 +1,5 @@
 <?php
+/*******************/
 $stations = views_get_view_result('list_all_datalogger');
 GLOBAL $station_name;
 $station_name = array();
@@ -652,14 +653,6 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
   
   $form['stations_fieldset']['selectReport']['#access']=FALSE;
 	
-  /*$form['person']['txtNameQTV']['#access']=FALSE;
-	$form['person']['txtNameNLB']['#access']=FALSE;
-	$form['person']['txtNameKS']['#access']=FALSE;
-	$form['person']['txtNamePT']['#access']=FALSE;
-  */
-	
-  
-	//dpm($form);
   $form["submit"] = array(
       "#type" => "submit",
       "#value" => t("Report"),
@@ -671,21 +664,18 @@ function _datalogger_report_rainfall_day_form($form, &$form_state){
 }
 
 function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
-	//module_load_include('inc', 'datalogger', 'datalogger.admin.excel');
+	
 	module_load_include('inc', 'datalogger', 'datalogger.admin.excel.stations.day');
-  //dpm($province);
   $region = $form['stations_fieldset']['selectArea']['#options'][$form_state['values']['selectArea']];
-  //$province = $form['stations_fieldset']['selectProvince']['province']['#options'][$form_state['values']['province']];
+  
   $province = array();
+  
   if(count($form_state['values']['province'])) 
-    foreach($form_state['values']['province'] as $tentinh){  
-    //dpm($tentinh);
+    foreach($form_state['values']['province'] as $tentinh){
     array_push($province, $form['stations_fieldset']['selectProvince']['province']['#options'][$tentinh]);
   }  
-  //dpm($form);
-  //dpm($form_state);
+  
   $station_nids = array();
-  //$station_names = array();
   $sotram = count($form_state['values']['station']);
   
   $nids = array_keys($form['stations_fieldset']['selectStation']['station']['#value']);
@@ -694,14 +684,12 @@ function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
     $station_nids[$i] = $nids[$i];
     
   }
-  //dpm($station_nids);
+  
   $day = new DateTime($form_state['values']['day']);
   $year = $day->format('Y');
   $month = $day->format('m');
   $day = $day->format('Ymd');
   
-  //dpm($form);
-  //dpm($form_state);
   $khang = array(
     'region' => $region,
     'province' => $province,
@@ -711,22 +699,18 @@ function _datalogger_report_rainfall_day_form_submit(&$form, &$form_state) {
     'year' => $year
   );
   
-  $tramdomua = implode(",", $station_nids);
-  //dpm($tramdomua);
+  /*$tramdomua = implode(",", $station_nids);
   
-	$rainfalls = views_get_view_result('view_rainfall_admin','page', $tramdomua, $day);
-  //dpm($rainfalls);
+	/*$rainfalls = views_get_view_result('view_rainfall_admin','page', $tramdomua, $day);
   
-  //_datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day);
-	if(count($rainfalls) <= 0){
+	/*if(count($rainfalls) <= 0){
 		drupal_set_message(t('Rainfall stations in the no data to report'),'error');
 	}
-	else{
-		// $args = array($nid, $rainfalls, $name_qtv, $name_nlb, $name_ks, $name_pt);
-		//$args = array($nid, $rainfalls);
-		//_export_excel($args);
+	else{*/
     _datalogger_export_rainfall_station_day_excel($region, $province, $station_nids, $year, $month, $day);
-	}
+	/*}*/
+  
+  return;
 }
 
 
@@ -767,6 +751,7 @@ function _datalogger_convert_number($number){
 
 function _datalogger_node_save_field($nid, $type, $field, $value) {
 
+
   $n = new stdClass();
   $n->nid = $nid;
   $n->type = $type;
@@ -774,6 +759,7 @@ function _datalogger_node_save_field($nid, $type, $field, $value) {
   field_attach_presave('node', $n);
   field_attach_update('node', $n);
   node_load($nid, NULL, TRUE);      // reset
+
 
 }
 //Ham lay thoi gian truyen tin
@@ -794,6 +780,7 @@ function _datalogger_update_receive_time($nid, $value){
       _datalogger_node_save_field($nid, 'station', 'field_station_report_time', $value);
 		}
 	}
+
 	
 }
 
@@ -805,6 +792,7 @@ function _datalogger_update_receive_time($nid, $value){
 
 
 function _datalogger_check_status_30_minutes(){
+
 	
 	$content_type = "station";
   	$all_nodes = node_load_multiple(array(), array('type' => $content_type));
@@ -817,6 +805,7 @@ function _datalogger_check_status_30_minutes(){
 				if($node->field_station_report_time['und'][0]['value'] ==''){
           
 						if ($node->field_station_status['und'][0]['value'] != 'station_deactive') {  
+
               _datalogger_node_save_field($node->nid, 'station', 'field_station_status', 'station_deactive');
             }
 				} else{
@@ -877,7 +866,7 @@ function _datalogger_check_inbox() {
   
   foreach ($rows as $row) {
     
-    // //tin nh?n t? datalogger
+    // //tin nhan tu datalogger
 		$id_inbox = $row->ID;
 
     //print "Inbox ID: {$row->ID}\n";
@@ -888,9 +877,7 @@ function _datalogger_check_inbox() {
     $smsID = $row->ID;
   
     //Lay thoi gian nhan tin
-    
     $tram_nid = _datalogger_return_nid($number);
-    
     watchdog('Thong tin tram',$receiveTime.'-smsID-'.$row->ID.'-Nid-'.$tram_nid);
     
     if (!$tram_nid) {
@@ -899,41 +886,49 @@ function _datalogger_check_inbox() {
     }
     //$node_tram = node_load($tram_nid);
     
-
+    dpm('1----------'.date('m/d/Y h:i:s a', time()));
     _datalogger_update_receive_time($tram_nid, $receiveTime);
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
+     
       $len_sms = strlen($row->TextDecoded);
-      //X? lý tin nh?n du?c yêu c?u:88byte
+      //Xu ly tin nhan duoc yeu cau:88byte
       
       if($len_sms == 88){
         $output .= "Command.\n";
         
-				//Th?c hi?n chèn b?n tin vào b?ng command
-				_datalogger_separate_sms_command($sms, $number);
-				//C?p nh?t các b?n tin dã x? lý
-				_datalogger_update_process_inbox(1,$id_inbox);
+        //return $output;
         
+				//Thuc hien chen ban tin vao bang command
+				_datalogger_separate_sms_command($sms, $number);
+        
+				//Cap nhat cac ban tin da xu ly
+				_datalogger_update_process_inbox(1,$id_inbox);
+        //return $output;
       }
-      //X? lý b?n tin do mua t? d?ng:140byte
+      //Xu ly ban tin do mua tu dong:140byte
       elseif($len_sms == 140) {
         
         $output .= "Rain.\n";
-      
+        //return $output;
+        
         switch ($number) {
 	
           default:
-            // Chèn b?n tin vào b?ng do mua
+            // Chèn ban tin vào bang do mua
             // dsm('into 140');
             if (!$test_tram)
               _datalogger_separate_sms($sms,$number, $id_inbox);
+            dpm('2----------'.date('m/d/Y h:i:s a', time()));  
             
-            // C?p nh?t các b?n tin dã x? lý
+            // Cap nhat cac ban tin da xu ly
             _datalogger_update_process_inbox(1, $id_inbox);
-            
+            dpm('3----------'.date('m/d/Y h:i:s a', time())); 
             
             //Xuat file txt tu dong
 						//_datalogger_
+            
+            //Tam thoi bo qua
             _datalogger_ftp_txt_export_inc($tram_nid);
           }
       }			
@@ -945,10 +940,13 @@ function _datalogger_check_inbox() {
 		else{
 			_datalogger_update_process_inbox(2, $id_inbox);
 		}
-    flush (); // flush the output buffer
+    
+   dpm('4----------'.date('m/d/Y h:i:s a', time()));
+   //return  $output;
+    //flush (); // flush the output buffer
   }
-	
-  return 'Ok';
+	dpm('5----------'.date('m/d/Y h:i:s a', time()));
+  return  $output;
   
   print "Ok.";
   
@@ -977,8 +975,8 @@ function _datalogger_separate_sms_command($sms, $number){
 	if($malenh == 'A:ALARM INTERVAL:'){
 		$stations = views_get_view_result('view_station_find', Null, $number);
 		if(count($stations) >= 1){
-			$station = node_load($stations[0]->nid);			
-      _datalogger_node_save_field($station, 'field_station_alarm', 'alarm_true');
+			//$station = node_load($stations[0]->nid);			
+      _datalogger_node_save_field($stations[0]->nid, 'station', 'field_station_alarm', 'alarm_true');
 		}
 	}
 	

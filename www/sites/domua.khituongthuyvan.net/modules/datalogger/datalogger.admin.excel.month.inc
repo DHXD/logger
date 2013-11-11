@@ -1,5 +1,6 @@
 <?php
 
+// BKT14
 function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_state){
 
   //error_reporting(E_ALL ^ E_NOTICE);
@@ -61,10 +62,13 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
       if ($day <1 ) continue;
       $record->title = sprintf("%02d/%02d/%04d 23:60:00", $day, $month, $year);
     }
+    if ($minute == 0 && $second == 0) $hour--;
+    
     if (!isset($in_array[$day])) $in_array[$day] = array();
     $in_array[$day][$record->entity_id] = $record;
     $hours_miss_sms[$day][$hour] = $record;
   }
+  
   $time_rainfall_last = $record;
   
 	for($day = 1; $day <= $month_days_number; $day++){
@@ -86,8 +90,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 				$hour = (int)substr($rainfall->title, -8, 2);
         $minute = (int)substr($rainfall->title, -5, 2);
         $second = (int)substr($rainfall->title, -2, 2);
-        if($minute == 0 && $second == 0){
-          if($hour == 0) $hour = '23';
+        if($minute == '00' && $second == '00'){
+          if($hour == '00') $hour = '23';
           else $hour -=1;
         }
         array_push($dem_luong_mua_trong_dot[$day-1],0);
@@ -107,7 +111,8 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 					$time_rainfall_in_day =0;
 				}
 			}
-      for($i = 0; $i <=23; $i++) {
+      
+      for($i = 0; $i <= 23; $i++) {
 				$number = count($hours_in_day[$i]);
      
         $total_rainfall_in_hour = 0;
@@ -120,31 +125,38 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 						'total_rainfall_in_hour' => -999,
 						'time_rainfall_in_hour' => 0);
         }
-        
-        foreach($in_array[$day] as $miss_sms) {
-          $minute = (int)substr($miss_sms->title, -5, 2);
-          $second = (int)substr($miss_sms->title, -2, 2);
-          if($minute == 0 && $second == 0 && !isset($hours_miss_sms[$day][$i])){
-            $hours_in_day[$i - 1] = array(
+        else {
+          $number = count($hours_in_day[$i]);
+          if($number > 0){
+            for($j = 0; $j < $number; $j++){
+              $rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value ;
+              $total_rainfall_in_hour += $rainfall_measuring;
+              $time_rainfall_in_hour += 10;
+              $max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
+            }
+            $hours_in_day[$i] = array(
+              'max_rainfall_in_hour' => $max_rainfall_in_hour, 
+              'total_rainfall_in_hour' => $total_rainfall_in_hour, 
+              'time_rainfall_in_hour' => $time_rainfall_in_hour);
+          }
+          else {
+            $hours_in_day[$i] = array( 
               'max_rainfall_in_hour' => 0, 
-              'total_rainfall_in_hour' => -999,
+              'total_rainfall_in_hour' => 0, 
               'time_rainfall_in_hour' => 0);
           }
         }
-        
-				if($number > 0){
-					for($j = 0; $j < $number; $j++){
-						$rainfall_measuring = (float)$hours_in_day[$i][$j]->field_rainfall_measuring_value ;
-						$total_rainfall_in_hour += $rainfall_measuring;
-						$time_rainfall_in_hour += 10;
-						$max_rainfall_in_hour = ($max_rainfall_in_hour < $rainfall_measuring) ? $rainfall_measuring : $max_rainfall_in_hour; 
-					}
-					$hours_in_day[$i] = array('max_rainfall_in_hour' => $max_rainfall_in_hour, 
-						'total_rainfall_in_hour' => $total_rainfall_in_hour, 
-						'time_rainfall_in_hour' => $time_rainfall_in_hour);
-				}
+        $max_rainfall_in_day = ($max_rainfall_in_day < $hours_in_day[$i]['max_rainfall_in_hour']) ? $hours_in_day[$i]['max_rainfall_in_hour'] : $max_rainfall_in_day; 
 			}
 		}
+    else { // Khong lay duoc mua
+      for($i = 23; $i >=0; $i--){
+				$hours_in_day[$i] = array(
+          'max_rainfall_in_hour' => 0, 
+          'total_rainfall_in_hour' => -999, 
+          'time_rainfall_in_hour' => 0);
+			}
+    }
     
     $max_rainfall_in_day = $hours_in_day[0]['total_rainfall_in_hour'];
     $max_time_in_hours = $hours_in_day[0]['time_rainfall_in_hour'];
@@ -160,16 +172,17 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
 			'max_total_time_rainfall_in_day' => $max_total_time_rainfall_in_day, 
 			'max_rainfall_in_day' => $max_rainfall_in_day,
 			'hours_in_day' => $hours_in_day,
-      'max_total_time_in_hours' => $max_time_in_hours
+      'max_total_time_in_hours' => $max_time_in_hours,
       );
 	}
   
+  //dpm($day_of_month);return;
 	/*-----------------------------------------------------------------------------------------------------------*/
 
-  if (!$co_mua) {
+  /*if (!$co_mua) {
     drupal_set_message(t('Rainfall stations in the no data to report'),'error');
     return;
-  }
+  }*/
   
   $objPHPExcel = new PHPExcel();
   $objPHPExcel->getProperties()->setCreator("Datalogger")
@@ -738,4 +751,3 @@ function _datalogger_export_rainfall_month_excel($nid, $year, $month, $form_stat
   
   drupal_exit();
 }
-////////////////////////
