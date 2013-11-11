@@ -1640,4 +1640,3 @@ function datalogger_node_presave($node) {
     watchdog('save station', 'Presave... nid = ' . $node->nid);
   }
 }
-
