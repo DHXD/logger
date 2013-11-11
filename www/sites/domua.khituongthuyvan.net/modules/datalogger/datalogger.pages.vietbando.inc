@@ -46,7 +46,8 @@ function full_url()
 }
 
 function _datalogger_vietbando() {
-	$tram = node_load(15150);
+
+	//$tram = node_load(3126181);
 	//dpm($tram);
 	$rows = views_get_view_result('viet_ban_do');
 	//dpm($rows);
@@ -307,10 +308,13 @@ MANG2;
 				contentString[i] += '/views/statistics/search/';
 				contentString[i] += station[i].nid;
 				contentString[i] += '"><b>Thống kê số lương mưa theo bảng</b></a></li><li><a title="Thống kê số lượng mưa theo biểu đồ" href="';
+
 				contentString[i] += '/manage/chart/rainfalls/';
+
 				contentString[i] += station[i].nid;
+
 				contentString[i] += '"><b>Thống kê số lượng mưa theo biểu đồ</b></a></li></ul><!--[if lte IE 6]></td></tr></table></a><![endif]--></li></ul></div></div></div></div>';
-				  contentString[i] += '';
+				contentString[i] += '';
 			
 				contentString[i] += '';		
 			}
@@ -459,8 +463,12 @@ MANG2;
 			map.setCenter(new VLatLng(lat,lon),8);
 			markers[feature.contentString].openInfoWindow(contentString[feature.contentString]);				
 		}
+		
+		
+		
 MANG2;
-
+		
+		
 	$s.="}";
 	
 	drupal_add_js( <<< EEE
@@ -482,9 +490,17 @@ EEE
 		<input type="button" id="olvm-search-btn" name="olvm-search-btn" value="Tìm kiếm" class="form-submit">
 	</div>
   <div id="container" style="height:500px; width:930px;position:relative; margin:10px; border:1px #b1c4d5 solid;"></div>
-  <div id"test"></div>
+  <style type="text/css">
+		.dragmarker {
+			display:none;
+		}
+		#container_InfoWindow >.dragmap {
+			display:none;
+		}
+	</style>
   <script>
     loadMap();
+		
   </script>
   
 ABC;
