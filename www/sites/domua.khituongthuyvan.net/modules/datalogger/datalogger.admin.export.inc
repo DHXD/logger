@@ -219,7 +219,7 @@ function write_to_text($str,$matram, $year, $month, $day, $hour, $file_path)  {
 }
 
 function creat_folder($matinh, $matram, $year, $month, $day) {
-  $file_path = sprintf("E:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
+  $file_path = sprintf("F:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
   
   if(!file_exists($file_path)) {
     mkdir($file_path, 0700, true);
