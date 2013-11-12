@@ -83,6 +83,10 @@ function _datalogger_views_exposed_form_bieu_do_luong_mua_validate(&$form, &$for
 function datalogger_form_alter(&$form, &$form_state, &$form_id){
 	global $user,$admin_khuvuc;
 	$path = current_path();
+  // ------------ cadic
+  //dpm($form);
+	 
+  //<--- end cadic
 	//$path_alias = drupal_lookup_path('alias',$path);
 	//drupal_set_message('_form_alter: '.$user->uid.'-'.$user->name.'-'.$form_id.'-'.$path.'</br>');
 	//back page: header( 'Location: '.$_SERVER['HTTP_REFERER']); 
@@ -114,7 +118,6 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
 		if($form_id = 'views_exposed_form'){
 			if($form['#id'] == 'views-exposed-form-view-command-send-station-page' || 
 				$form['#id'] == 'views-exposed-form-view-rainfall-default-page' ||
-				$form['#id'] == 'views-exposed-form-search-rainfall-page' ||
 				$form['#id'] == 'views-exposed-form-rainfall-chart-page' ||
 				$form['#id'] == 'views-exposed-form-view-list-stations-page' ||
 				$form['#id'] == 'views-exposed-form-view-rainfall-chart-hour-page' ||
@@ -192,6 +195,43 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
 						$form['field_rainfall_station_nid_1']['#options'] = $stations_view;
 					}
 			}
+      // cadic
+      if($form['#id'] == 'views-exposed-form-search-rainfall-page'){
+        //print_r($form);
+        $tram_nid = intval(arg(3));
+        $tram = node_load($tram_nid);
+        $tinh = $tram->field_station_province_city['und'][0]['value'];
+        
+        //dpm($tinh);
+        $end_time = time();
+        $begin_time = $end_time - 24*60*60;
+        $begin_time = date('Y-m-d H:i',$begin_time);
+        $end_time = date('Y-m-d H:i',$end_time);
+        
+        drupal_add_js(array('datalogger' => array('list_default' => array('b_time'=>$begin_time, 'e_time'=>$end_time, 'id_tram'=>$tram_nid, 'tinh'=> $tinh))),'setting');
+        
+        $form['field_rainfall_send_time_value']['min']['#default_value'] = $begin_time;
+        //dpm($form['field_rainfall_send_time_value']['min']['#default_value']);
+        $form['field_rainfall_send_time_value']['max']['#default_value'] = $end_time;
+        //dpm($form['field_rainfall_send_time_value']['max']['#default_value']);
+        // add js
+        	$provinces = array();
+					$provinces['All'] = t('- Any -');
+					$provinces = array_merge($provinces, _datalogger_return_city2($user->field_station_region['und'][0]['value']));
+          
+          global $khuvuc;
+  
+          // add provinces to Drupal.settings
+          $provinces = array();
+                  $provinces['All'] = t('- Any -');
+                  $provinces = array_merge($provinces, _datalogger_return_city2($khuvuc[0] /*$account->field_station_region['und'][0]['value']*/));
+                  //$form['stations_fieldset']['field_station_province_city_value']['#options'] = $provinces;
+          
+          _datalogger_alter_add_js_stations($provinces);
+                    
+          
+        drupal_add_js(drupal_get_path('module', 'datalogger').'/list_station_follow_province.js');
+      }
 		}
 	}
 }
@@ -1122,6 +1162,7 @@ function _datalogger_menu_access_callback_command() {
 function _datalogger_menu_access_callback_manage_data() {
   return user_access('manage data')|| user_access('khuvucbactrungbo')|| user_access('khuvuctrungtrungbo')|| user_access('khuvucnamtrungbo')|| user_access('khuvucnambo')|| user_access('khuvuctaynguyen');
 }
+
 
 /**
  * Implements hook_permission().
