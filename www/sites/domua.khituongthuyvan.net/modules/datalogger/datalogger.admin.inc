@@ -817,26 +817,16 @@ function _datalogger_check_status_30_minutes(){
           if ($node->field_station_status['und'][0]['value'] != $value) {                      
             _datalogger_node_save_field($node->nid, 'station', 'field_station_status', $value);
           }
-
-				}		
-
-
+				}
 		}
-		
 }
 
 function _datalogger_check_inbox() {
-
-  
   $cron = (arg(3) == 'remote');
-  
   $test_tram = (arg(3) == 'test');
-  
   $processed = 0;
   
   $sql = "SELECT * FROM inbox WHERE Processed=0 ORDER BY `ID` DESC LIMIT 0,10";
-  
-  
   
   if ($test_tram) {
     //$sql = "SELECT * FROM inbox WHERE ID = 262967";   // cho LASI
@@ -872,6 +862,7 @@ function _datalogger_check_inbox() {
     //print "Inbox ID: {$row->ID}\n";
     $receiveTime = $row->UpdatedInDB;
     
+    // $number: so dt tram.
 		$number = _datalogger_convert_number($row->SenderNumber);
 		$sms = $row->TextDecoded;
     $smsID = $row->ID;
@@ -885,8 +876,6 @@ function _datalogger_check_inbox() {
       continue;
     }
     //$node_tram = node_load($tram_nid);
-    
-    dpm('1----------'.date('m/d/Y h:i:s a', time()));
     _datalogger_update_receive_time($tram_nid, $receiveTime);
 
     if(_datalogger_startsWith($row->TextDecoded,'HS') && _datalogger_endsWith($row->TextDecoded,';')) {
@@ -896,8 +885,6 @@ function _datalogger_check_inbox() {
       
       if($len_sms == 88){
         $output .= "Command.\n";
-        
-        //return $output;
         
 				//Thuc hien chen ban tin vao bang command
 				_datalogger_separate_sms_command($sms, $number);
@@ -916,19 +903,13 @@ function _datalogger_check_inbox() {
 	
           default:
             // Chèn ban tin vào bang do mua
-            // dsm('into 140');
             if (!$test_tram)
               _datalogger_separate_sms($sms,$number, $id_inbox);
-            dpm('2----------'.date('m/d/Y h:i:s a', time()));  
             
             // Cap nhat cac ban tin da xu ly
             _datalogger_update_process_inbox(1, $id_inbox);
-            dpm('3----------'.date('m/d/Y h:i:s a', time())); 
             
             //Xuat file txt tu dong
-						//_datalogger_
-            
-            //Tam thoi bo qua
             _datalogger_ftp_txt_export_inc($tram_nid);
           }
       }			
@@ -940,16 +921,10 @@ function _datalogger_check_inbox() {
 		else{
 			_datalogger_update_process_inbox(2, $id_inbox);
 		}
-    
-   dpm('4----------'.date('m/d/Y h:i:s a', time()));
-   //return  $output;
-    //flush (); // flush the output buffer
   }
-	dpm('5----------'.date('m/d/Y h:i:s a', time()));
-  return  $output;
+  flush (); // flush the output buffer
   
   print "Ok.";
-  
   drupal_exit();
 }
 

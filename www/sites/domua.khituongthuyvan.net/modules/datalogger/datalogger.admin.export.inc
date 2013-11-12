@@ -121,10 +121,6 @@ function _datalogger_ftp_txt_export_inc($tram) {
   $tomorow = tomorow_time($d, $m, $y);
   
   for($i = 1 - 5; $i <=24; $i++) {
-  
-    //if ($i == 0)  $out .= "\r\n";   // begin
-  
-    //$d_ = $i < 0 ? $d_1 : $d;    // ngay hom truoc, xem lai...
     if($i < 0) {
       $d_ = $yesterday->format('d');
       $m_ = $yesterday->format('m');
@@ -173,7 +169,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
     }
     
     if( $i == $h) {
-      $out .= sprintf("%04d%02d%02d%02d0000%5d", $y, $m, $d, $h, "60");
+      $out .= sprintf("%04d%02d%02d%02d0000%5d", $y_, $m_, $d_, ($h == 0 ? 24 : $h), "60");
       $out .= sprintf("%7d", $R24h);
       $out .= sprintf("%7d", $R19h);
       $out .= sprintf("%7d", $RnOb);
@@ -184,8 +180,22 @@ function _datalogger_ftp_txt_export_inc($tram) {
     // $dpm[$time]  = $node ? $node->title : '(null)';
   }
   dpm($out);
-  $file_path = creat_folder($matinh, $matram, $y, $m, $d);
-  write_to_text($out, $matram, $y, $m, $d, $h, $file_path);
+  
+  if(intval($h) == 0) {
+    $h_ = 24;
+    $d_ = $yesterday->format('d');
+    $m_ = $yesterday->format('m');
+    $y_ = $yesterday->format('Y');
+  }
+  else {
+    $h_ = $h;
+    $d_ = $d;
+    $m_ = $m;
+    $y_ = $y;
+  }
+ 
+  $file_path = creat_folder($matinh, $matram, $y_, $m_, $d_);
+  write_to_text($out, $matram, $y_, $m_, $d_, $h_, $file_path);
   
   drupal_set_message('Xuat du lieu xong tram ' . $ten);
   }
@@ -210,8 +220,8 @@ function convert_vi_to_en($str) {
 }
 
 function write_to_text($str,$matram, $year, $month, $day, $hour, $file_path)  {
-  
-  $file_name = sprintf("%06d_%4d-%02d-%02d-%02d.00.00", $matram, $year, $month, $day, $hour +1);
+ 
+  $file_name = sprintf("%06d_%4d-%02d-%02d-%02d.00.00", $matram, $year, $month, $day, $hour);
   $file = fopen($file_path . "\\" . $file_name .".txt", 'w');
   //dpm($file_name);
   fwrite($file, $str);
