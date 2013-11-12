@@ -96,8 +96,22 @@ function _datalogger_vietbando() {
 
 	
  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
-  
-  $s = "  function loadMap() {";
+  $s = "";
+	$s .= <<< MANG
+	function hienCanhBao(luongmua){
+		var res = luongmua.split("mm");
+		var luongmuatram = parseFloat(res[0]);
+		var x = '';
+		if(luongmuatram > 7.6){
+			x = 1;
+		}else{
+			x =0;
+		}
+		
+		return x;
+	}
+MANG;
+  $s .= "  function loadMap() {";
 	$s .= "var station = [];\n";
 	
 	foreach ($rows as $k => $row) {
@@ -142,6 +156,7 @@ function _datalogger_vietbando() {
       
     }
     station[$k].thoigiantruyentin = "{$row->field_field_station_report_time[0]['rendered']['#markup']}";
+		
 MANG;
 		if(count($row->field_field_station_alarm) == 0){
 			//Binh thuong
@@ -238,12 +253,28 @@ MANG2;
 			for(var i =0;i<station.length;i++){
 				var pt = new VLatLng(station[i].lat,station[i].lon);
 				if(station[i].trangthai=='station_active'){
+					var canhbaomualon = 0;
+					if(station[i].luongmuagannhat == ''){
+						station[i].luongmuagannhat = "Chưa có dữ liệu";
+					}else{
+						canhbaomualon = hienCanhBao(station[i].luongmuagannhat);
+						
+					}
+										
 					if(station[i].canhbao == 0){
+					
 						markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/orange1.png", new VSize(15, 15)), false);
+					
 					}else if(station[i].canhbao == 1){
-            markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/blue.png", new VSize(15, 15)), false);
+						
+						if(canhbaomualon == 1){
+							markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/canhbao.gif", new VSize(15, 15)), false);
+						}else{
+							markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/blue.png", new VSize(15, 15)), false);
+						}
+            
 					}else if(station[i].canhbao == 2){
-            markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/red.png", new VSize(15, 15)), false);
+            markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/canhbao.gif", new VSize(15, 15)), false);
           }
 				}else{
 					markers[i] = new VMarker(pt, new VIcon("/sites/domua.khituongthuyvan.net/icons/black.png", new VSize(15, 15)), false);
