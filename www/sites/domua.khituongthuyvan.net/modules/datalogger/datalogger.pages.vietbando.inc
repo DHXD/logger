@@ -98,17 +98,10 @@ function _datalogger_vietbando() {
  drupal_add_js('document.write(unescape("%3Cscript src=\''. $external_js . '\' type=\'text/javascript\'%3E%3C/script%3E"));', 'inline');
   $s = "";
 	$s .= <<< MANG
-	function hienCanhBao(luongmua){
+	function layLuongMua(luongmua){
 		var res = luongmua.split("mm");
 		var luongmuatram = parseFloat(res[0]);
-		var x = '';
-		if(luongmuatram > 7.6){
-			x = 1;
-		}else{
-			x =0;
-		}
-		
-		return x;
+		return luongmuatram;
 	}
 MANG;
   $s .= "  function loadMap() {";
@@ -148,6 +141,9 @@ MANG;
     station[$k].trangthaigiatri ="{$row->field_field_station_status[0]['rendered']['#markup']}" ;
 		//Chu ky truyen tin
 		station[$k].chukytruyentin = "{$row->field_field_station_transmission_speed[0]['rendered']['#markup']}";
+		//Luong mua canh bao
+		station[$k].luongmuacanhbao ="{$row->field_field_station_alarm_rainfall[0]['rendered']['#markup']}";
+		
 		station[$k].tinhtrang = "{$row->field_field_station_alarm[0]['rendered']['#markup']}";
 		if(station[$k].chukytruyentin == ""){
 			station[$k].chukytruyentin = "Chưa có dữ liệu";	
@@ -257,8 +253,8 @@ MANG2;
 					if(station[i].luongmuagannhat == ''){
 						station[i].luongmuagannhat = "Chưa có dữ liệu";
 					}else{
-						canhbaomualon = hienCanhBao(station[i].luongmuagannhat);
-						
+						luongmua = layLuongMua(station[i].luongmuagannhat);
+						canhbaomualon = (luongmua > station[i].luongmuacanhbao)?1:0;
 					}
 										
 					if(station[i].canhbao == 0){
