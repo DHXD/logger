@@ -6,6 +6,7 @@
 		var tinh = Drupal.settings.datalogger.list_default.tinh;
 		var b_time = Drupal.settings.datalogger.list_default.b_time;
 		var e_time = Drupal.settings.datalogger.list_default.e_time;
+		var temp = Drupal.settings.datalogger.list_default.temp;
 		if(id_tram) {
 			jQuery("select#edit-field-station-province-city-value option")
 			 .each(function() { 
@@ -43,6 +44,10 @@
 			 
 			 jQuery("input#edit-field-rainfall-send-time-value-max-datepicker-popup-0").val(e_time.substring(0,10));
 			 jQuery("input#edit-field-rainfall-send-time-value-max-timepicker-popup-1").val(e_time.substring(11,16));
+			 if(!temp) {
+				jQuery( "#edit-submit-search-rainfall" ).trigger( "click" );
+			 }
+			 
 		}
 		
 	
