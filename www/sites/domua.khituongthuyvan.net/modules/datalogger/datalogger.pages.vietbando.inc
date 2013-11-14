@@ -47,7 +47,7 @@ function full_url()
 
 function _datalogger_vietbando() {
 
-	//$tram = node_load(3126181);
+	//$tram = node_load(2948);
 	//dpm($tram);
 	$rows = views_get_view_result('viet_ban_do');
 	//dpm($rows);
@@ -103,6 +103,20 @@ function _datalogger_vietbando() {
 		var luongmuatram = parseFloat(res[0]);
 		return luongmuatram;
 	}
+	
+	function tachTenTram(tentram){
+		var ten = tentram.split(' ');
+		var tram = "";
+		for(var i =0;i<ten.length;i++){
+			if(i<(ten.length -1)){
+				tram += ten[i]+"-";
+			}else{
+				tram +=ten[i];
+			}
+		}
+		return tram;
+	}
+	
 MANG;
   $s .= "  function loadMap() {";
 	$s .= "var station = [];\n";
@@ -152,7 +166,8 @@ MANG;
       
     }
     station[$k].thoigiantruyentin = "{$row->field_field_station_report_time[0]['rendered']['#markup']}";
-		
+		//Ten viet lien
+		station[$k].tentramlien = tachTenTram(station[$k].tentram);
 MANG;
 		if(count($row->field_field_station_alarm) == 0){
 			//Binh thuong
@@ -283,7 +298,8 @@ MANG2;
 				contentString[i] = '<div style =" width: 200px; height: 100px"><div id="popup" class="olPopup" style="position: absolute; overflow: visible; width: 190px; height: 100px; z-index: 751;"><div id="popup_GroupDiv" style="position: absolute; overflow: visible; top: 0px; left: 0px; height: 100%; width: 100%;"><div id="popup_contentDiv" class="olFramedCloudPopupContent" style="width: 190px; height: 110px; position: absolute; z-index: 1; left: 0px; top: 0px;"><div class="menu"><ul><li><a class="hide" href="';
 
 
-				contentString[i] += '/station/Quảng-Hợp';
+				contentString[i] += '/station/';
+				contentString[i] += station[i].tentramlien;
 				contentString[i] += '"><b>Trạm ';
 				contentString[i] += station[i].tentram;
 				contentString[i] += '</b></a></li><li><a class="hide">Thông tin trạm</a><ul><li><a title="ID">ID: <b>';
