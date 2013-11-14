@@ -32,8 +32,8 @@ function _datalogger_ftp_export() {
 }
 
 function _datalogger_ftp_txt_export_inc($tram) {
-//function _datalogger_ftp_txt_export_inc() {
-  //$tram = 2961; // Hoa thanh.
+// function _datalogger_ftp_txt_export_inc() {
+  // $tram = 2961; // Hoa thanh.
   $query_station = $tram;
   
   $node_station = node_load($query_station);
@@ -172,17 +172,27 @@ function _datalogger_ftp_txt_export_inc($tram) {
     }
     
     if( $i == $h) {
-      $out .= sprintf("%04d%02d%02d%02d0000%5d", $y_, $m_, $d_, ($h == 0 ? 24 : $h), "60");
+    
+      if($h == 0) {
+        $h_ = 24;
+        $d_ = $yesterday->format('d');
+        $m_ = $yesterday->format('m');
+        $y_ = $yesterday->format('Y');
+      }
+      else {
+        $h_ = $h;
+        $d_ = $d; $m_ = $m; $y_ = $y;
+      }   
+
+      $out .= sprintf("%04d%02d%02d%02d0000%5d", $y_, $m_, $d_, $h_, "60");
       $out .= sprintf("%7d", $R24h);
       $out .= sprintf("%7d", $R19h);
       $out .= sprintf("%7d", $RnOb);
       $out .= sprintf("%10sv", $batt);
       $out .= sprintf("%10d%10d%10d%10d%10d%10d\r\n", $rain[0], $rain[1], $rain[2], $rain[3], $rain[4], $rain[5]);
+      
     }
-    
-    // $dpm[$time]  = $node ? $node->title : '(null)';
   }
-  dpm($out);
   
   if(intval($h) == 0) {
     $h_ = 24;
@@ -201,7 +211,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
   write_to_text($out, $matram, $y_, $m_, $d_, $h_, $file_path);
   
   drupal_set_message('Xuat du lieu xong tram ' . $ten);
-  }
+}
 
 function convert_vi_to_en($str) {
   $str = preg_replace("/( )/", '', $str);
