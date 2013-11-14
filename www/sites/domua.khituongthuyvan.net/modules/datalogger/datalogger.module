@@ -201,18 +201,20 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
         $tram_nid = intval(arg(3));
         $tram = node_load($tram_nid);
         $tinh = $tram->field_station_province_city['und'][0]['value'];
-        
+        //dpm($tram_nid);
         //dpm($tinh);
         $end_time = time();
         $begin_time = $end_time - 24*60*60;
         $begin_time = date('Y-m-d H:i',$begin_time);
         $end_time = date('Y-m-d H:i',$end_time);
+        //field_station_province_city_value
+        $temp = $_REQUEST['field_station_province_city_value'];
+        //dpm($temp);
+        drupal_add_js(array('datalogger' => array('list_default' => array('temp'=>$temp, 'b_time'=>$begin_time, 'e_time'=>$end_time, 'id_tram'=>$tram_nid, 'tinh'=> $tinh))),'setting');
         
-        drupal_add_js(array('datalogger' => array('list_default' => array('b_time'=>$begin_time, 'e_time'=>$end_time, 'id_tram'=>$tram_nid, 'tinh'=> $tinh))),'setting');
-        
-        $form['field_rainfall_send_time_value']['min']['#default_value'] = $begin_time;
+        //$form['field_rainfall_send_time_value']['min']['#default_value'] = $begin_time;
         //dpm($form['field_rainfall_send_time_value']['min']['#default_value']);
-        $form['field_rainfall_send_time_value']['max']['#default_value'] = $end_time;
+        //$form['field_rainfall_send_time_value']['max']['#default_value'] = $end_time;
         //dpm($form['field_rainfall_send_time_value']['max']['#default_value']);
         // add js
         	$provinces = array();
