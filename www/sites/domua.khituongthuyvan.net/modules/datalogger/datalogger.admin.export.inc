@@ -9,7 +9,7 @@ function _datalogger_ftp_export() {
   
   $content_type = "station";
   $all_nodes = node_load_multiple(array(), array('type' => $content_type));
-  
+  dpm($all_nodes); return '123';
   foreach($all_nodes as $station)  {
     $operations[] = array("_datalogger_ftp_txt", array( $station->nid));
   }
@@ -31,9 +31,9 @@ function _datalogger_ftp_export() {
  
 }
 
-function _datalogger_ftp_txt_export_inc($tram) {
-//function _datalogger_ftp_txt_export_inc() {
-  //$tram = 2961; // Hoa thanh.
+//function _datalogger_ftp_txt_export_inc($tram) {
+function _datalogger_ftp_txt_export_inc() {
+  $tram = 87813; // Dong van.
   $query_station = $tram;
   
   $node_station = node_load($query_station);
@@ -180,7 +180,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
     // $dpm[$time]  = $node ? $node->title : '(null)';
   }
   dpm($out);
-  
+  return '123';
   if(intval($h) == 0) {
     $h_ = 24;
     $d_ = $yesterday->format('d');
