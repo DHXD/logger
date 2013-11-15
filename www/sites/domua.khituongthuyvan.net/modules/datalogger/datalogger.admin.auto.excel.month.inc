@@ -105,7 +105,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
         
         if(!isset($hours_miss_sms[$day][$i])) {
           $hours_in_day[$i] = array(
-						'total_rainfall_in_hour' => -999,
+						'total_rainfall_in_hour' => -999,);
         }
         else {
           $number = count($hours_in_day[$i]);
@@ -115,12 +115,12 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
               $total_rainfall_in_hour += $rainfall_measuring;
             }
             $hours_in_day[$i] = array(
-              'total_rainfall_in_hour' => $total_rainfall_in_hour, 
+              'total_rainfall_in_hour' => $total_rainfall_in_hour,);
           
           }
           else {
             $hours_in_day[$i] = array( 
-              'total_rainfall_in_hour' => 0,
+              'total_rainfall_in_hour' => 0,);
           }          
 				}
 			}
@@ -129,7 +129,7 @@ function _datalogger_auto_export_rainfall_month_excel($nid, $year, $month, $form
     else { // Khong lay duoc mua
       for($i = 23; $i >=0; $i--){
 				$hours_in_day[$i] = array(
-          'total_rainfall_in_hour' => -999, 
+          'total_rainfall_in_hour' => -999,);
 			}
     }
 		
