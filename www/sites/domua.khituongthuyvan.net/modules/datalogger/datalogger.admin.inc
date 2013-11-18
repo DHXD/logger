@@ -1,5 +1,7 @@
 <?php
 /*******************/
+/*
+/*******************/
 $stations = views_get_view_result('list_all_datalogger');
 GLOBAL $station_name;
 $station_name = array();

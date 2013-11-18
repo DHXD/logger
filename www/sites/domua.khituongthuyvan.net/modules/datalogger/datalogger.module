@@ -1,5 +1,5 @@
 <?php
-
+/********************************************/
 global $khuvuc; 
 global $admin_khuvuc;    
 require 'khuvuc.php';
@@ -198,6 +198,7 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
       // cadic
       if($form['#id'] == 'views-exposed-form-search-rainfall-page'){
         //print_r($form);
+        $arg0 = arg(0);
         $tram_nid = intval(arg(3));
         $tram = node_load($tram_nid);
         $tinh = $tram->field_station_province_city['und'][0]['value'];
@@ -209,8 +210,8 @@ function datalogger_form_alter(&$form, &$form_state, &$form_id){
         $end_time = date('Y-m-d H:i',$end_time);
         //field_station_province_city_value
         $temp = $_REQUEST['field_station_province_city_value'];
-        //dpm($temp);
-        drupal_add_js(array('datalogger' => array('list_default' => array('temp'=>$temp, 'b_time'=>$begin_time, 'e_time'=>$end_time, 'id_tram'=>$tram_nid, 'tinh'=> $tinh))),'setting');
+        //dpm($arg0);
+        drupal_add_js(array('datalogger' => array('list_default' => array('arg0' => $arg0, 'temp'=>$temp, 'b_time'=>$begin_time, 'e_time'=>$end_time, 'id_tram'=>$tram_nid, 'tinh'=> $tinh))),'setting');
         
         //$form['field_rainfall_send_time_value']['min']['#default_value'] = $begin_time;
         //dpm($form['field_rainfall_send_time_value']['min']['#default_value']);
@@ -279,9 +280,11 @@ function _datalogger_alter_add_js_stations(&$provinces) {
   // drupal_add_js(drupal_get_path('module', 'datalogger').'/list_station_follow_province.js');
   // drupal_add_js(array('datalogger' => array('list_station_province' => $station_follow_provinces)),'setting');
   //thiet lap gia tri tham so cho file javascript
+  $arg0 = arg(0);
   drupal_add_js(array('datalogger' => array('list_station_province' => $station_follow_provinces)),'setting');
-  
+  drupal_add_js(array('datalogger' => array('list_default' => array('arg0' => $arg0))),'setting');
 }
+//cadic
 
  /**
  *Begin:15/11. 
