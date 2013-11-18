@@ -9,7 +9,6 @@ function _datalogger_ftp_export() {
   
   $content_type = "station";
   $all_nodes = node_load_multiple(array(), array('type' => $content_type));
-  dpm($all_nodes); return '123';
   foreach($all_nodes as $station)  {
     $operations[] = array("_datalogger_ftp_txt", array( $station->nid));
   }
