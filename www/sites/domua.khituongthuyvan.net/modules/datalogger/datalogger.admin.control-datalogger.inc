@@ -815,7 +815,7 @@ function _log_rainfalls($title, $station, $event) {
   // $node->field_[$node->language][0]["value"] = $body;
   $node-> field_event_type[$node->language][0]["value"] = $event;
   $node->	field_log_tram['und'][0]['nid'] = $station;
-  dpm($node);
+  //dpm($node);
   $node = node_submit($node);
   node_save($node);
 
@@ -1274,8 +1274,8 @@ function _datalogger_send_command($nid, $select, $form, &$form_state) {
       }
       // cadic
       global $nids;
-      dpm($form_state);
-      dpm($nids[1]);
+      //dpm($form_state);
+      //dpm($nids[1]);
       _log_rainfalls('log', $nids[1], $arg[0]);
 
       
