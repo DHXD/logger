@@ -1274,8 +1274,8 @@ function _datalogger_send_command($nid, $select, $form, &$form_state) {
       }
       // cadic
       global $nids;
-      dpm($form_state);
-      dpm($nids[1]);
+      //dpm($form_state);
+      //dpm($nids[1]);
       _log_rainfalls('log', $nids[1], $arg[0]);
 
       
