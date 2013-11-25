@@ -815,7 +815,7 @@ function _log_rainfalls($title, $station, $event) {
   // $node->field_[$node->language][0]["value"] = $body;
   $node-> field_event_type[$node->language][0]["value"] = $event;
   $node->	field_log_tram['und'][0]['nid'] = $station;
-  dpm($node);
+  //dpm($node);
   $node = node_submit($node);
   node_save($node);
 
