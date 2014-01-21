@@ -1569,7 +1569,7 @@ function _datalogger_new_sentitems_form(){
       $status = "Thành công";
     }
     else {
-      $status = "L?i";
+      $status = "Lỗi";
     }
 
     $rows[] = array (
