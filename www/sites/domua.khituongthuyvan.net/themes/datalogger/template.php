@@ -97,7 +97,7 @@ function datalogger_page_alter(&$page){
 	
 	if($user_path.'/'=='user/'){
 		$user_edit = trim(explode('/', current_path())[1]);
-    if ($user_edit) {
+    if ($user_edit && is_numeric($user_edit)) {
       $user_edit_fields = user_load($user_edit);
       if($user_edit!=$user->uid && !in_array($user->name, $admin_khuvuc)){
         header( 'Location: /user');
