@@ -1692,11 +1692,17 @@ function watchdog($type, $message, $variables = array(), $severity = WATCHDOG_NO
 
     // The user object may not exist in all conditions, so 0 is substituted if needed.
     $user_uid = isset($user->uid) ? $user->uid : 0;
+    
+    /*ob_start();
+    print_r(debug_backtrace());
+    $output = ob_get_contents();
+    ob_end_clean();*/
+    $output = '';
 
     // Prepare the fields to be logged
     $log_entry = array(
       'type'        => $type,
-      'message'     => $message,
+      'message'     => $message . $output,
       'variables'   => $variables,
       'severity'    => $severity,
       'link'        => $link,

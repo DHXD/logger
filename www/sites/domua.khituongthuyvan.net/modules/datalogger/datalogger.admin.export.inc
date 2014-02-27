@@ -9,7 +9,6 @@ function _datalogger_ftp_export() {
   
   $content_type = "station";
   $all_nodes = node_load_multiple(array(), array('type' => $content_type));
-  
   foreach($all_nodes as $station)  {
     $operations[] = array("_datalogger_ftp_txt", array( $station->nid));
   }
@@ -43,12 +42,9 @@ function _datalogger_ftp_txt_export_inc($tram) {
   $ten_tinh = $node_station->field_station_province_city['und'][0]['value'];
   
   $tinh = array(
-    "quang_binh" =>31,
-    "quang_tri" => 32,
-    "thua_thien_hue" => 33,
-    "da_nang" => 04,
-    "quang_nam" =>34,
-    "quang_ngai" =>35, 
+    "thanh_hoa" =>28,
+    "nghe_an" => 29,
+    "ha_tinh" => 30,
     );
   
   $matinh = $tinh[$ten_tinh];
@@ -242,7 +238,7 @@ function write_to_text($str,$matram, $year, $month, $day, $hour, $file_path)  {
 }
 
 function creat_folder($matinh, $matram, $year, $month, $day) {
-  $file_path = sprintf("E:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
+  $file_path = sprintf("F:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
   
   if(!file_exists($file_path)) {
     mkdir($file_path, 0700, true);

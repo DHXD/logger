@@ -50,7 +50,9 @@ function _datalogger_vietbando() {
 	//$tram = node_load(2948);
 	//dpm($tram);
 	$rows = views_get_view_result('viet_ban_do');
+
 	//dpm($rows);
+
 	$full_url = full_url();
 	//echo $full_url;
 	
@@ -86,6 +88,7 @@ function _datalogger_vietbando() {
 			$url = "PxVLItwK6WpL/gxKoctolsN6g0viC8l/XlqTfK7KTG4=";
 		break;
 	}
+
 	
 	//dpm($rows);
 	//echo $rows[0]->field_field_station_alarm;

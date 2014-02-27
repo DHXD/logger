@@ -54,8 +54,8 @@
  * @see http://drupal.org/documentation/install/multi-site
  */
 
-  $sites['117.6.129.235'] = 'domua.khituongthuyvan.net';
-  $sites['bactrungbo.dnsdynamic.net'] = 'domua.khituongthuyvan.net';
+  //$sites['117.6.129.235'] = 'domua.khituongthuyvan.net';
+  //$sites['bactrungbo.dnsdynamic.net'] = 'domua.khituongthuyvan.net';
  
   $sites[$_SERVER['SERVER_NAME']] = 'domua.khituongthuyvan.net';
  

@@ -191,7 +191,7 @@ class DrupalDefaultEntityController implements DrupalEntityControllerInterface {
     // load, if loading a revision, or if $conditions was passed without $ids.
     if ($ids === FALSE || $ids || $revision_id || ($conditions && !$passed_ids)) {
       // Build the query.
-      $query = $this->buildQuery($ids, $conditions, $revision_id);
+      $query = $this->buildQuery($ids, $conditions, $revision_id);            
       $queried_entities = $query
         ->execute()
         ->fetchAllAssoc($this->idKey);
