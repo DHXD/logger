@@ -1,8 +1,10 @@
 //thay doi gia tri tram do mưa theo tinh thanh quan ly
 (function ($){
   $(document).ready(function(){
-	
-		var id_tram = Drupal.settings.datalogger.list_default.id_tram;
+		var arg0 = Drupal.settings.datalogger.list_default.arg0;
+		if(arg0 == "views") {
+			//alert("hehe");
+			var id_tram = Drupal.settings.datalogger.list_default.id_tram;
 		var tinh = Drupal.settings.datalogger.list_default.tinh;
 		var b_time = Drupal.settings.datalogger.list_default.b_time;
 		var e_time = Drupal.settings.datalogger.list_default.e_time;
@@ -49,6 +51,8 @@
 			 }
 			 
 		}
+		}
+		
 		
 	
 	//$("#edit-day").attr("value", "New value");
