@@ -151,10 +151,10 @@ class DatabaseSchema_sqlsrv extends DatabaseSchema {
   protected function createFieldSql($table, $name, $spec, $skip_checks = FALSE) {
     $sql = $this->connection->quoteIdentifier($name) . ' ' . $spec['sqlsrv_type'];
 
-    if (!empty($spec['length'])) {
+    if (in_array($spec['sqlsrv_type'], array('char', 'varchar', 'text', 'nchar', 'nvarchar', 'ntext')) && !empty($spec['length'])) {
       $sql .= '(' . $spec['length'] . ')';
     }
-    elseif (isset($spec['precision']) && isset($spec['scale'])) {
+    elseif (in_array($spec['sqlsrv_type'], array('numeric', 'decimal')) && isset($spec['precision']) && isset($spec['scale'])) {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
     }
 
@@ -171,7 +171,7 @@ class DatabaseSchema_sqlsrv extends DatabaseSchema {
         $sql .= ' IDENTITY';
       }
       if (!empty($spec['unsigned'])) {
-        $sql .= ' CHECK (' . $name . ' >= 0)';
+        $sql .= ' CHECK (' . $this->connection->quoteIdentifier($name) . ' >= 0)';
       }
     }
     return $sql;
@@ -404,6 +404,10 @@ class DatabaseSchema_sqlsrv extends DatabaseSchema {
     // we are modifying is part of it.
     $primary_key_sql = $this->introspectPrimaryKey($table, $field);
 
+    // If there is a generated unique key for this field, we will need to
+    // add it back in when we are done
+    $unique_key = $this->uniqueKeyExists($table, $field);
+
     // Drop the related objects.
     $this->dropFieldRelatedObjects($table, $field);
 
@@ -425,7 +429,9 @@ class DatabaseSchema_sqlsrv extends DatabaseSchema {
     $this->addField($table, $field_new, $spec);
 
     // Migrate the data over.
-    $this->connection->query('UPDATE [{' . $table . '}] SET [' . $field_new . '] = [' . $field . '_old]');
+    // Explicitly cast the old value to the new value to avoid conversion errors.
+    $field_spec = $this->processField($spec);
+    $this->connection->query('UPDATE [{' . $table . '}] SET [' . $field_new . '] = CAST([' . $field . '_old] AS ' . $field_spec['sqlsrv_type'] . ')');
 
     // Switch to NOT NULL now.
     if (!empty($fixnull)) {
@@ -436,6 +442,11 @@ class DatabaseSchema_sqlsrv extends DatabaseSchema {
     // Recreate the primary key.
     if ($primary_key_sql) {
       $this->recreatePrimaryKey($table, $primary_key_sql);
+    }
+    if ($unique_key) {
+      $fields = array();
+      $fields[] = $field;
+      $this->addUniqueKey($table, $field, $fields);
     }
 
     // Drop the old field.
@@ -547,7 +558,11 @@ class DatabaseSchema_sqlsrv extends DatabaseSchema {
       $this->connection->query('ALTER TABLE [{' . $table . '}] DROP CONSTRAINT [' . $constraint->name . ']');
     }
 
-    // TODO: we might need to drop computed columns when we have some.
+    // Drop any indexes on related computed columns when we have some.
+    if ($this->uniqueKeyExists($table, $field)) {
+      $this->dropUniqueKey($table, $field);
+    }
+
   }
 
   /**
@@ -564,7 +579,7 @@ class DatabaseSchema_sqlsrv extends DatabaseSchema {
       $default = 'NULL';
     }
     elseif (is_string($default)) {
-      $default = "'" . addslashes($spec['default']) . "'";      
+      $default = "'" . addslashes($spec['default']) . "'";
     }
 
     // Try to remove any existing default first.

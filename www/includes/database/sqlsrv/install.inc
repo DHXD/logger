@@ -55,17 +55,32 @@ BEGIN
   DECLARE @part int
   SET @end = 0
   SET @part = 0
-  WHILE (@part < @count)
+  IF (@count = 0)
   BEGIN
-    SET @end = CHARINDEX(@delimiter, @string, @end + 1)
-    IF (@end = 0)
-    BEGIN
-      SET @end = LEN(@string) + 1
-      BREAK
-    END
-    SET @part = @part + 1
+    SET @result = ''
   END
-  SET @result = SUBSTRING(@string, 1, @end - 1)
+  ELSE
+  BEGIN
+    IF (@count < 0)
+    BEGIN
+      SET @string = REVERSE(@string)
+    END
+    WHILE (@part < ABS(@count))
+    BEGIN
+      SET @end = CHARINDEX(@delimiter, @string, @end + 1)
+      IF (@end = 0)
+      BEGIN
+        SET @end = LEN(@string) + 1
+        BREAK
+      END
+      SET @part = @part + 1
+    END
+    SET @result = SUBSTRING(@string, 1, @end - 1)
+    IF (@count < 0)
+    BEGIN
+      SET @result = REVERSE(@result)
+    END
+  END
   RETURN @result
 END
 EOF
@@ -120,5 +135,16 @@ EOF
     catch (Exception $e) {
       $this->fail(st('Drupal could not be correctly setup with the existing database. Revise any errors.'));
     }
+  }
+
+  // Modify the default options form to allow Windows authentication.
+  public function getFormOptions($database) {
+    $form = parent::getFormOptions($database);
+    // Make username not required.
+    $form['username']['#required'] = FALSE;
+    // Add a description for about leaving username blank.
+    $form['username']['#description'] = t('Leave username (and password) blank to use Windows authentication.');
+
+    return $form;
   }
 }
