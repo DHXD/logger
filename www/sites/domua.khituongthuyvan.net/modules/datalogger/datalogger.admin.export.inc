@@ -31,13 +31,13 @@ function _datalogger_ftp_export() {
  
 }
 
-//function _datalogger_ftp_txt_export_inc($tram) {
- function _datalogger_ftp_txt_export_inc() {
+function _datalogger_ftp_txt_export_inc($tram) {
+//function _datalogger_ftp_txt_export_inc() {
   //$content_type = "station";
   //$all_nodes = node_load_multiple(array(), array('type' => $content_type));
   //dpm($all_nodes); return '1';
   
-  $tram = 2967; // Ba long.
+  //$tram = 2967; // Ba long.
   //$tram = 2961; // Hoa thanh.
   $query_station = $tram;
   
@@ -49,17 +49,16 @@ function _datalogger_ftp_export() {
   $matram = $node_station->field_station_code['und'][0]['value'];
   $ten_tinh = $node_station->field_station_province_city['und'][0]['value'];
   
-  dpm($ten_tinh); return '1';
-  
   $tinh = array(
-    "thanh_hoa" =>28,
-    "nghe_an" => 29,
-    "ha_tinh" => 30,
+    "quang_binh" =>31,
+    "quang_tri" => 32,
+    "thua_thien_hue" => 33,
+    "da_nang" => 04,
+    "quang_nam" => 34,
+    "quang_ngai" => 35,
     );
   
   $matinh = $tinh[$ten_tinh];
-  
-  dpm($matinh); return '1';
   
   //$d = 6; $m = 11; $y = 2013;
   $now = getdate();
