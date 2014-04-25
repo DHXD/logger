@@ -9,6 +9,7 @@ function _datalogger_ftp_export() {
   
   $content_type = "station";
   $all_nodes = node_load_multiple(array(), array('type' => $content_type));
+  
   foreach($all_nodes as $station)  {
     $operations[] = array("_datalogger_ftp_txt", array( $station->nid));
   }
@@ -30,16 +31,25 @@ function _datalogger_ftp_export() {
  
 }
 
-function _datalogger_ftp_txt_export_inc($tram) {
-// function _datalogger_ftp_txt_export_inc() {
-  // $tram = 2961; // Hoa thanh.
+//function _datalogger_ftp_txt_export_inc($tram) {
+ function _datalogger_ftp_txt_export_inc() {
+  //$content_type = "station";
+  //$all_nodes = node_load_multiple(array(), array('type' => $content_type));
+  //dpm($all_nodes); return '1';
+  
+  $tram = 2967; // Ba long.
+  //$tram = 2961; // Hoa thanh.
   $query_station = $tram;
   
   $node_station = node_load($query_station);
   
+  //dpm ($node_station); return;
+  
   $ten = $node_station->title;
   $matram = $node_station->field_station_code['und'][0]['value'];
   $ten_tinh = $node_station->field_station_province_city['und'][0]['value'];
+  
+  dpm($ten_tinh); return '1';
   
   $tinh = array(
     "thanh_hoa" =>28,
@@ -49,27 +59,34 @@ function _datalogger_ftp_txt_export_inc($tram) {
   
   $matinh = $tinh[$ten_tinh];
   
+  dpm($matinh); return '1';
+  
   //$d = 6; $m = 11; $y = 2013;
   $now = getdate();
   $h = $now["hours"];
   $d = $now["mday"]; $m = $now["mon"]; $y = $now["year"];
   
-  $d_min = 1; $m_min = 8; $y_min = 2013;
+  $d_min = $d; $m_min = $m; $y_min = $y;
   
-  $time_min = yesterday_time($d_min, $m_min, $y_min)->format('Y-m-d') . "  19:00";
+  $time_min = yesterday_time($d_min, $m_min, $y_min)->format('Y-m-d') . "  19:00"; 
+  //$time_min = "2014-03-25". "  19:00";
   $time_max = tomorow_time($d, $m, $y)->format('Y-m-d') . "  00:00";
   
   $query = 'SELECT DISTINCT f.field_rainfall_send_time_value, f.entity_id
-                FROM {field_data_field_rainfall_send_time} f ';
-  $query .= ' LEFT JOIN {field_data_field_rainfall_station} fs ON fs.entity_id=f.entity_id';
+                FROM datalogger_field_data_field_rainfall_send_time f ';
+  $query .= ' LEFT JOIN datalogger_field_data_field_rainfall_station fs ON fs.entity_id=f.entity_id';
   $query .= '  WHERE f.bundle = \'rainfall\' AND f.entity_type = \'node\' ';
+ 
+  
  
   // Set station
   if(isset($query_station)) $query .= '  AND fs.field_rainfall_station_nid = '.$query_station;
   if(isset($time_min)&&isset($time_max)) $query .= '  AND f.field_rainfall_send_time_value >= '.strtotime($time_min) .
                                                    ' AND  f.field_rainfall_send_time_value <= '.strtotime($time_max);
-  $query .= ' GROUP BY f.field_rainfall_send_time_value';
+  $query .= ' GROUP BY f.field_rainfall_send_time_value, f.entity_id';
  
+  //dpm($query); return;
+  
   // Result is returned as a iterable object that returns a stdClass object on each iteration
   $result = db_query($query);
   
@@ -91,6 +108,8 @@ function _datalogger_ftp_txt_export_inc($tram) {
     }
   }
   
+  
+  
   if (!count($sms_id)) $sms_id = array(-1);
   $sms_id_s = implode(',', $sms_id);
   
@@ -103,8 +122,6 @@ function _datalogger_ftp_txt_export_inc($tram) {
   foreach ($result as $r) {
     $sms[$r->ID] = $r->TextDecoded;
   }
-  
-  // $dpm = array();
   
   $ten = convert_vi_to_en($ten);
   
@@ -140,6 +157,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
     
     $batt = intval(substr($sms[$node->field_rainfall_sms_id['und'][0]['value']], 133, 3));
     $batt = $batt / 10.0;
+    
     $batt = number_format($batt, 1, '.', '') . ($batt < 10 ? '0' : '');
     
     $rain[0] = intval(substr($sms[$node->field_rainfall_sms_id['und'][0]['value']], 36, 5));
@@ -148,7 +166,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
     $rain[3] = intval(substr($sms[$node->field_rainfall_sms_id['und'][0]['value']], 87, 5));
     $rain[4] = intval(substr($sms[$node->field_rainfall_sms_id['und'][0]['value']], 104, 5));
     $rain[5] = intval(substr($sms[$node->field_rainfall_sms_id['und'][0]['value']], 121, 5));
-    
+        
     $RnOb = $rain[0] + $rain[1]+ $rain[2]+ $rain[3]+ $rain[4]+ $rain[5];
     if($i >= 1)
     {
@@ -188,7 +206,7 @@ function _datalogger_ftp_txt_export_inc($tram) {
       $out .= sprintf("%10d%10d%10d%10d%10d%10d\r\n", $rain[0], $rain[1], $rain[2], $rain[3], $rain[4], $rain[5]);
       
     }
-  }
+  } 
   
   if(intval($h) == 0) {
     $h_ = 24;
@@ -238,7 +256,7 @@ function write_to_text($str,$matram, $year, $month, $day, $hour, $file_path)  {
 }
 
 function creat_folder($matinh, $matram, $year, $month, $day) {
-  $file_path = sprintf("F:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
+  $file_path = sprintf("E:\KTTV_3_DataDemo\Success\%02d\%06d\%4d\%02d\%02d", $matinh, $matram, $year, $month, $day);
   
   if(!file_exists($file_path)) {
     mkdir($file_path, 0700, true);
